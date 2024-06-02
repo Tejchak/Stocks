@@ -94,14 +94,19 @@ public class ModelStock {
     }
     String[] outputInLines = output.toString().split("\n");
     Double startprice = 0.0;
+    Double endprice = 0.0;
     for (String line: outputInLines) {
-      if (line.substring(0,11).equals(startDate)) {
+      if (line.substring(0,10).equals(startDate)) {
         String[] sections = line.split(",");
         startprice = Double.parseDouble(sections[1]);
       }
+      if (line.substring(0,10).equals(startDate)) {
+        String[] sections = line.split(",");
+        endprice = Double.parseDouble(sections[1]);
+      }
     }
   //  System.out.println("Return value: ");
-   // System.out.println(output.toString());
+    System.out.println(output.toString());
     System.out.println(startprice);
   }
 

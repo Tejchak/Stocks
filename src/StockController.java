@@ -1,2 +1,8 @@
-package PACKAGE_NAME;public interface StockController {
+public interface StockController {
+
+  /**
+   * start.
+   */
+  public void start();
+
 }

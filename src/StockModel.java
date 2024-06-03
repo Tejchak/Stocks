@@ -13,7 +13,7 @@ public class StockModel {
     this.apiKey = "F99D5A7QDFY52B58";
   }
 
-  private String[] getStockData(String stockSymbol) {
+  protected String[] getStockData(String stockSymbol) {
     URL url = null;
     try {
       /*
@@ -61,12 +61,10 @@ public class StockModel {
     return output.toString().split("\n");
   }
 
-  protected Double stockGainLoss(String stockSymbol, String startDate, String endDate) {
-    String[] outputInLines = this.getStockData(stockSymbol);
-    System.out.println(Arrays.toString(outputInLines));
+  protected Double stockGainLoss(String[] stockData, String startDate, String endDate) {
     Double startPrice = 0.0;
     Double endPrice = 0.0;
-    for (String line: outputInLines) {
+    for (String line: stockData) {
       if (line.substring(0,10).equals(startDate)) {
         String[] sections = line.split(",");
         startPrice = Double.parseDouble(sections[4]);
@@ -77,27 +75,54 @@ public class StockModel {
       }
     }
     Double gainLoss = endPrice - startPrice;
-    return 0.0;
+    return gainLoss;
   }
 
-  protected Double movingAverage(String stockSymbol, String startDate, int xDays) {
-    String[] outputInLines = getStockData(stockSymbol);
+  protected Double movingAverage(String[] stockData, String startDate, int xDays) {
     Double movingAverage = 0.0;
     int startIndex = -1;
-    for (int i = 0; i < outputInLines.length; i++) {
-      String line = outputInLines[i];
+    for (int i = 0; i < stockData.length; i++) {
+      String line = stockData[i];
       if (line.substring(0, 10).equals(startDate)) {
         String[] sections = line.split(",");
         startIndex = i;
       }
     }
     for (int j = startIndex; j < startIndex + xDays; j++) {
-      String line = outputInLines[j];
+      String line = stockData[j];
       String[] sections = line.split(",");
       movingAverage += Double.parseDouble(sections[4]);
     }
     movingAverage /= xDays;
     return movingAverage;
+  }
+
+  public StringBuilder xDayCrossover(String[] stockData, String startDate, String endDate, int xDays) {
+    StringBuilder crossovers = new StringBuilder();
+    int startIndex = -1;
+    int endIndex = -2;
+    for (int i = 0; i < stockData.length; i++) {
+      String line = stockData[i];
+      if (line.substring(0, 10).equals(startDate)) {
+        endIndex = i;
+      }
+      if (line.substring(0, 10).equals(endDate)) {
+        startIndex = i;
+      }
+    }
+    for (int j = startIndex; j < endIndex + 1; j++) {
+        String line = stockData[j];
+        String[] sections = line.split(",");
+        if (this.isCrossover(stockData, sections[0], xDays, Double.parseDouble(sections[2]))) {
+          crossovers.append(sections[0]).append(", ");
+        }
+      }
+      return crossovers;
+
+  }
+
+  private boolean isCrossover(String[] stockData, String startDate, int xDays, Double highestPrice) {
+    return highestPrice - this.movingAverage(stockData, startDate, xDays) > 0;
   }
 
 }

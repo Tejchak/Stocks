@@ -10,23 +10,49 @@ public class StockControllerImpl implements StockController{
   }
 
   public void startProgram() {
-    int option = view.createWelcomeMenu();
-    switch (option) {
-      case 1:
-        handleGainLoss();
-        break;
-      case 2:
-        handleMovingAverage();
-        break;
-      case 3:
-        handleCrossover();
-        break;
-      case 4:
-        view.displayResult("Examine or create portfolio not implemented yet.");
-        break;
-      default:
-        view.displayResult("Invalid option.");
+    view.displayResult("Welcome to the Stocks Program!");
+    boolean endProgram = false;
+    while(!endProgram) {
+      int option = view.createMenu();
+      switch (option) {
+        case 1:
+          handleGainLoss();
+          break;
+        case 2:
+          handleMovingAverage();
+          break;
+        case 3:
+          handleCrossover();
+          break;
+        case 4:
+          this.handlePortfolioMenu();
+          break;
+        case 5:
+          endProgram = true;
+          break;
+        default:
+          view.displayResult("Invalid Number: Please pick between options 1 through 5");
+      }
     }
+  }
+
+  private void handlePortfolioMenu() {
+    int option = view.portfolioMenu();
+    switch(option) {
+      case 1:
+        handleNewPortfolio();
+    }
+  }
+
+  private void handleNewPortfolio() {
+    String name = view.getStringInput("Type the name for your portfolio");
+    view.displayResult("You must have atleast one stock in your portfolio");
+    String stockSymbol = view.getStockSymbol();
+    while (!model.checkStockExists(stockSymbol)) {
+      view.displayResult("Sorry it appears your stock doesn't exist in out database");
+      stockSymbol = view.getStockSymbol();
+    }
+    model.createPortfolio(name, stockSymbol);
   }
 
   private void handleGainLoss() {

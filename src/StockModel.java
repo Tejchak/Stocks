@@ -4,13 +4,18 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class StockModel {
   private final String apiKey;
+  private final Map<String, ArrayList<String>> portfolios;
 
   StockModel() {
     this.apiKey = "F99D5A7QDFY52B58";
+    this.portfolios = new HashMap<String, ArrayList<String>>();
   }
 
   protected String[] getStockData(String stockSymbol) {
@@ -57,8 +62,44 @@ public class StockModel {
     catch (IOException e) {
       throw new IllegalArgumentException("No price data found for "+stockSymbol);
     }
-    System.out.println(output.toString());
+   // System.out.println(output.toString());
     return output.toString().split("\n");
+  }
+
+  protected boolean checkStockExists(String stockSymbol) {
+    URL url = null;
+    try {
+      url = new URL("https://www.alphavantage"
+              + ".co/query?function=TIME_SERIES_DAILY"
+              + "&outputsize=full"
+              + "&symbol"
+              + "=" + stockSymbol + "&apikey="+this.apiKey+"&datatype=csv");
+    }
+    catch (MalformedURLException e) {
+      throw new RuntimeException("the alphavantage API has either changed or "
+              + "no longer works");
+    }
+
+    InputStream in = null;
+    StringBuilder output = new StringBuilder();
+
+    try {
+
+      in = url.openStream();
+      int b;
+
+      while ((b=in.read())!=-1) {
+        output.append((char)b);
+      }
+    }
+    catch (IOException e) {
+      throw new IllegalArgumentException("No price data found for "+stockSymbol);
+    }
+    return !output.toString().contains("\"Error Message\":");
+  }
+
+  protected void createPortfolio(String name, String stockSymbol) {
+    this.portfolios.put(name, new ArrayList<String>(Collections.singletonList(stockSymbol)));
   }
 
   protected Double stockGainLoss(String[] stockData, String startDate, String endDate) {

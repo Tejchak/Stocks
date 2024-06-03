@@ -8,27 +8,54 @@ public class StockView {
     this.scanner = scanner;
   }
 
-  public int createWelcomeMenu() {
-    System.out.println("Welcome to the stocks program\n Here you can practice trading stocks!");
+  public int createMenu() {
     System.out.println("What would you like to do today?");
-    System.out.println("Would you like to examine the gain or loss of a specific stock? Type 1");
-    System.out.println("Would you like to examine the x-day moving average of a stock for a "
-            + "specified date and a specified value of x? Type 2");
-    System.out.println("Would you like to find the x-day crossovers for a stock"
-            + " over a specified date range and a specified value of x? Type 3");
-    System.out.println("Would you like to examine or create a portfolio? Type 4");
-    return this.scanner.nextInt();
+    System.out.println("1. Examine the gain or loss of a specific stock");
+    System.out.println("2. Examine the x-day moving average of a stock");
+    System.out.println("3. Find the x-day crossovers for a stock");
+    System.out.println("4. Examine or create a portfolio");
+    System.out.println("5. Quit the program");
+    return getValidNum("Please enter a number between 1 and 5: ");
+  }
+
+  public int portfolioMenu() {
+    System.out.println("1. Create a new portfolio?");
+    System.out.println("2. Add stock to a portfolio?");
+    System.out.println("3. Take away stock from a portfolio?");
+    System.out.println("4. Calculate the value of a portfolio?");
+    return getValidNum("Please enter a number between 1 and 4: ");
+  }
+
+  private int getValidNum(String prompt) {
+    int input = 0;
+    boolean validInput = false;
+    while (!validInput) {
+      System.out.print(prompt);
+      if (scanner.hasNextInt()) {
+        input = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+        validInput = true;
+      } else {
+        System.out.println("Invalid input. Please enter a number.");
+        scanner.next(); // Discard invalid input
+      }
+    }
+    return input;
+  }
+
+  public String getStringInput(String prompt) {
+    System.out.println(prompt);
+    return this.scanner.next();
   }
 
   public String getStockSymbol() {
-    System.out.println("Type the stock symbol (e.g., GOOG):");
-    return this.scanner.next();
+    return getStringInput("Type the stock symbol (e.g., GOOG):");
   }
 
   public String getDate(String prompt) {
-    System.out.println("Type the " + prompt + " date (YYYY-MM-DD):");
-    return this.scanner.next();
+    return getStringInput("Type the " + prompt + " date (YYYY-MM-DD):");
   }
+
 
   public int getXDays() {
     System.out.println("Type the number of days for moving average:");
@@ -36,6 +63,7 @@ public class StockView {
   }
 
   public void displayResult(String result) {
+
     System.out.println(result);
   }
 }

@@ -5,10 +5,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class ModelStock {
+public class StockModel {
   private final String apiKey;
 
-  ModelStock() {
+  StockModel() {
     this.apiKey = "F99D5A7QDFY52B58";
   }
 
@@ -63,9 +63,8 @@ public class ModelStock {
               + ".co/query?function=TIME_SERIES_DAILY"
               + "&outputsize=full"
               + "&symbol"
-              + "=" + stockSymbol + "&apikey="+this.apiKey+"&datatype=csv");
-    }
-    catch (MalformedURLException e) {
+              + "=" + stockSymbol + "&apikey=" + this.apiKey + "&datatype=csv");
+    } catch (MalformedURLException e) {
       throw new RuntimeException("the alphavantage API has either changed or "
               + "no longer works");
     }
@@ -86,29 +85,28 @@ public class ModelStock {
       in = url.openStream();
       int b;
 
-      while ((b=in.read())!=-1) {
-        output.append((char)b);
+      while ((b = in.read()) != -1) {
+        output.append((char) b);
       }
-    }
-    catch (IOException e) {
-      throw new IllegalArgumentException("No price data found for "+stockSymbol);
+    } catch (IOException e) {
+      throw new IllegalArgumentException("No price data found for " + stockSymbol);
     }
     String[] outputInLines = output.toString().split("\n");
     Double startPrice = 0.0;
     Double endPrice = 0.0;
-    for (String line: outputInLines) {
-      if (line.substring(0,10).equals(startDate)) {
+    for (String line : outputInLines) {
+      if (line.substring(0, 10).equals(startDate)) {
         String[] sections = line.split(",");
         startPrice = Double.parseDouble(sections[4]);
       }
-      if (line.substring(0,10).equals(endDate)) {
+      if (line.substring(0, 10).equals(endDate)) {
         String[] sections = line.split(",");
         endPrice = Double.parseDouble(sections[4]);
       }
     }
     Double gainLoss = endPrice - startPrice;
-  //  System.out.println("Return value: ");
-   System.out.println(output.toString());
+    //  System.out.println("Return value: ");
+    System.out.println(output.toString());
     System.out.println("The gain/loss over that period of time is" + gainLoss);
   }
 
@@ -174,6 +172,13 @@ public class ModelStock {
         startIndex = i;
       }
     }
+    double movingAverage = 0.0;
+    for (int j = startIndex; j < startIndex + xDays; j++) {
+      String line = outputInLines[j];
+      String[] sections = line.split(",");
+      movingAverage += Double.parseDouble(sections[4]);
+    }
+    movingAverage /= xDays;
+    System.out.println("The moving average is " + movingAverage);
   }
-
 }

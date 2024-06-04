@@ -41,7 +41,13 @@ public class StockControllerImpl implements StockController{
     switch(option) {
       case 1:
         handleNewPortfolio();
+      case 2:
+        addStockToPortfolio();
     }
+  }
+
+  private void addStockToPortfolio() {
+
   }
 
   private void handleNewPortfolio() {

@@ -1,8 +1,5 @@
-public interface StockController {
 
-  /**
-   * start.
-   */
-  public void start();
+interface StockController {
 
+  public void startProgram();
 }

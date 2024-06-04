@@ -1,3 +1,5 @@
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -16,6 +18,24 @@ public class StockModel {
   StockModel() {
     this.apiKey = "F99D5A7QDFY52B58";
     this.portfolios = new HashMap<String, ArrayList<String>>();
+  }
+
+  protected String[] getStockDataCSV(String stocksymbol) throws FileNotFoundException {
+    StringBuilder result = new StringBuilder();
+    try {
+      Scanner scanner = new Scanner(new File("data/" + stocksymbol + ".csv"));
+      if (scanner.hasNextLine()) {
+        result.append(scanner.nextLine());
+      }
+
+      while (scanner.hasNextLine()) {
+        result.append(scanner.nextLine());
+      }
+    }
+    catch (FileNotFoundException e) {
+      throw new RuntimeException("Could not find file " + stocksymbol + ".csv");
+    }
+    return result.toString().split("/n");
   }
 
   protected String[] getStockData(String stockSymbol) {

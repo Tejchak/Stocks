@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class StockModel {
@@ -22,20 +23,28 @@ public class StockModel {
 
   protected String[] getStockDataCSV(String stocksymbol) throws FileNotFoundException {
     StringBuilder result = new StringBuilder();
-    try {
-      Scanner scanner = new Scanner(new File("data/" + stocksymbol + ".csv"));
-      if (scanner.hasNextLine()) {
-        result.append(scanner.nextLine());
-      }
+    URL url = null;
 
-      while (scanner.hasNextLine()) {
-        result.append(scanner.nextLine());
+    try {
+      url = getClass().getClassLoader().getResource(stocksymbol + ".csv");
+    }
+    catch (NullPointerException e) {
+      throw new RuntimeException("the alphavantage API has either changed or "
+              + "no longer works");
+    }
+
+    try {
+      InputStream is = url.openStream();
+      int b;
+
+      while ((b=is.read())!=-1) {
+        result.append((char)b);
       }
     }
-    catch (FileNotFoundException e) {
+    catch (IOException e) {
       throw new RuntimeException("Could not find file " + stocksymbol + ".csv");
     }
-    return result.toString().split("/n");
+    return result.toString().split("\n");
   }
 
   protected String[] getStockData(String stockSymbol) {

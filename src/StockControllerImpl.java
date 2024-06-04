@@ -19,7 +19,7 @@ public class StockControllerImpl implements StockController{
         handleMovingAverage();
         break;
       case 3:
-        view.displayResult("x-day crossovers not implemented yet.");
+        handleCrossover();
         break;
       case 4:
         view.displayResult("Examine or create portfolio not implemented yet.");
@@ -43,6 +43,15 @@ public class StockControllerImpl implements StockController{
     int xDays = view.getXDays();
     double movingAverage = model.movingAverage(stockSymbol, startDate, xDays);
     view.displayResult("The " + xDays + "-day moving average is " + movingAverage);
+  }
+
+  private void handleCrossover() {
+    String stockSymbol = view.getStockSymbol();
+    String startDate = view.getDate("start");
+    String endDate = view.getDate("end");
+    int xDays = view.getXDays();
+    String crossover = model.xdayCrossover(stockSymbol, startDate, endDate, xDays);
+    view.displayResult("The " + xDays + "-day crossovers for your specified dates are:" + crossover);
   }
 
 }

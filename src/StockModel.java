@@ -10,7 +10,7 @@ public class StockModel {
   private final String apiKey;
 
   StockModel() {
-    this.apiKey = "F99D5A7QDFY52B58";
+    this.apiKey = "UKFRFIDTUCC65L7C.";
   }
 
   private String[] getStockData(String stockSymbol) {
@@ -76,8 +76,7 @@ public class StockModel {
         endPrice = Double.parseDouble(sections[4]);
       }
     }
-    Double gainLoss = endPrice - startPrice;
-    return 0.0;
+    return endPrice - startPrice;
   }
 
   protected Double movingAverage(String stockSymbol, String startDate, int xDays) {
@@ -100,4 +99,26 @@ public class StockModel {
     return movingAverage;
   }
 
+  protected String xdayCrossover(String stockSymbol,
+                                        String startDate, String endDate, int xDays) {
+    String[] outputInLines = getStockData(stockSymbol);
+    StringBuilder xdayCrossover = new StringBuilder();
+    boolean inRange = false;
+    for (int i = 0; i < outputInLines.length; i++) {
+      String line = outputInLines[i];
+      if (line.substring(0, 10).equals(startDate)) {
+        inRange = true;
+      }
+      if (inRange) {
+        String[] sections = line.split(",");
+        if (Double.parseDouble(sections[4]) > this.movingAverage(stockSymbol, startDate, xDays)) {
+          xdayCrossover.append(sections[0]).append(",");
+        }
+      }
+      if (line.substring(0, 10).equals(startDate)) {
+        inRange = false;
+      }
+    }
+    return xdayCrossover.toString();
+  }
 }

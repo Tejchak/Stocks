@@ -154,7 +154,7 @@ public class StockModel {
     for (int j = startIndex; j < endIndex + 1; j++) {
         String line = stockData[j];
         String[] sections = line.split(",");
-        if (this.isCrossover(stockData, sections[0], xDays, Double.parseDouble(sections[2]))) {
+        if (this.isCrossover(stockData, sections[0], xDays, Double.parseDouble(sections[4]))) {
           crossovers.append(sections[0]).append(", ");
         }
       }

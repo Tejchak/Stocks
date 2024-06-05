@@ -21,7 +21,7 @@ public class StockModel {
     this.portfolios = new HashMap<String, ArrayList<String>>();
   }
 
-  protected String[] getStockDataCSV(String stocksymbol) throws FileNotFoundException {
+  protected String[] getStockDataCSV(String stocksymbol) {
     StringBuilder result = new StringBuilder();
     URL url = null;
 

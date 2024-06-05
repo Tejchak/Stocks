@@ -1,4 +1,4 @@
-
+import java.io.FileNotFoundException;
 
 public class StockControllerImpl implements StockController{
   private final StockModel model;
@@ -59,7 +59,7 @@ public class StockControllerImpl implements StockController{
     String stockSymbol = view.getStockSymbol();
     String startDate = view.getDate("start");
     String endDate = view.getDate("end");
-    double gainLoss = model.stockGainLoss(model.getStockData(stockSymbol), startDate, endDate);
+    double gainLoss = model.stockGainLoss(model.getStockDataCSV(stockSymbol), startDate, endDate);
     view.displayResult("The gain/loss over that period of time is " + gainLoss);
   }
 
@@ -67,7 +67,7 @@ public class StockControllerImpl implements StockController{
     String stockSymbol = view.getStockSymbol();
     String startDate = view.getDate("start");
     int xDays = view.getXDays();
-    double movingAverage = model.movingAverage(model.getStockData(stockSymbol), startDate, xDays);
+    double movingAverage = model.movingAverage(model.getStockDataCSV(stockSymbol), startDate, xDays);
     view.displayResult("The " + xDays + "-day moving average is " + movingAverage);
   }
 
@@ -76,7 +76,7 @@ public class StockControllerImpl implements StockController{
     String startDate = view.getDate("start");
     String endDate = view.getDate("end");
     int xDays = view.getXDays();
-    StringBuilder crossovers = model.xDayCrossover(model.getStockData(stockSymbol), startDate, endDate, xDays);
+    StringBuilder crossovers = model.xDayCrossover(model.getStockDataCSV(stockSymbol), startDate, endDate, xDays);
     if (crossovers.length() >= 2) {
       crossovers.delete(crossovers.length() - 2, crossovers.length());
     }

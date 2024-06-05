@@ -6,7 +6,7 @@ public class Main {
   public static void main(String[] args) {
     StockView view = new StockView();
     StockModel model = new StockModel();
-    StockControllerImpl controller = new StockControllerImpl(model, view, new Scanner (System.in));
+    StockControllerImpl controller = new StockControllerImpl(model, view, new Scanner(System.in));
     controller.startProgram();
   }
 }

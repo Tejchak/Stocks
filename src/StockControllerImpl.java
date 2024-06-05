@@ -87,8 +87,11 @@ public class StockControllerImpl implements StockController {
         break;
       case 2:
         int shares;
-        getStringInput("Enter the name of the portfolio you would like to add to: ");
-        String portfolioName = scanner.nextLine();
+        String portfolioName = getStringInput("Enter the name of the portfolio you would like to add to: ");
+        while (!model.existingPortfolio(portfolioName)) {
+          portfolioName = getStringInput("Portfolio " + portfolioName +
+                  " does not exist. Please enter another name.");
+        }
         String stockSymbol = getStockSymbol();
         shares = getValidPositiveNum("How many shares would you like to get" +
                 "(you can only purchase whole shares):");
@@ -96,8 +99,11 @@ public class StockControllerImpl implements StockController {
         break;
       case 3:
         int share;
-        getStringInput("Enter the name of the portfolio you would like to take away from: ");
-        String pName = scanner.nextLine();
+        String pName = getStringInput("Enter the name of the portfolio you would like to take away from: ");
+        while (!model.existingPortfolio(pName)) {
+          pName = getStringInput("Portfolio " + pName +
+                  " does not exist. Please enter a name.");
+        }
         String symbol = getStockSymbol();
         share = getValidPositiveNum("How many shares would you like to remove" +
                 "(you can only purchase whole shares):");
@@ -106,7 +112,11 @@ public class StockControllerImpl implements StockController {
         case 4:
           String n = getStringInput("Enter the name of the portfolio you " +
                   "would like to calculate the value of: ");
-          String date = getDate("Enter the date you would like " +
+          while (!model.existingPortfolio(n)) {
+            n = getStringInput("Portfolio " + n +
+                    " does not exist. Please enter a name.");
+          }
+          String date = getDate("date you would like " +
                   "to calculate the value on: ");
           view.displayResult(n + " is worth " + model.calculatePortfolio(n, date) + " USD");
     }

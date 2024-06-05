@@ -263,4 +263,12 @@ public class StockModel {
     return highestPrice - this.movingAverage(stockData, startDate, xDays) > 0;
   }
 
+  protected boolean existingPortfolio(String n) {
+    for (Portfolio p : this.portfolios) {
+      if (p.name.equals(n)) {
+        return true;
+      }
+    }
+    return false;
+  }
 }

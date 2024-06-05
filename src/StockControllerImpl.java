@@ -1,20 +1,61 @@
 import java.io.FileNotFoundException;
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class StockControllerImpl implements StockController{
   private final StockModel model;
   private final StockView view;
+  private final Scanner scanner;
 
-  public StockControllerImpl(StockModel model, StockView view) {
+  public StockControllerImpl(StockModel model, StockView view, Scanner scanner) {
     this.model = model;
     this.view = view;
+    this.scanner = scanner;
+  }
+
+  public String getStringInput(String prompt) {
+    view.displayResult(prompt);
+    return this.scanner.nextLine();
+  }
+
+  public String getStockSymbol() {
+    return getStringInput("Type the stock symbol (e.g., GOOG):");
+  }
+
+  public String getDate(String prompt) {
+
+    return getStringInput("Type the " + prompt + " date (YYYY-MM-DD):");
+  }
+
+  protected int getValidPositiveNum(String prompt) {
+    int input = 0;
+    boolean validInput = false;
+    while (!validInput) {
+      view.displayResult(prompt);
+      if (scanner.hasNextInt()) {
+        input = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+        if (input > 0) {
+          validInput = true;
+        }
+        else {
+          view.displayResult("Invalid input. Please enter a positive number.");
+        }
+
+      } else {
+        view.displayResult("Invalid input. Please enter a positive number.");
+        scanner.next();
+      }
+    }
+    return input;
   }
 
   public void startProgram() {
     view.displayResult("Welcome to the Stocks Program!");
     boolean endProgram = false;
     while(!endProgram) {
-      int option = view.createMenu();
+      view.createMenu();
+      int option = getValidPositiveNum("Please enter a number between 1 and 5");
       switch (option) {
         case 1:
           handleGainLoss();
@@ -38,7 +79,8 @@ public class StockControllerImpl implements StockController{
   }
 
   private void handlePortfolioMenu() {
-    int option = view.portfolioMenu();
+    view.portfolioMenu();
+    int option = getValidPositiveNum("Please enter a number between 1 and 4");
     switch(option) {
       case 1:
         handleNewPortfolio();
@@ -52,12 +94,12 @@ public class StockControllerImpl implements StockController{
   }
 
   private void handleNewPortfolio() {
-    String name = view.getStringInput("Type the name for your portfolio");
+    String name = getStringInput("Type the name for your portfolio");
     view.displayResult("You must have atleast one stock in your portfolio");
-    String stockSymbol = view.getStockSymbol();
+    String stockSymbol = getStockSymbol();
     while (!model.checkStockExists(stockSymbol)) {
       view.displayResult("Sorry it appears your stock doesn't exist in out database");
-      stockSymbol = view.getStockSymbol();
+      stockSymbol = getStockSymbol();
     }
     model.createPortfolio(name, stockSymbol);
     view.displayResult("Successfully created portfolio");
@@ -72,7 +114,7 @@ public class StockControllerImpl implements StockController{
       } catch (IllegalArgumentException e) {
         view.displayResult("Sorry the date you entered wasn't a trading day. Please make sure you "
                 + "you have the correct format and try again: E.G 2024-05-09");
-        date = view.getDate(startEnd);
+        date = getDate(startEnd);
       }
     }
     return line;
@@ -88,46 +130,46 @@ public class StockControllerImpl implements StockController{
         }
         else {
           view.displayResult("Your symbol doesn't exist in our database. Please try again.");
-          stockSymbol = view.getStockSymbol();
+          stockSymbol = getStockSymbol();
         }
       }
       catch (IllegalArgumentException e) {
         view.displayResult("Your symbol doesn't exist in our database. Please try again.");
-        stockSymbol = view.getStockSymbol();
+        stockSymbol = getStockSymbol();
       }
     }
     return stockData;
   }
 
   private void handleGainLoss() {
-    String stockSymbol = view.getStockSymbol();
+    String stockSymbol = getStockSymbol();
     String[] stockData = getValidStock(stockSymbol);
-    String startDate = view.getDate("start");
+    String startDate = getDate("start");
     String[] startDateLine = getValidTradingDay(stockData, startDate, "start");
-    String endDate = view.getDate("end");
+    String endDate = getDate("end");
     String[] endDateLine = getValidTradingDay(stockData, endDate, "end");
-    double gainLoss = model.stockGainLoss(model.getStockData(stockSymbol), startDateLine, endDateLine);
+    double gainLoss = model.stockGainLoss(stockData, startDateLine, endDateLine);
     view.displayResult("The gain/loss over that period of time is " + gainLoss);
   }
 
   private void handleMovingAverage() {
-    String stockSymbol = view.getStockSymbol();
+    String stockSymbol = getStockSymbol();
     String[] stockData = getValidStock(stockSymbol);
-    String startDate = view.getDate("start");
+    String startDate = getDate("start");
     startDate = getValidTradingDay(stockData, startDate, "start")[0];
-    int xDays = view.getValidPositiveNum("Type the number of days for moving average:");
-    double movingAverage = model.movingAverage(model.getStockData(stockSymbol), startDate, xDays);
+    int xDays = getValidPositiveNum("Type the number of days for moving average:");
+    double movingAverage = model.movingAverage(stockData, startDate, xDays);
     view.displayResult("The " + xDays + "-day moving average is " + movingAverage);
   }
 
   private void handleCrossover() {
-    String stockSymbol = view.getStockSymbol();
+    String stockSymbol = getStockSymbol();
     String[] stockData = getValidStock(stockSymbol);
-    String startDate = view.getDate("start");
+    String startDate = getDate("start");
     startDate = getValidTradingDay(stockData, startDate, "start")[0];
-    String endDate = view.getDate("end");
+    String endDate = getDate("end");
     endDate = getValidTradingDay(stockData, endDate, "end")[0];
-    int xDays =  view.getValidPositiveNum("Type the number of days for moving average:");
+    int xDays =  getValidPositiveNum("Type the number of days for moving average:");
     StringBuilder crossovers = model.xDayCrossover(stockData, startDate, endDate, xDays);
     if (crossovers.length() >= 2) {
       crossovers.delete(crossovers.length() - 2, crossovers.length());

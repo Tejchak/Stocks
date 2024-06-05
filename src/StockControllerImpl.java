@@ -54,6 +54,8 @@ public class StockControllerImpl implements StockController{
     String name = view.getStringInput("Type the name for your portfolio");
     view.displayResult("You must have atleast one stock in your portfolio");
     String stockSymbol = view.getStockSymbol();
+    System.out.println(stockSymbol);
+    model.getStockDataCSV(stockSymbol);
     while (!model.checkStockExists(stockSymbol)) {
       view.displayResult("Sorry it appears your stock doesn't exist in out database");
       stockSymbol = view.getStockSymbol();

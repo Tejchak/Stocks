@@ -15,10 +15,33 @@ import java.util.Scanner;
 public class StockModel {
   private final String apiKey;
   private final Map<String, ArrayList<String>> portfolios;
+  private Map<String, String[]> stocks;
 
   StockModel() {
     this.apiKey = "F99D5A7QDFY52B58";
     this.portfolios = new HashMap<String, ArrayList<String>>();
+    this.stocks = new HashMap<String, String[]>();
+  }
+
+  public String[] getStockData(String stockSymbol) {
+    if (this.stocks.containsKey(stockSymbol)) {
+      return this.stocks.get(stockSymbol);
+    }
+    try {
+      String[] stockData = this.getStockDataCSV(stockSymbol);
+      this.stocks.put(stockSymbol, stockData);
+      return stockData;
+    }
+    catch (Exception e) {
+      try {
+        String[] stockData = this.getStockDataAPI(stockSymbol);
+        this.stocks.put(stockSymbol, stockData);
+        return stockData;
+      }
+      catch (Exception e2) {
+        throw new RuntimeException("Error getting stock data for symbol " + stockSymbol);
+      }
+    }
   }
 
   protected String[] getStockDataCSV(String stocksymbol) {
@@ -44,10 +67,12 @@ public class StockModel {
     catch (IOException e) {
       throw new RuntimeException("Could not find file " + stocksymbol + ".csv");
     }
-    return result.toString().split("\n");
+    String[] stockData = result.toString().split("\n");
+    Collections.reverse(Arrays.asList(stockData));
+    return stockData;
   }
 
-  protected String[] getStockData(String stockSymbol) {
+  protected String[] getStockDataAPI(String stockSymbol) {
     URL url = null;
     try {
       /*

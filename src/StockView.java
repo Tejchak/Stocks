@@ -45,7 +45,7 @@ public class StockView {
 
   public String getStringInput(String prompt) {
     System.out.println(prompt);
-    return this.scanner.next();
+    return this.scanner.nextLine();
   }
 
   public String getStockSymbol() {

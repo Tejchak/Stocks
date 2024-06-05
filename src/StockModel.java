@@ -14,12 +14,12 @@ import java.util.Scanner;
 
 public class StockModel {
   private final String apiKey;
-  private final Map<String, ArrayList<String>> portfolios;
+  private final ArrayList<Portfolio> portfolios;
   private Map<String, String[]> stocks;
 
   StockModel() {
     this.apiKey = "F99D5A7QDFY52B58";
-    this.portfolios = new HashMap<String, ArrayList<String>>();
+    this.portfolios = new ArrayList<Portfolio>();
     this.stocks = new HashMap<String, String[]>();
   }
 
@@ -33,14 +33,9 @@ public class StockModel {
       return stockData;
     }
     catch (Exception e) {
-      try {
         String[] stockData = this.getStockDataAPI(stockSymbol);
         this.stocks.put(stockSymbol, stockData);
         return stockData;
-      }
-      catch (Exception e2) {
-        throw new RuntimeException("Error getting stock data for symbol " + stockSymbol);
-      }
     }
   }
 
@@ -152,23 +147,44 @@ public class StockModel {
     return !output.toString().contains("\"Error Message\":");
   }
 
-  protected void createPortfolio(String name, String stockSymbol) {
-    this.portfolios.put(name, new ArrayList<String>(Collections.singletonList(stockSymbol)));
+  protected void createPortfolio(String name, String stockSymbol, int shares) {
+    Portfolio p = new Portfolio(name);
+    p.stocks.put(stockSymbol, shares);
+    this.portfolios.add(p);
   }
 
-  protected Double stockGainLoss(String[] stockData, String startDate, String endDate) {
-    Double startPrice = 0.0;
-    Double endPrice = 0.0;
-    for (String line: stockData) {
-      if (line.substring(0,10).equals(startDate)) {
-        String[] sections = line.split(",");
-        startPrice = Double.parseDouble(sections[4]);
+  protected void removeStockFromPortfolio(String portfolioName, String stockSymbol, int shares) {
+    for (Portfolio p : this.portfolios) {
+      if (p.name.equals(portfolioName)) {
+        p.stocks.put(stockSymbol, p.stocks.getOrDefault(stockSymbol, 0) - shares);
       }
-      if (line.substring(0,10).equals(endDate)) {
-        String[] sections = line.split(",");
-        endPrice = Double.parseDouble(sections[4]);
+      if (p.stocks.get(stockSymbol) <= 0) {
+        p.stocks.remove(stockSymbol);
       }
     }
+  }
+
+  protected void addStockToPortfolio(String portfolioName, String stockSymbol, int shares) {
+    for (Portfolio p : this.portfolios) {
+      if (p.name.equals(portfolioName)) {
+        p.stocks.put(stockSymbol, p.stocks.getOrDefault(stockSymbol, 0) + shares);
+      }
+    }
+  }
+
+  protected String[] getLine(String[] stockData, String date) {
+    for (String line: stockData) {
+      if (line.substring(0, 10).equals(date)) {
+        String[] sections = line.split(",");
+        return sections;
+      }
+    }
+    throw new IllegalArgumentException("Date does not exist for stock");
+  }
+
+  protected Double stockGainLoss(String[] stockData, String[] startDateLine, String[] endDateLine) {
+     Double startPrice = Double.parseDouble(startDateLine[4]);
+     Double endPrice = Double.parseDouble(endDateLine[4]);
     Double gainLoss = endPrice - startPrice;
     return gainLoss;
   }

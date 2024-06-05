@@ -14,11 +14,34 @@ import java.util.Scanner;
 
 public class StockModel {
   private final String apiKey;
-  private final ArrayList<Portfolio> portfolios;
+  private final Map<String, ArrayList<String>> portfolios;
+  private Map<String, String[]> stocks;
 
   StockModel() {
     this.apiKey = "F99D5A7QDFY52B58";
-    this.portfolios = new ArrayList<Portfolio>();
+    this.portfolios = new HashMap<String, ArrayList<String>>();
+    this.stocks = new HashMap<String, String[]>();
+  }
+
+  public String[] getStockData(String stockSymbol) {
+    if (this.stocks.containsKey(stockSymbol)) {
+      return this.stocks.get(stockSymbol);
+    }
+    try {
+      String[] stockData = this.getStockDataCSV(stockSymbol);
+      this.stocks.put(stockSymbol, stockData);
+      return stockData;
+    }
+    catch (Exception e) {
+      try {
+        String[] stockData = this.getStockDataAPI(stockSymbol);
+        this.stocks.put(stockSymbol, stockData);
+        return stockData;
+      }
+      catch (Exception e2) {
+        throw new RuntimeException("Error getting stock data for symbol " + stockSymbol);
+      }
+    }
   }
 
   protected String[] getStockDataCSV(String stocksymbol) {
@@ -29,8 +52,8 @@ public class StockModel {
       url = getClass().getClassLoader().getResource(stocksymbol + ".csv");
     }
     catch (NullPointerException e) {
-      throw new RuntimeException("The stock you entered is not in our database " +
-              stocksymbol);
+      throw new RuntimeException("the alphavantage API has either changed or "
+              + "no longer works");
     }
 
     try {
@@ -44,12 +67,12 @@ public class StockModel {
     catch (IOException e) {
       throw new RuntimeException("Could not find file " + stocksymbol + ".csv");
     }
-    String[] data = result.toString().split("\n");
-    Collections.reverse(Arrays.asList(data));
-    return data;
+    String[] stockData = result.toString().split("\n");
+    Collections.reverse(Arrays.asList(stockData));
+    return stockData;
   }
 
-  protected String[] getStockData(String stockSymbol) {
+  protected String[] getStockDataAPI(String stockSymbol) {
     URL url = null;
     try {
       /*
@@ -98,24 +121,39 @@ public class StockModel {
   }
 
   protected boolean checkStockExists(String stockSymbol) {
+    URL url = null;
     try {
-      this.getStockDataCSV(stockSymbol);
+      url = new URL("https://www.alphavantage"
+              + ".co/query?function=TIME_SERIES_DAILY"
+              + "&outputsize=full"
+              + "&symbol"
+              + "=" + stockSymbol + "&apikey="+this.apiKey+"&datatype=csv");
     }
-    catch (RuntimeException e) {
-      try {
-        this.getStockData(stockSymbol);
-      }
-      catch (RuntimeException e2) {
-        return false;
+    catch (MalformedURLException e) {
+      throw new RuntimeException("the alphavantage API has either changed or "
+              + "no longer works");
+    }
+
+    InputStream in = null;
+    StringBuilder output = new StringBuilder();
+
+    try {
+
+      in = url.openStream();
+      int b;
+
+      while ((b=in.read())!=-1) {
+        output.append((char)b);
       }
     }
-    return true;
+    catch (IOException e) {
+      throw new IllegalArgumentException("No price data found for "+stockSymbol);
+    }
+    return !output.toString().contains("\"Error Message\":");
   }
 
   protected void createPortfolio(String name, String stockSymbol) {
-    Portfolio p = new Portfolio(name);
-    p.stocks.add(stockSymbol);
-    this.portfolios.add(p);
+    this.portfolios.put(name, new ArrayList<String>(Collections.singletonList(stockSymbol)));
   }
 
   protected Double stockGainLoss(String[] stockData, String startDate, String endDate) {

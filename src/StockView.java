@@ -26,7 +26,7 @@ public class StockView {
     return getValidNum("Please enter a number between 1 and 4: ");
   }
 
-  private int getValidNum(String prompt) {
+  protected int getValidNum(String prompt) {
     int input = 0;
     boolean validInput = false;
     while (!validInput) {

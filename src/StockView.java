@@ -15,7 +15,7 @@ public class StockView {
     System.out.println("3. Find the x-day crossovers for a stock");
     System.out.println("4. Examine or create a portfolio");
     System.out.println("5. Quit the program");
-    return getValidNum("Please enter a number between 1 and 5: ");
+    return getValidPositiveNum("Please enter a number between 1 and 5: ");
   }
 
   public int portfolioMenu() {
@@ -23,10 +23,10 @@ public class StockView {
     System.out.println("2. Add stock to a portfolio?");
     System.out.println("3. Take away stock from a portfolio?");
     System.out.println("4. Calculate the value of a portfolio?");
-    return getValidNum("Please enter a number between 1 and 4: ");
+    return getValidPositiveNum("Please enter a number between 1 and 4: ");
   }
 
-  private int getValidNum(String prompt) {
+  protected int getValidPositiveNum(String prompt) {
     int input = 0;
     boolean validInput = false;
     while (!validInput) {
@@ -34,10 +34,16 @@ public class StockView {
       if (scanner.hasNextInt()) {
         input = scanner.nextInt();
         scanner.nextLine(); // Consume newline
-        validInput = true;
+        if (input > 0) {
+          validInput = true;
+        }
+        else {
+          System.out.println("Invalid input. Please enter a positive number.");
+        }
+
       } else {
-        System.out.println("Invalid input. Please enter a number.");
-        scanner.next(); // Discard invalid input
+        System.out.println("Invalid input. Please enter a positive number.");
+        scanner.next();
       }
     }
     return input;
@@ -53,14 +59,10 @@ public class StockView {
   }
 
   public String getDate(String prompt) {
+
     return getStringInput("Type the " + prompt + " date (YYYY-MM-DD):");
   }
 
-
-  public int getXDays() {
-    System.out.println("Type the number of days for moving average:");
-    return this.scanner.nextInt();
-  }
 
   public void displayResult(String result) {
 

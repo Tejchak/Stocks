@@ -33,14 +33,9 @@ public class StockModel {
       return stockData;
     }
     catch (Exception e) {
-      try {
         String[] stockData = this.getStockDataAPI(stockSymbol);
         this.stocks.put(stockSymbol, stockData);
         return stockData;
-      }
-      catch (Exception e2) {
-        throw new RuntimeException("Error getting stock data for symbol " + stockSymbol);
-      }
     }
   }
 
@@ -156,19 +151,19 @@ public class StockModel {
     this.portfolios.put(name, new ArrayList<String>(Collections.singletonList(stockSymbol)));
   }
 
-  protected Double stockGainLoss(String[] stockData, String startDate, String endDate) {
-    Double startPrice = 0.0;
-    Double endPrice = 0.0;
+  protected String[] getLine(String[] stockData, String date) {
     for (String line: stockData) {
-      if (line.substring(0,10).equals(startDate)) {
+      if (line.substring(0, 10).equals(date)) {
         String[] sections = line.split(",");
-        startPrice = Double.parseDouble(sections[4]);
-      }
-      if (line.substring(0,10).equals(endDate)) {
-        String[] sections = line.split(",");
-        endPrice = Double.parseDouble(sections[4]);
+        return sections;
       }
     }
+    throw new IllegalArgumentException("Date does not exist for stock");
+  }
+
+  protected Double stockGainLoss(String[] stockData, String[] startDateLine, String[] endDateLine) {
+     Double startPrice = Double.parseDouble(startDateLine[4]);
+     Double endPrice = Double.parseDouble(endDateLine[4]);
     Double gainLoss = endPrice - startPrice;
     return gainLoss;
   }

@@ -2,11 +2,8 @@ import java.io.InputStream;
 import java.util.Scanner;
 
 public class StockView {
-  private final Scanner scanner;
 
-  public StockView(Scanner scanner) {
-    this.scanner = scanner;
-  }
+  public StockView() {}
 
   public int createMenu() {
     System.out.println("What would you like to do today?");

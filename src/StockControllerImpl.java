@@ -7,10 +7,10 @@ public class StockControllerImpl implements StockController {
   private final StockView view;
   private final Scanner scanner;
 
-  public StockControllerImpl(StockModel model, StockView view) {
+  public StockControllerImpl(StockModel model, StockView view, Scanner scanner) {
     this.model = model;
     this.view = view;
-    this.scanner = new Scanner(System.in);
+    this.scanner = scanner;
   }
 
   public void startProgram() {

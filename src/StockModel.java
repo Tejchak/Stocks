@@ -147,6 +147,33 @@ public class StockModel {
     return !output.toString().contains("\"Error Message\":");
   }
 
+  protected double calculatePortfolio(String name, String date) {
+    double result = 0.0;
+    Portfolio portfolio = null;
+    for (Portfolio p : this.portfolios) {
+      while (portfolio == null) {
+        if (p.name.equals(name)) {
+          portfolio = p;
+        }
+      }
+    }
+    if (portfolio != null) {
+      for (String stockSymbol : portfolio.stocks.keySet()) {
+        String[] stockData = getStockData(stockSymbol);
+        Double value = 0.0;
+        for (int i = 0; i < stockData.length; i++) {
+          String line = stockData[i];
+          if (line.substring(0, 10).equals(date)) {
+            String[] sections = line.split(",");
+            value = Double.parseDouble(sections[4]);
+          }
+        }
+        result += (value * portfolio.stocks.getOrDefault(stockSymbol, 0));
+      }
+    }
+    return result;
+  }
+
   protected void createPortfolio(String name, String stockSymbol, int shares) {
     Portfolio p = new Portfolio(name);
     p.stocks.put(stockSymbol, shares);

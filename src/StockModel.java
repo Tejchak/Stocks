@@ -13,33 +13,17 @@ import java.util.Scanner;
 
 public class StockModel {
   private final String apiKey;
-  private Map<String, ArrayList<String>> portfolios;
-  private Map<String, String[]> stocks;
+  private final Map<String, ArrayList<String>> portfolios;
 
   StockModel() {
     this.apiKey = "F99D5A7QDFY52B58";
     this.portfolios = new HashMap<String, ArrayList<String>>();
-    this.stocks = new HashMap<String, String[]>();
-  }
-
-  protected String[] getStockData(String stockSymbol)  {
-    try {
-      return getStockDataCSV(stockSymbol);
-    }
-    catch (FileNotFoundException e) {
-      //ignore
-    }
-    if (stocks.containsKey(stockSymbol)) {
-      return stocks.get(stockSymbol);
-    }
-    this.stocks.put(stockSymbol, this.getStockDataAPI(stockSymbol));
-    return this.stocks.get(stockSymbol);
   }
 
   protected String[] getStockDataCSV(String stocksymbol) throws FileNotFoundException {
     StringBuilder result = new StringBuilder();
     try {
-      Scanner scanner = new Scanner(new File("Assignment4Stocks/StocksInfo/" + stocksymbol + ".csv"));
+      Scanner scanner = new Scanner(new File("data/" + stocksymbol + ".csv"));
       if (scanner.hasNextLine()) {
         result.append(scanner.nextLine());
       }
@@ -49,12 +33,12 @@ public class StockModel {
       }
     }
     catch (FileNotFoundException e) {
-      throw e;
+      throw new RuntimeException("Could not find file " + stocksymbol + ".csv");
     }
     return result.toString().split("/n");
   }
 
-  protected String[] getStockDataAPI(String stockSymbol) {
+  protected String[] getStockData(String stockSymbol) {
     URL url = null;
     try {
       /*
@@ -98,9 +82,7 @@ public class StockModel {
     catch (IOException e) {
       throw new IllegalArgumentException("No price data found for "+stockSymbol);
     }
-    if (output.toString().contains("\"Error Message\":")) {
-      throw new RuntimeException("Error, could not find stock data for "+stockSymbol);
-    }
+   // System.out.println(output.toString());
     return output.toString().split("\n");
   }
 

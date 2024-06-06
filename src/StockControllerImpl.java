@@ -1,5 +1,3 @@
-import java.io.FileNotFoundException;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class StockControllerImpl implements StockController {
@@ -7,10 +5,10 @@ public class StockControllerImpl implements StockController {
   private final StockView view;
   private final Scanner scanner;
 
-  public StockControllerImpl(StockModel model, StockView view, Scanner scanner) {
+  public StockControllerImpl(StockModel model, StockView view, Readable readable) {
     this.model = model;
     this.view = view;
-    this.scanner = scanner;
+    this.scanner = new Scanner(readable);
   }
 
   public String getStringInput(String prompt) {

@@ -1,5 +1,3 @@
-import java.io.FileNotFoundException;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class StockControllerImpl implements StockController {
@@ -7,10 +5,10 @@ public class StockControllerImpl implements StockController {
   private final StockView view;
   private final Scanner scanner;
 
-  public StockControllerImpl(StockModel model, StockView view, Scanner scanner) {
+  public StockControllerImpl(StockModel model, StockView view, Readable readable) {
     this.model = model;
     this.view = view;
-    this.scanner = scanner;
+    this.scanner = new Scanner(readable);
   }
 
   public String getStringInput(String prompt) {
@@ -135,6 +133,28 @@ public class StockControllerImpl implements StockController {
     view.displayResult("Successfully created portfolio");
   }
 
+  private String[] getValidEndDate(String[] stockData, String startDate,
+                                   String[] endLine) {
+    while (true) {
+      String endDate = endLine[0];
+      int startYear = Integer.parseInt(startDate.substring(0, 4));
+      int endYear = Integer.parseInt(endDate.substring(0, 4));
+      int startMonth = Integer.parseInt(startDate.substring(5, 7));
+      int endMonth = Integer.parseInt(endDate.substring(5, 7));
+      int startDay = Integer.parseInt(startDate.substring(8));
+      int endDay = Integer.parseInt(endDate.substring(8));
+      if (startYear > endYear || (startYear == endYear && startMonth > endMonth) ||
+              (startYear == endYear && startMonth == endMonth && startDay >= endDay)) {
+        view.displayResult("End date must be after start date");
+        endLine = getValidTradingDay(stockData, getDate("end"), "end");
+      }
+      else {
+        break;
+      }
+    }
+    return endLine;
+  }
+
   private String[] getValidTradingDay(String[] stockData, String date, String startEnd) {
     String[] line;
     while (true) {
@@ -177,7 +197,8 @@ public class StockControllerImpl implements StockController {
     String startDate = getDate("start");
     String[] startDateLine = getValidTradingDay(stockData, startDate, "start");
     String endDate = getDate("end");
-    String[] endDateLine = getValidTradingDay(stockData, endDate, "end");
+    String[] endLine = getValidTradingDay(stockData, endDate, "end");
+    String[] endDateLine = getValidEndDate(stockData, startDateLine[0], endLine);
     double gainLoss = model.stockGainLoss(stockData, startDateLine, endDateLine);
     view.displayResult("The gain/loss over that period of time is " + gainLoss);
   }
@@ -198,7 +219,8 @@ public class StockControllerImpl implements StockController {
     String startDate = getDate("start");
     startDate = getValidTradingDay(stockData, startDate, "start")[0];
     String endDate = getDate("end");
-    endDate = getValidTradingDay(stockData, endDate, "end")[0];
+    String[] endLine = getValidTradingDay(stockData, endDate, "end");
+    endDate = getValidEndDate(stockData, startDate, endLine)[0];
     int xDays =  getValidPositiveNum("Type the number of days for moving average:");
     StringBuilder crossovers = model.xDayCrossover(stockData, startDate, endDate, xDays);
     if (crossovers.length() >= 2) {

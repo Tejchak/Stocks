@@ -117,7 +117,7 @@ public class StockModelImpl implements StockModel {
     return output.toString().split("\n");
   }
 
-  protected boolean checkStockExists(String stockSymbol) {
+  public boolean checkStockExists(String stockSymbol) {
     URL url = null;
     try {
       url = new URL("https://www.alphavantage"
@@ -149,7 +149,7 @@ public class StockModelImpl implements StockModel {
     return !output.toString().contains("\"Error Message\":");
   }
 
-  protected double calculatePortfolio(String name, String date) {
+  public double calculatePortfolio(String name, String date) {
     double result = 0.0;
     Portfolio portfolio = null;
     for (Portfolio p : this.portfolios) {
@@ -176,13 +176,13 @@ public class StockModelImpl implements StockModel {
     return result;
   }
 
-  protected void createPortfolio(String name, String stockSymbol, int shares) {
+  public void createPortfolio(String name, String stockSymbol, int shares) {
     Portfolio p = new Portfolio(name);
     p.stocks.put(stockSymbol, shares);
     this.portfolios.add(p);
   }
 
-  protected void removeStockFromPortfolio(String portfolioName, String stockSymbol, int shares) {
+  public void removeStockFromPortfolio(String portfolioName, String stockSymbol, int shares) {
     for (Portfolio p : this.portfolios) {
       if (p.name.equals(portfolioName)) {
         p.stocks.put(stockSymbol, p.stocks.getOrDefault(stockSymbol, 0) - shares);
@@ -193,7 +193,7 @@ public class StockModelImpl implements StockModel {
     }
   }
 
-  protected void addStockToPortfolio(String portfolioName, String stockSymbol, int shares) {
+  public void addStockToPortfolio(String portfolioName, String stockSymbol, int shares) {
     for (Portfolio p : this.portfolios) {
       if (p.name.equals(portfolioName)) {
         p.stocks.put(stockSymbol, p.stocks.getOrDefault(stockSymbol, 0) + shares);
@@ -201,7 +201,7 @@ public class StockModelImpl implements StockModel {
     }
   }
 
-  protected String[] getLine(String[] stockData, String date) {
+  public String[] getLine(String[] stockData, String date) {
     for (String line: stockData) {
       if (line.substring(0, 10).equals(date)) {
         String[] sections = line.split(",");
@@ -211,15 +211,15 @@ public class StockModelImpl implements StockModel {
     throw new IllegalArgumentException("Date does not exist for stock");
   }
 
-  protected Double stockGainLoss(String[] stockData, String[] startDateLine, String[] endDateLine) {
-     Double startPrice = Double.parseDouble(startDateLine[4]);
-     Double endPrice = Double.parseDouble(endDateLine[4]);
-    Double gainLoss = endPrice - startPrice;
+  public double stockGainLoss(String[] stockData, String[] startDateLine, String[] endDateLine) {
+    double startPrice = Double.parseDouble(startDateLine[4]);
+    double endPrice = Double.parseDouble(endDateLine[4]);
+    double gainLoss = endPrice - startPrice;
     return gainLoss;
   }
 
-  protected Double movingAverage(String[] stockData, String startDate, int xDays) {
-    Double movingAverage = 0.0;
+  public double movingAverage(String[] stockData, String startDate, int xDays) {
+    double movingAverage = 0.0;
     int startIndex = -1;
     for (int i = 0; i < stockData.length; i++) {
       String line = stockData[i];
@@ -265,7 +265,7 @@ public class StockModelImpl implements StockModel {
     return highestPrice - this.movingAverage(stockData, startDate, xDays) > 0;
   }
 
-  protected boolean existingPortfolio(String n) {
+  public boolean existingPortfolio(String n) {
     for (Portfolio p : this.portfolios) {
       if (p.name.equals(n)) {
         return true;

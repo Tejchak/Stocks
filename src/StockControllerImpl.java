@@ -3,11 +3,11 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class StockControllerImpl implements StockController {
-  private final StockModelImpl model;
+  private final StockModel model;
   private final StockView view;
   private final Scanner scanner;
 
-  public StockControllerImpl(StockModelImpl model, StockView view, Scanner scanner) {
+  public StockControllerImpl(StockModel model, StockView view, Scanner scanner) {
     this.model = model;
     this.view = view;
     this.scanner = scanner;
@@ -23,7 +23,6 @@ public class StockControllerImpl implements StockController {
   }
 
   public String getDate(String prompt) {
-
     return getStringInput("Type the " + prompt + " date (YYYY-MM-DD):");
   }
 

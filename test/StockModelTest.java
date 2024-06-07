@@ -3,13 +3,16 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 import org.junit.Test;
 import org.junit.Before;
 
 import java.util.Arrays;
 import java.util.Collections;
 
-
+/**
+ * Class representing the tests for the model.
+ */
 public class StockModelTest {
   private static StockModelImpl stockModel;
 
@@ -18,6 +21,9 @@ public class StockModelTest {
     stockModel = new StockModelImpl();
   }
 
+  /**
+   * Tests that the model is able to access the csv and take information.
+   */
   @Test
   public void testGetStockDataFromCSV() {
     // This test assumes that a file named "AAPL.csv" is present in the classpath
@@ -26,6 +32,9 @@ public class StockModelTest {
     assertTrue(stockData.length > 0);
   }
 
+  /**
+   * Tests that the model is able to access the API and take information.
+   */
   @Test
   public void testGetStockDataFromAPI() {
     // This test will make a real API call
@@ -34,18 +43,55 @@ public class StockModelTest {
     assertTrue(stockData.length > 0);
   }
 
+  /**
+   * Tests that checkStockExists will return true and false
+   * at the correct times.
+   */
   @Test
   public void testCheckStockExists() {
     // This test will make a real CSV call
     assertTrue(stockModel.checkStockExists("AAPL"));
   }
 
+  /**
+   * Tests that the model is able to create a portfolio.
+   */
   @Test
   public void testCreatePortfolio() {
     stockModel.createPortfolio("TestPortfolio", "AAPL", 10);
     assertTrue(stockModel.existingPortfolio("TestPortfolio"));
+    assertEquals(10.0,
+            stockModel.getPortfolios().get(0).stocks.get("AAPL"), 0.01);
+
+  }
+  /**
+   * Tests that getPortfolio does not allow the user to mutate the field.
+   */
+  @Test
+  public void testGetPortfolio() {
+    stockModel.getPortfolios().add(new Portfolio("test"));
+    stockModel.createPortfolio("TestPortfolio", "AAPL", 10);
+    stockModel.getPortfolios().get(0).name = "yo";
+    assertFalse(stockModel.existingPortfolio("test"));
+    assertFalse(stockModel.existingPortfolio("yo"));
   }
 
+  /**
+   * Tests that the value of a portfolio is correctly calculated.
+   */
+  @Test
+  public void testCalculatePortfolios() {
+    stockModel.createPortfolio("TestPortfolio", "AAPL", 10);
+    assertEquals(1902.89993,
+            stockModel.calculatePortfolio("TestPortfolio", "2024-05-29"), 0.0001);
+    stockModel.addStockToPortfolio("TestPortfolio", "GOOG", 10);
+    assertEquals(3676.89987,
+            stockModel.calculatePortfolio("TestPortfolio", "2024-05-29"), 0.0001);
+  }
+
+  /**
+   * Tests that get line can get the information from a given day.
+   */
   @Test
   public void testGetLine() {
     String[] stockData = {
@@ -58,15 +104,24 @@ public class StockModelTest {
     assertEquals("2023-06-01", line[0]);
   }
 
+  /**
+   * Tests that gain loss will return the right value.
+   */
   @Test
   public void testStockGainLoss() {
     String[] startDateLine = {"2023-06-01", "100", "110", "90", "105", "1000"};
     String[] endDateLine = {"2023-06-02", "105", "115", "95", "110", "2000"};
+    String[] endDateLine2 = {"2023-06-02", "105", "115", "95", "104", "2000"};
 
     double gainLoss = stockModel.stockGainLoss(new String[0], startDateLine, endDateLine);
+    double gainLoss2 = stockModel.stockGainLoss(new String[0], startDateLine, endDateLine2);
     assertEquals(5.0, gainLoss, 0.1);
+    assertEquals(-1.0, gainLoss2, 0.1);
   }
 
+  /**
+   * Tests that the program will return the correct moving average
+   */
   @Test
   public void testMovingAverage() {
     String[] stockData = {
@@ -101,7 +156,7 @@ public class StockModelTest {
   }
 
   /**
-   *
+   * Tests that existing portfolio works properly.
    */
   @Test
   public void testExistingPortfolio() {

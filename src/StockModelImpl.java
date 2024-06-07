@@ -371,4 +371,18 @@ public class StockModelImpl implements StockModel {
     }
     return false;
   }
+
+  /**
+   * Gets a copy of the portfolios field.
+   */
+  @Override
+  public ArrayList<Portfolio> getPortfolios() {
+    ArrayList<Portfolio> result = new ArrayList<>();
+    for (Portfolio p : this.portfolios) {
+      Portfolio port = new Portfolio(p.name);
+      port.stocks = new HashMap<>(p.stocks);
+      result.add(port);
+    }
+    return result;
+  }
 }

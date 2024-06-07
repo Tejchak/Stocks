@@ -73,6 +73,7 @@ public class StockControllerImplTest {
     assertEquals(expectedOutput, ((MockView) view).log.toString());
   }
 
+
   @Test
   public void testXDayCrossOversModelToControllerToView() {
     StockModel model = new StockModelImpl();

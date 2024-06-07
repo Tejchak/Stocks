@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  * Interface for a model that can do certain calculations about a stock or,
  * add a stock and shares to a portfolio.
@@ -94,4 +96,9 @@ public interface StockModel {
    * @return the crossover dates.
    */
   public StringBuilder xDayCrossover(String[] stockData, String startDate, String endDate, int xDays);
+
+  /**
+   * Gets a copy of the portfolios field.
+   */
+  public ArrayList<Portfolio> getPortfolios();
 }

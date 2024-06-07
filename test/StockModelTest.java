@@ -169,4 +169,14 @@ public class StockModelTest {
     stockModel.createPortfolio("TestPortfolio", "AAPL", 10);
     assertTrue(stockModel.existingPortfolio("TestPortfolio"));
   }
+
+  /**
+   * Tests that the value of a portfolio will default to zero
+   * if the given date was not a trading day.
+   */
+  @Test
+  public void testAddStockToPortfolioDefaultToZero() {
+    stockModel.createPortfolio("TestPortfolio", "AAPL", 10);
+    assertEquals(0.0, stockModel.calculatePortfolio("TestPortfolio", "2025-05-29"), 0.0001);
+  }
 }

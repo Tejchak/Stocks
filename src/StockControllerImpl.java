@@ -21,7 +21,7 @@ public class StockControllerImpl implements StockController {
   }
 
   public String getDate(String prompt) {
-    return getStringInput("Type the " + prompt + " date (YYYY-MM-DD):");
+    return getStringInput("Type the " + prompt + " date (YYYY-MM-DD, e.g., 2024-05-09):");
   }
 
   protected int getValidPositiveNum(String prompt) {
@@ -163,7 +163,7 @@ public class StockControllerImpl implements StockController {
         break;
       } catch (IllegalArgumentException e) {
         view.displayResult("Sorry the date you entered wasn't a trading day. Please make sure you "
-                + "you have the correct format and try again: E.G 2024-05-09");
+                + "you have the correct format and try again.");
         date = getDate(startEnd);
       }
     }

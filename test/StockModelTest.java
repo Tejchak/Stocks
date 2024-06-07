@@ -1,9 +1,8 @@
-
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+
 import org.junit.Test;
 import org.junit.Before;
 
@@ -16,6 +15,9 @@ import java.util.Collections;
 public class StockModelTest {
   private static StockModelImpl stockModel;
 
+  /**
+   * Sets up the tests.
+   */
   @Before
   public void setUp() {
     stockModel = new StockModelImpl();
@@ -64,6 +66,7 @@ public class StockModelTest {
             stockModel.getPortfolios().get(0).stocks.get("AAPL"), 0.01);
 
   }
+
   /**
    * Tests that getPortfolio does not allow the user to mutate the field.
    */
@@ -134,6 +137,9 @@ public class StockModelTest {
     assertEquals(107.5, movingAverage, 0.01);
   }
 
+  /**
+   * Tests that the x-day crossover returns the correct dates.
+   */
   @Test
   public void testXDayCrossover() {
     String[] stockData = {
@@ -150,9 +156,9 @@ public class StockModelTest {
             "2013-09-03,21.279240,21.573887,21.269028,21.429178,21.429178,82210996"
     };
     Collections.reverse(Arrays.asList(stockData));
-    System.out.println(stockModel.movingAverage(stockData,"2013-08-19", 4));
+    System.out.println(stockModel.movingAverage(stockData, "2013-08-19", 4));
     StringBuilder crossovers = stockModel.xDayCrossover(stockData, "2013-08-19", "2013-08-22", 4);
-    assertTrue(crossovers.toString().contains("2013-08-20"));
+    assertEquals("2013-08-22, 2013-08-21, 2013-08-20, 2013-08-19, ", crossovers.toString());
   }
 
   /**

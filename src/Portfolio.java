@@ -11,6 +11,7 @@ public class Portfolio {
   /**
    * Creates the portfolio and initializes the hashmap
    * with no stocks and no shares.
+   *
    * @param name a String name of the portfolio.
    */
   public Portfolio(String name) {

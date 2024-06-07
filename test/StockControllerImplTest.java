@@ -5,17 +5,32 @@ import java.io.StringReader;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Tests for the controller and view, by looking at outputs.
+ */
 public class StockControllerImplTest {
   private StockModel mockModel;
   private StockViewImpl mockView;
   private ByteArrayOutputStream outContent;
   private StockControllerImpl controller;
 
+  /**
+   * Static class representing a mock for the view.
+   */
   public static class MockView implements StockView {
     private StringBuilder log;
+
+    /**
+     * Constructor with a stringbuilder log so the information can be appended.
+     */
     public MockView() {
+
       log = new StringBuilder();
     }
+
+    /**
+     * Adds the menu to the mock view.
+     */
     @Override
     public void createMenu() {
       log.append("1. Examine the gain or loss of a specific stock\n" +
@@ -25,6 +40,9 @@ public class StockControllerImplTest {
               "5. Quit the program\n");
     }
 
+    /**
+     * Adds the portfolio menu to the mock view.
+     */
     @Override
     public void portfolioMenu() {
       log.append("1. Create a new portfolio?\n" +
@@ -33,6 +51,11 @@ public class StockControllerImplTest {
               "4. Calculate the value of a portfolio?\n");
     }
 
+    /**
+     * Adds to the log  of the mock.
+     *
+     * @param result a String to be displayed.
+     */
     @Override
     public void displayResult(String result) {
       log.append(result + "\n");
@@ -40,8 +63,9 @@ public class StockControllerImplTest {
   }
 
 
-
-
+  /**
+   * Tests that the controller can properly handle the gain loss case.
+   */
   @Test
   public void testViewCorrectlyCreatedAndReceivesCorrectInputWithHandleGainLoss() {
     StockModel model = new StockModelImpl();
@@ -74,6 +98,10 @@ public class StockControllerImplTest {
   }
 
 
+  /**
+   * Tests that the controller can handle x-day crossover and
+   * distpatch to the view and model.
+   */
   @Test
   public void testXDayCrossOversModelToControllerToView() {
     StockModel model = new StockModelImpl();
@@ -111,6 +139,10 @@ public class StockControllerImplTest {
     assertEquals(expectedOutput, ((MockView) view).log.toString());
   }
 
+  /**
+   * Tests that the controller will indicate when an invalid stockSymbol
+   * is inputed and will run the message again.
+   */
   @Test
   public void testInvalidStockSymbol() {
     StockModel model = new StockModelImpl();
@@ -150,6 +182,10 @@ public class StockControllerImplTest {
     assertEquals(expectedOutput, ((MockView) view).log.toString());
   }
 
+  /**
+   * Tests that the controller will indicate when an invalid date
+   * is inputed and will run the message again.
+   */
   @Test
   public void testInvalidDay() {
     StockModel model = new StockModelImpl();
@@ -171,7 +207,7 @@ public class StockControllerImplTest {
             + "Type the start date (YYYY-MM-DD, e.g., 2024-05-09):\n"
             + "Type the end date (YYYY-MM-DD, e.g., 2024-05-09):\n"
             + "Sorry the date you entered wasn't a trading day. Please make"
-            + " sure you you have the correct format and try again.\n"
+            + "sure you you have the correct format and try again.\n"
             + "Type the end date (YYYY-MM-DD, e.g., 2024-05-09):\n"
             + "The gain/loss over that period of time is -0.15660000000000007\n"
             + "1. Examine the gain or loss of a specific stock\n"
@@ -184,6 +220,10 @@ public class StockControllerImplTest {
     assertEquals(expectedOutput, ((MockView) view).log.toString());
   }
 
+  /**
+   * Tests that the controller can handle when
+   * the start date is after the end date.
+   */
   @Test
   public void testEndDateBeforeStartDate() {
     StockModel model = new StockModelImpl();
@@ -204,6 +244,7 @@ public class StockControllerImplTest {
             + "Type the stock symbol (case insensitive, e.g., GOOG or goog):\n"
             + "Type the start date (YYYY-MM-DD, e.g., 2024-05-09):\n"
             + "Type the end date (YYYY-MM-DD, e.g., 2024-05-09):\n"
+            //this line
             + "End date must be after start date\n"
             + "Type the end date (YYYY-MM-DD, e.g., 2024-05-09):\n"
             + "The gain/loss over that period of time is -0.15660000000000007\n"
@@ -216,6 +257,4 @@ public class StockControllerImplTest {
 
     assertEquals(expectedOutput, ((MockView) view).log.toString());
   }
-
-
 }

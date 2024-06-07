@@ -190,7 +190,7 @@ public class StockControllerImplTest {
   public void testInvalidDay() {
     StockModel model = new StockModelImpl();
     StockView view = new MockView();
-    String input = "1\nBLUE\n2024-05-09\n2024-06-01\n2024-06-03\n5\n";
+    String input = "1\nAAPL\n2024-05-09\n2024-06-01\n2024-06-03\n5\n";
     Readable rd = new StringReader(input);
     StockController controller = new StockControllerImpl(model, view, rd);
 
@@ -209,7 +209,7 @@ public class StockControllerImplTest {
             + "Sorry the date you entered wasn't a trading day. Please make"
             + " sure you you have the correct format and try again.\n"
             + "Type the end date (YYYY-MM-DD, e.g., 2024-05-09):\n"
-            + "The gain/loss over that period of time is -0.15660000000000007\n"
+            + "The gain/loss over that period of time is 9.459992\n"
             + "1. Examine the gain or loss of a specific stock\n"
             + "2. Examine the x-day moving average of a stock\n"
             + "3. Find the x-day crossovers for a stock\n"
@@ -228,7 +228,7 @@ public class StockControllerImplTest {
   public void testEndDateBeforeStartDate() {
     StockModel model = new StockModelImpl();
     StockView view = new MockView();
-    String input = "1\nBLUE\n2024-05-09\n2023-06-01\n2024-06-03\n5\n";
+    String input = "1\nAAL\n2024-05-09\n2023-06-01\n2024-06-03\n5\n";
     Readable rd = new StringReader(input);
     StockController controller = new StockControllerImpl(model, view, rd);
 
@@ -244,10 +244,9 @@ public class StockControllerImplTest {
             + "Type the stock symbol (case insensitive, e.g., GOOG or goog):\n"
             + "Type the start date (YYYY-MM-DD, e.g., 2024-05-09):\n"
             + "Type the end date (YYYY-MM-DD, e.g., 2024-05-09):\n"
-            //this line
             + "End date must be after start date\n"
             + "Type the end date (YYYY-MM-DD, e.g., 2024-05-09):\n"
-            + "The gain/loss over that period of time is -0.15660000000000007\n"
+            + "The gain/loss over that period of time is -2.950000000000001\n"
             + "1. Examine the gain or loss of a specific stock\n"
             + "2. Examine the x-day moving average of a stock\n"
             + "3. Find the x-day crossovers for a stock\n"

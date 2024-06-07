@@ -127,7 +127,7 @@ public class StockModelImpl implements StockModel {
     catch (IOException e) {
       throw new IllegalArgumentException("No price data found for "+stockSymbol);
     }
-   // System.out.println(output.toString());
+   //System.out.println(output.toString());
     return output.toString().split("\n");
   }
 
@@ -258,9 +258,11 @@ public class StockModelImpl implements StockModel {
   @Override
   public String[] getLine(String[] stockData, String date) {
     for (String line: stockData) {
-      if (line.substring(0, 10).equals(date)) {
-        String[] sections = line.split(",");
-        return sections;
+      if (line.length() > 9) {
+        if (line.substring(0, 10).equals(date)) {
+          String[] sections = line.split(",");
+          return sections;
+        }
       }
     }
     throw new IllegalArgumentException("Date does not exist for stock");

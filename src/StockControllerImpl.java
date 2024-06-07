@@ -240,7 +240,8 @@ public class StockControllerImpl implements StockController {
       try {
         stockData = model.getStockData(stockSymbol);
         // System.out.println(Arrays.toString(stockData));
-        if (!stockData[1].contains("\"Error Message\":")) {
+        if (!stockData[1].contains("\"Error Message\":") &&
+        !stockData[1].contains("API rate limit is 25 requests per day.")) {
           break;
         } else {
           view.displayResult("Your symbol doesn't exist in our database. Please try again.");

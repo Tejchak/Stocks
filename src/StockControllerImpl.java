@@ -1,56 +1,35 @@
 import java.util.Scanner;
 
+/**
+ * Controller for the stock model that gets inputs and calls the model at certain points.
+ */
 public class StockControllerImpl implements StockController {
   private final StockModel model;
   private final StockView view;
   private final Scanner scanner;
 
+  /**
+   * Constructor that takes in a model and view so it can send to both
+   * and a readable.
+   *
+   * @param model    the model for the stock program.
+   * @param view     the view for the stock progrqm.
+   * @param readable the information that the scanner will be taking.
+   */
   public StockControllerImpl(StockModel model, StockView view, Readable readable) {
     this.model = model;
     this.view = view;
     this.scanner = new Scanner(readable);
   }
 
-  public String getStringInput(String prompt) {
-    view.displayResult(prompt);
-    return this.scanner.nextLine();
-  }
-
-  public String getStockSymbol() {
-    return getStringInput("Type the stock symbol (e.g., GOOG):");
-  }
-
-  public String getDate(String prompt) {
-    return getStringInput("Type the " + prompt + " date (YYYY-MM-DD):");
-  }
-
-  protected int getValidPositiveNum(String prompt) {
-    int input = 0;
-    boolean validInput = false;
-    while (!validInput) {
-      view.displayResult(prompt);
-      if (scanner.hasNextInt()) {
-        input = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
-        if (input > 0) {
-          validInput = true;
-        }
-        else {
-          view.displayResult("Invalid input. Please enter a positive number.");
-        }
-
-      } else {
-        view.displayResult("Invalid input. Please enter a positive number.");
-        scanner.next();
-      }
-    }
-    return input;
-  }
-
+  /**
+   * Starts the main program loop, displaying the menu and handling user input.
+   */
+  @Override
   public void startProgram() {
     view.displayResult("Welcome to the Stocks Program!");
     boolean endProgram = false;
-    while(!endProgram) {
+    while (!endProgram) {
       view.createMenu();
       int option = getValidPositiveNum("Please enter a number between 1 and 5");
       switch (option) {
@@ -75,10 +54,71 @@ public class StockControllerImpl implements StockController {
     }
   }
 
+  /**
+   * Gets a string response from the user after a message prompt.
+   *
+   * @param prompt a String prompt that gets printed.
+   * @return the string response of the user.
+   */
+  private String getStringInput(String prompt) {
+    view.displayResult(prompt);
+    return this.scanner.nextLine();
+  }
+
+  /**
+   * Prompts the user to enter a stock symbol and returns the input.
+   *
+   * @return the stock symbol entered by the user.
+   */
+  private String getStockSymbol() {
+    return getStringInput("Type the stock symbol (e.g., GOOG):");
+  }
+
+  /**
+   * Prompts the user to enter a date and returns the input.
+   *
+   * @param prompt a String prompt that specifies the type of date (start/end).
+   * @return the date entered by the user.
+   */
+  private String getDate(String prompt) {
+    return getStringInput("Type the " + prompt + " date (YYYY-MM-DD):");
+  }
+
+  /**
+   * Prompts the user to enter a positive number and validates the input.
+   *
+   * @param prompt a String prompt that specifies what the user should enter.
+   * @return a valid positive number entered by the user.
+   */
+  protected int getValidPositiveNum(String prompt) {
+    int input = 0;
+    boolean validInput = false;
+    while (!validInput) {
+      view.displayResult(prompt);
+      if (scanner.hasNextInt()) {
+        input = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+        if (input > 0) {
+          validInput = true;
+        } else {
+          view.displayResult("Invalid input. Please enter a positive integer.");
+        }
+
+      } else {
+        view.displayResult("Invalid input. Please enter a positive integer.");
+        scanner.next();
+      }
+    }
+    return input;
+  }
+
+  /**
+   * Handles the portfolio menu options, including creating, adding, removing, and calculating portfolio values.
+   */
   private void handlePortfolioMenu() {
     view.portfolioMenu();
     int option = getValidPositiveNum("Please enter a number between 1 and 4");
-    switch(option) {
+    switch (option) {
       case 1:
         handleNewPortfolio();
         break;
@@ -99,26 +139,29 @@ public class StockControllerImpl implements StockController {
         String pName = getStringInput("Enter the name of the portfolio you would like to take away from: ");
         while (!model.existingPortfolio(pName)) {
           pName = getStringInput("Portfolio " + pName +
-                  " does not exist. Please enter a name.");
+                  " does not exist. Please enter another name.");
         }
         String symbol = getStockSymbol();
         share = getValidPositiveNum("How many shares would you like to remove" +
                 "(you can only purchase whole shares):");
         model.removeStockFromPortfolio(pName, symbol, share);
         break;
-        case 4:
-          String n = getStringInput("Enter the name of the portfolio you " +
-                  "would like to calculate the value of: ");
-          while (!model.existingPortfolio(n)) {
-            n = getStringInput("Portfolio " + n +
-                    " does not exist. Please enter a name.");
-          }
-          String date = getDate("date you would like " +
-                  "to calculate the value on: ");
-          view.displayResult(n + " is worth " + model.calculatePortfolio(n, date) + " USD");
+      case 4:
+        String n = getStringInput("Enter the name of the portfolio you " +
+                "would like to calculate the value of: ");
+        while (!model.existingPortfolio(n)) {
+          n = getStringInput("Portfolio " + n +
+                  " does not exist. Please enter another name.");
+        }
+        String date = getDate("date you would like " +
+                "to calculate the value on: ");
+        view.displayResult(n + " is worth " + model.calculatePortfolio(n, date) + " USD");
     }
   }
 
+  /**
+   * Handles the creation of a new portfolio by prompting the user for details and updating the model.
+   */
   private void handleNewPortfolio() {
     String name = getStringInput("Type the name for your portfolio");
     view.displayResult("You must have atleast one stock in your portfolio");
@@ -133,6 +176,14 @@ public class StockControllerImpl implements StockController {
     view.displayResult("Successfully created portfolio");
   }
 
+  /**
+   * Validates the end date to ensure it is after the start date and is a trading day.
+   *
+   * @param stockData the stock data.
+   * @param startDate the start date.
+   * @param endLine   the end line.
+   * @return a valid end line.
+   */
   private String[] getValidEndDate(String[] stockData, String startDate,
                                    String[] endLine) {
     while (true) {
@@ -147,14 +198,21 @@ public class StockControllerImpl implements StockController {
               (startYear == endYear && startMonth == endMonth && startDay >= endDay)) {
         view.displayResult("End date must be after start date");
         endLine = getValidTradingDay(stockData, getDate("end"), "end");
-      }
-      else {
+      } else {
         break;
       }
     }
     return endLine;
   }
 
+  /**
+   * Validates the given date to ensure it is a trading day.
+   *
+   * @param stockData the stock data.
+   * @param date      the date to validate.
+   * @param startEnd  indicates if the date is start or end.
+   * @return a valid trading day line.
+   */
   private String[] getValidTradingDay(String[] stockData, String date, String startEnd) {
     String[] line;
     while (true) {
@@ -170,6 +228,12 @@ public class StockControllerImpl implements StockController {
     return line;
   }
 
+  /**
+   * Validates the stock symbol to ensure it exists in the database.
+   *
+   * @param stockSymbol the stock symbol to validate.
+   * @return the stock data for the valid stock symbol.
+   */
   private String[] getValidStock(String stockSymbol) {
     String[] stockData;
     while (true) {
@@ -190,7 +254,9 @@ public class StockControllerImpl implements StockController {
     return stockData;
   }
 
-
+  /**
+   * Handles the gain/loss calculation for a specified stock and date range.
+   */
   private void handleGainLoss() {
     String stockSymbol = getStockSymbol();
     String[] stockData = getValidStock(stockSymbol);
@@ -203,6 +269,7 @@ public class StockControllerImpl implements StockController {
     view.displayResult("The gain/loss over that period of time is " + gainLoss);
   }
 
+  //Handles the moving average and assigns the variables for the model.
   private void handleMovingAverage() {
     String stockSymbol = getStockSymbol();
     String[] stockData = getValidStock(stockSymbol);
@@ -216,6 +283,7 @@ public class StockControllerImpl implements StockController {
     view.displayResult("The " + xDays + "-day moving average is " + movingAverage);
   }
 
+  //Handles the crossover
   private void handleCrossover() {
     String stockSymbol = getStockSymbol();
     String[] stockData = getValidStock(stockSymbol);
@@ -227,7 +295,7 @@ public class StockControllerImpl implements StockController {
     String earliestDate = stockData[stockData.length - 2].substring(0, 11);
     view.displayResult("The moving average will be calulated over the days we have, and days " +
             "prior to " + earliestDate + " will not be included in calculating the moving average");
-    int xDays =  getValidPositiveNum("Type the number of days for moving average:");
+    int xDays = getValidPositiveNum("Type the number of days for moving average:");
     StringBuilder crossovers = model.xDayCrossover(stockData, startDate, endDate, xDays);
     if (crossovers.length() >= 2) {
       crossovers.delete(crossovers.length() - 2, crossovers.length());

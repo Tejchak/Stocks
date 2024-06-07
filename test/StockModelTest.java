@@ -36,7 +36,7 @@ public class StockModelTest {
 
   @Test
   public void testCheckStockExists() {
-    // This test will make a real API call
+    // This test will make a real CSV call
     assertTrue(stockModel.checkStockExists("AAPL"));
   }
 
@@ -100,6 +100,9 @@ public class StockModelTest {
     assertTrue(crossovers.toString().contains("2013-08-20"));
   }
 
+  /**
+   *
+   */
   @Test
   public void testExistingPortfolio() {
     stockModel.createPortfolio("TestPortfolio", "AAPL", 10);

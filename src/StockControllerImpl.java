@@ -244,7 +244,14 @@ public class StockControllerImpl implements StockController {
                 + "using Alpha Vantage!")) {
           break;
         } else {
-          view.displayResult("Your symbol doesn't exist in our database. Please try again.");
+          if (stockData[1].contains("\"Error Message\":")) {
+            view.displayResult("Your symbol doesn't exist in our database. Please try again.");
+          }
+          else {
+            view.displayResult("Your symbol does not exist in our local folder and cannot query API"
+                    + "right now so please try again later or input a different symbol in our local"
+                    + " database");
+          }
           stockSymbol = getStockSymbol();
         }
       } catch (IllegalArgumentException e) {

@@ -17,7 +17,7 @@ public class StockControllerImpl implements StockController {
   }
 
   public String getStockSymbol() {
-    return getStringInput("Type the stock symbol (e.g., GOOG):");
+    return getStringInput("Type the stock symbol (case insensitive, e.g., GOOG or goog):");
   }
 
   public String getDate(String prompt) {

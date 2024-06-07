@@ -207,7 +207,7 @@ public class StockControllerImplTest {
             + "Type the start date (YYYY-MM-DD, e.g., 2024-05-09):\n"
             + "Type the end date (YYYY-MM-DD, e.g., 2024-05-09):\n"
             + "Sorry the date you entered wasn't a trading day. Please make"
-            + "sure you you have the correct format and try again.\n"
+            + " sure you you have the correct format and try again.\n"
             + "Type the end date (YYYY-MM-DD, e.g., 2024-05-09):\n"
             + "The gain/loss over that period of time is -0.15660000000000007\n"
             + "1. Examine the gain or loss of a specific stock\n"

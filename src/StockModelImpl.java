@@ -228,12 +228,19 @@ public class StockModelImpl implements StockModel {
         startIndex = i;
       }
     }
+    int notCounted = -1;
     for (int j = startIndex; j < startIndex + xDays; j++) {
-      if (j < stockData.length) {
+      if (j < stockData.length - 1) {
         String line = stockData[j];
         String[] sections = line.split(",");
         movingAverage += Double.parseDouble(sections[4]);
       }
+      else {
+        notCounted = j;
+      }
+    }
+    if (notCounted > xDays) {
+      xDays = xDays - (notCounted - xDays);
     }
     movingAverage /= xDays;
     return movingAverage;

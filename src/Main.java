@@ -1,8 +1,15 @@
 import java.io.InputStreamReader;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+/**
+ * Main class that calls the program with the correct
+ * starting inputs.
+ */
 public class Main {
+
+  /**
+   * Static method that runs the program.
+   * @param args the arguments of the program.
+   */
   public static void main(String[] args) {
     StockViewImpl view = new StockViewImpl();
     Readable readable = new InputStreamReader(System.in);

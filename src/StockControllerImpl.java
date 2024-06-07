@@ -208,6 +208,9 @@ public class StockControllerImpl implements StockController {
     String[] stockData = getValidStock(stockSymbol);
     String startDate = getDate("start");
     startDate = getValidTradingDay(stockData, startDate, "start")[0];
+    String earliestDate = stockData[stockData.length - 2].substring(0, 11);
+    view.displayResult("The moving average will be calulated over the days we have, and days " +
+            "prior to " + earliestDate + " will not be included in calculating the moving average");
     int xDays = getValidPositiveNum("Type the number of days for moving average:");
     double movingAverage = model.movingAverage(stockData, startDate, xDays);
     view.displayResult("The " + xDays + "-day moving average is " + movingAverage);
@@ -221,6 +224,9 @@ public class StockControllerImpl implements StockController {
     String endDate = getDate("end");
     String[] endLine = getValidTradingDay(stockData, endDate, "end");
     endDate = getValidEndDate(stockData, startDate, endLine)[0];
+    String earliestDate = stockData[stockData.length - 2].substring(0, 11);
+    view.displayResult("The moving average will be calulated over the days we have, and days " +
+            "prior to " + earliestDate + " will not be included in calculating the moving average");
     int xDays =  getValidPositiveNum("Type the number of days for moving average:");
     StringBuilder crossovers = model.xDayCrossover(stockData, startDate, endDate, xDays);
     if (crossovers.length() >= 2) {

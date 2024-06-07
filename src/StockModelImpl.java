@@ -138,7 +138,7 @@ public class StockModelImpl implements StockModel {
   /**
    * Compares the name of a stock to our sources to see if it exists.
    * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
-   * @return true if 
+   * @return true if the stock exists, false if not.
    */
   public boolean checkStockExists(String stockSymbol) {
     URL url = null;
@@ -172,6 +172,12 @@ public class StockModelImpl implements StockModel {
     return !output.toString().contains("\"Error Message\":");
   }
 
+  /**
+   * Calculates the total value of a portfolio.
+   * @param name the name of the portfolio.
+   * @param date the date on which the value is being calculated.
+   * @return the total value in USD.
+   */
   public double calculatePortfolio(String name, String date) {
     double result = 0.0;
     Portfolio portfolio = null;
@@ -199,12 +205,24 @@ public class StockModelImpl implements StockModel {
     return result;
   }
 
+  /**
+   * Creates a portfolio, and adds the shares of the given stock.
+   * @param name the name of the portfolio.
+   * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
+   * @param shares the amount of shares pf the given stock.
+   */
   public void createPortfolio(String name, String stockSymbol, int shares) {
     Portfolio p = new Portfolio(name);
     p.stocks.put(stockSymbol, shares);
     this.portfolios.add(p);
   }
 
+  /**
+   * Removes the given stock from a portfolio.
+   * @param portfolioName the name of the portfolio.
+   * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
+   * @param shares the amount of shares pf the given stock.
+   */
   public void removeStockFromPortfolio(String portfolioName, String stockSymbol, int shares) {
     for (Portfolio p : this.portfolios) {
       if (p.name.equals(portfolioName)) {
@@ -216,6 +234,12 @@ public class StockModelImpl implements StockModel {
     }
   }
 
+  /**
+   * Adds the given stock to the portfolio.
+   * @param portfolioName the name of the portfolio.
+   * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
+   * @param shares the amount of shares pf the given stock.
+   */
   public void addStockToPortfolio(String portfolioName, String stockSymbol, int shares) {
     for (Portfolio p : this.portfolios) {
       if (p.name.equals(portfolioName)) {
@@ -224,6 +248,12 @@ public class StockModelImpl implements StockModel {
     }
   }
 
+  /**
+   * Gets the line of the given date.
+   * @param stockData the data about a stock.
+   * @param date the date as a String (YYYY-MM-DD).
+   * @return the line on a given date split up into its parts.
+   */
   public String[] getLine(String[] stockData, String date) {
     for (String line: stockData) {
       if (line.substring(0, 10).equals(date)) {
@@ -234,6 +264,13 @@ public class StockModelImpl implements StockModel {
     throw new IllegalArgumentException("Date does not exist for stock");
   }
 
+  /**
+   * Calculates the gain or loss of a stock from the startdate to the enddate.
+   * @param stockData the data about a stock.
+   * @param startDateLine the starting date line.
+   * @param endDateLine the end date line.
+   * @return the gain or loss of the stock as a double.
+   */
   public double stockGainLoss(String[] stockData, String[] startDateLine, String[] endDateLine) {
     double startPrice = Double.parseDouble(startDateLine[4]);
     double endPrice = Double.parseDouble(endDateLine[4]);
@@ -241,6 +278,14 @@ public class StockModelImpl implements StockModel {
     return gainLoss;
   }
 
+  /**
+   * Calculates the x-day moving average of a stock on a given day and with a
+   * given x
+   * @param stockData the data about a stock.
+   * @param startDate the starting date as a String (YYYY-MM-DD).
+   * @param xDays the amount of days the moving average is being calculated for.
+   * @return the x-day moving average.
+   */
   public double movingAverage(String[] stockData, String startDate, int xDays) {
     double movingAverage = 0.0;
     int startIndex = -1;
@@ -251,17 +296,33 @@ public class StockModelImpl implements StockModel {
         startIndex = i;
       }
     }
+    int notCounted = -1;
     for (int j = startIndex; j < startIndex + xDays; j++) {
-      if (j < stockData.length) {
+      if (j < stockData.length - 1) {
         String line = stockData[j];
         String[] sections = line.split(",");
         movingAverage += Double.parseDouble(sections[4]);
       }
+      else {
+        notCounted = j;
+      }
+    }
+    if (notCounted > xDays) {
+      xDays = xDays - (notCounted - xDays);
     }
     movingAverage /= xDays;
     return movingAverage;
   }
 
+  /**
+   * Creates a string with all of the days that are crossovers.
+   * @param stockData the data about a stock.
+   * @param startDate the starting date as a String (YYYY-MM-DD).
+   * @param endDate the ending date as a String (YYYY-MM-DD).
+   * @param xDays the amount of days the moving average is being calculated
+   *              for to find the moving average.
+   * @return the crossover dates.
+   */
   public StringBuilder xDayCrossover(String[] stockData, String startDate, String endDate, int xDays) {
     StringBuilder crossovers = new StringBuilder();
     int startIndex = -1;
@@ -286,10 +347,16 @@ public class StockModelImpl implements StockModel {
 
   }
 
+  //Checks if the highest price is above the moving average.
   private boolean isCrossover(String[] stockData, String startDate, int xDays, Double highestPrice) {
     return highestPrice - this.movingAverage(stockData, startDate, xDays) > 0;
   }
 
+  /**
+   * Checks if a portfolio exists in the model.
+   * @param n the name of the portfolio we're looking for.
+   * @return true if it exists in the model, false if not.
+   */
   public boolean existingPortfolio(String n) {
     for (Portfolio p : this.portfolios) {
       if (p.name.equals(n)) {

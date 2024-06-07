@@ -12,17 +12,34 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
 
+/**
+ * The implementation of the Stock model.
+ * Uses the AlphaVantage api to access stock data.
+ * Also keeps track of stocks that have once been used while being able to pull
+ * from a collections of CSV files.
+ */
 public class StockModelImpl implements StockModel {
   private final String apiKey;
   private final ArrayList<Portfolio> portfolios;
   private Map<String, String[]> stocks;
 
+  /**
+   * Constructor for the model, initializes the key as
+   * the key from Alpha Vantage. Also creates the list of
+   * portfolios that will be stored in the program.
+   * Further the hashmap is the storage of stock info.
+   */
   StockModelImpl() {
     this.apiKey = "F99D5A7QDFY52B58";
     this.portfolios = new ArrayList<Portfolio>();
     this.stocks = new HashMap<String, String[]>();
   }
 
+  /**
+   * Gets the information about a stock given its name.
+   * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
+   * @return The information of the stock as a string array.
+   */
   @Override
   public String[] getStockData(String stockSymbol) {
     if (this.stocks.containsKey(stockSymbol)) {
@@ -40,7 +57,7 @@ public class StockModelImpl implements StockModel {
     }
   }
 
-
+//gets the stock data from a csv file.
   protected String[] getStockDataCSV(String stocksymbol) {
     StringBuilder result = new StringBuilder();
     URL url = null;
@@ -69,6 +86,7 @@ public class StockModelImpl implements StockModel {
     return stockData;
   }
 
+  //gets the stock data from an online API.
   protected String[] getStockDataAPI(String stockSymbol) {
     URL url = null;
     try {
@@ -117,6 +135,11 @@ public class StockModelImpl implements StockModel {
     return output.toString().split("\n");
   }
 
+  /**
+   * Compares the name of a stock to our sources to see if it exists.
+   * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
+   * @return true if 
+   */
   public boolean checkStockExists(String stockSymbol) {
     URL url = null;
     try {

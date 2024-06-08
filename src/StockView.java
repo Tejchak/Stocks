@@ -9,7 +9,7 @@ public interface StockView {
   public void createMenu();
 
   /**
-   * Creates the portfolio method for what they can do related to a portfolio
+   * Creates the portfolio method for what they can do related to a portfolio.
    */
   public void portfolioMenu();
 

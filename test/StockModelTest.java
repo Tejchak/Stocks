@@ -123,7 +123,7 @@ public class StockModelTest {
   }
 
   /**
-   * Tests that the program will return the correct moving average
+   * Tests that the program will return the correct moving average.
    */
   @Test
   public void testMovingAverage() {

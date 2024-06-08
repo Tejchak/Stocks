@@ -113,7 +113,8 @@ public class StockControllerImpl implements StockController {
   }
 
   /**
-   * Handles the portfolio menu options, including creating, adding, removing, and calculating portfolio values.
+   * Handles the portfolio menu options, including creating, adding,
+   * removing, and calculating portfolio values.
    */
   private void handlePortfolioMenu() {
     view.portfolioMenu();
@@ -129,7 +130,8 @@ public class StockControllerImpl implements StockController {
         break;
       case 2:
         int shares;
-        String portfolioName = getStringInput("Enter the name of the portfolio you would like to add to: ");
+        String portfolioName = getStringInput(
+                "Enter the name of the portfolio you would like to add to: ");
         while (!model.existingPortfolio(portfolioName)) {
           portfolioName = getStringInput("Portfolio " + portfolioName +
                   " does not exist. Please enter another name.");
@@ -141,7 +143,8 @@ public class StockControllerImpl implements StockController {
         break;
       case 3:
         int share;
-        String pName = getStringInput("Enter the name of the portfolio you would like to take away from: ");
+        String pName = getStringInput(
+                "Enter the name of the portfolio you would like to take away from: ");
         while (!model.existingPortfolio(pName)) {
           pName = getStringInput("Portfolio " + pName +
                   " does not exist. Please enter another name.");
@@ -161,11 +164,14 @@ public class StockControllerImpl implements StockController {
         String date = getDate("date you would like " +
                 "to calculate the value on: ");
         view.displayResult(n + " is worth " + model.calculatePortfolio(n, date) + " USD");
+        break;
+      default: view.displayResult("Invalid input. Please enter a valid number.");
     }
   }
 
   /**
-   * Handles the creation of a new portfolio by prompting the user for details and updating the model.
+   * Handles the creation of a new portfolio
+   * by prompting the user for details and updating the model.
    */
   private void handleNewPortfolio() {
     String name = getStringInput("Type the name for your portfolio");
@@ -251,8 +257,7 @@ public class StockControllerImpl implements StockController {
         } else {
           if (stockData[1].contains("\"Error Message\":")) {
             view.displayResult("Your symbol doesn't exist in our database. Please try again.");
-          }
-          else {
+          } else {
             view.displayResult("Your symbol does not exist in our local folder and cannot query API"
                     + "right now so please try again later or input a different symbol in our local"
                     + " database");

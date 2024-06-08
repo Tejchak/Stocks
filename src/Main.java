@@ -8,8 +8,9 @@ public class Main {
 
   /**
    * Static method that runs the program.
+   *
    * @param args the arguments of the program.
-   * Takes in a view, model and readable for scanning inputs
+   *             Takes in a view, model and readable for scanning inputs
    */
   public static void main(String[] args) {
     StockViewImpl view = new StockViewImpl();

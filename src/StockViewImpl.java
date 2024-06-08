@@ -8,6 +8,7 @@ public class StockViewImpl implements StockView {
    * Constructor with no params, just used for dispatch.
    */
   public StockViewImpl() {
+    //This constructor is purely for design.
   }
 
   /**

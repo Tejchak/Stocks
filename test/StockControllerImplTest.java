@@ -140,49 +140,6 @@ public class StockControllerImplTest {
   }
 
   /**
-   * Tests that the controller will indicate when an invalid stockSymbol
-   * is inputed and will run the message again.
-   */
-//  @Test
-//  public void testInvalidStockSymbol() {
-//    StockModel model = new StockModelImpl();
-//    StockView view = new MockView();
-//    String input = "3\nblad\nGOOG\n2024-05-09\n2024-05-29\n30\n5\n";
-//    Readable rd = new StringReader(input);
-//    StockController controller = new StockControllerImpl(model, view, rd);
-//
-//    controller.startProgram();
-//
-//    String expectedOutput = "Welcome to the Stocks Program!\n"
-//            + "1. Examine the gain or loss of a specific stock\n"
-//            + "2. Examine the x-day moving average of a stock\n"
-//            + "3. Find the x-day crossovers for a stock\n"
-//            + "4. Examine or create a portfolio\n"
-//            + "5. Quit the program\n"
-//            + "Please enter a number between 1 and 5\n"
-//            + "Type the stock symbol (case insensitive, e.g., GOOG or goog):\n"
-//            + "Your symbol doesn't exist in our database. Please try again.\n"
-//            + "Type the stock symbol (case insensitive, e.g., GOOG or goog):\n"
-//            + "Type the start date (YYYY-MM-DD, e.g., 2024-05-09):\n"
-//            + "Type the end date (YYYY-MM-DD, e.g., 2024-05-09):\n"
-//            + "The moving average will be calulated over the days we have, "
-//            + "and days prior to 2013-08-19, will not be included in "
-//            + "calculating the moving average\n"
-//            + "Type the number of days for moving average:\n"
-//            + "The following are x-day Crossovers: 2024-05-29, 2024-05-28, 2024-05-24, 2024-05-23, "
-//            + "2024-05-22, 2024-05-21, 2024-05-20, 2024-05-17, 2024-05-16, 2024-05-15, 2024-05-14,"
-//            + " 2024-05-13, 2024-05-10, 2024-05-09\n"
-//            + "1. Examine the gain or loss of a specific stock\n"
-//            + "2. Examine the x-day moving average of a stock\n"
-//            + "3. Find the x-day crossovers for a stock\n"
-//            + "4. Examine or create a portfolio\n"
-//            + "5. Quit the program\n"
-//            + "Please enter a number between 1 and 5\n";
-//
-//    assertEquals(expectedOutput, ((MockView) view).log.toString());
-//  }
-
-  /**
    * Tests that the controller will indicate when an invalid date
    * is inputed and will run the message again.
    */

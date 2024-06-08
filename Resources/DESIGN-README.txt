@@ -1,6 +1,6 @@
     We designed our program using the classic Model, View, Controller.
 Our model contains the api key so the program can access the Alpha
-vantage API. Our model also contains a list of portfolios sos the
+vantage API. Our model also contains a list of portfolios so the
 program can add and store multiple portfolios. Portfolios are a
 class that we created to make the storage of a stock with its shares
 much simpler. Finally our model also contains a map of stocks to

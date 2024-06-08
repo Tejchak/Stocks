@@ -1,5 +1,5 @@
 Once you are in folder containing the jar file, you can run it by typing -jar Assignment4Stocks.jar.
-Please make sure that the folder you are in contains the StocksInfo directory as that is our local
+Please make sure that the folder you are in contains the stocks info as that is our local
 database to retrieve stocks from if the Alphavantage API is not working. To create a program when
 the program starts type 4 for the portfolio option, then type 1 to create a new portfolio, enter
 the name of your profile, enter the name of a stock to add to your portfolio, enter the amount of

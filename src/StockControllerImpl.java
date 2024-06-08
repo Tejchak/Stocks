@@ -118,6 +118,11 @@ public class StockControllerImpl implements StockController {
   private void handlePortfolioMenu() {
     view.portfolioMenu();
     int option = getValidPositiveNum("Please enter a number between 1 and 4");
+    while (option != 1 && model.getPortfolios().isEmpty()) {
+      view.displayResult("Must have an existing portfolio " +
+              "before you can add, remove, or calculate.");
+      option = getValidPositiveNum("Please enter a number between 1 and 4");
+    }
     switch (option) {
       case 1:
         handleNewPortfolio();

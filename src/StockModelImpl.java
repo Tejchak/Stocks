@@ -9,10 +9,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The implementation of the Stock model.
- * Uses the AlphaVantage api to access stock data.
- * Also keeps track of stocks that have once been used while being able to pull
- * from a collections of CSV files.
+ * The implementation of the Stock model. This specific implementation uses the alphavantage api
+ * and a resources root folder to obtain its stocks. Furthermore we also gave it a stocks field
+ * to store all the stocks that have thus far been called. We also enforced the constraint that you
+ * cannot have a portfolio with without a stock in the portfolio, and when calculating any kind
+ * of moving average, if the x days ends up going further back than what we have data for,
+ * those days will be not be used when calculating the moving average. The portfolios list is a
+ * list of portfolios, portfolios is a class we created to create and manage stock portfolios. The
+ * ApiKey is used to access Alphavantage, it is a free one so there are a limited number of
+ * querries (which is why we have the csv files and stocks field)
  */
 public class StockModelImpl implements StockModel {
   private final String apiKey;
@@ -53,7 +58,7 @@ public class StockModelImpl implements StockModel {
     }
   }
 
-//gets the stock data from a csv file.
+//gets the stock data from a csv file in the resources root folder.
   protected String[] getStockDataCSV(String stocksymbol) {
     StringBuilder result = new StringBuilder();
     URL url = null;
@@ -82,7 +87,7 @@ public class StockModelImpl implements StockModel {
     return stockData;
   }
 
-  //gets the stock data from an online API.
+  //gets the stock data from an online API (Alphavantage)
   protected String[] getStockDataAPI(String stockSymbol) {
     URL url = null;
     try {
@@ -170,7 +175,7 @@ public class StockModelImpl implements StockModel {
   }
 
   /**
-   * Calculates the total value of a portfolio.
+   * Calculates the total value of a portfolio on the given date.
    * @param n the name of the portfolio.
    * @param date the date on which the value is being calculated.
    * @return the total value in USD.
@@ -204,7 +209,7 @@ public class StockModelImpl implements StockModel {
   }
 
   /**
-   * Creates a portfolio, and adds the shares of the given stock.
+   * Creates a portfolio, and adds the given amount shares of the given stock.
    * @param name the name of the portfolio.
    * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
    * @param shares the amount of shares pf the given stock.

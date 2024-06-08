@@ -314,5 +314,4 @@ public class StockControllerImpl implements StockController {
       view.displayResult("The following are x-day Crossovers: " + crossovers.toString());
     }
   }
-
 }

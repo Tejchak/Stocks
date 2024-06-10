@@ -2,11 +2,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.text.SimpleDateFormat;
 
 /**
  * The implementation of the Stock model. This specific implementation uses the alphavantage api
@@ -181,7 +184,7 @@ public class StockModelImpl implements StockModel {
    * @return the total value in USD.
    */
   @Override
-  public double calculatePortfolio(String n, String date) {
+  public double calculatePortfolio(String n, String date) throws ParseException {
     double result = 0.0;
     BetterPortfolio portfolio = null;
     for (BetterPortfolio p : this.portfolios) {
@@ -203,7 +206,11 @@ public class StockModelImpl implements StockModel {
           }
         }
         ArrayList<StockPurchases> l = portfolio.purchases.getOrDefault(stockSymbol, new ArrayList<StockPurchases>());
-        result += (value * l.get());
+        for (StockPurchases p : l) {
+          if (p.sellDate != null && p.sellDate.after()) {
+            result += (value *);
+          }
+        }
       }
     }
     return result;

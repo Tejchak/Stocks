@@ -8,8 +8,8 @@ import java.util.Map;
  */
 public class BetterPortfolio {
   String name;
-  Map<String, ArrayList<StockPurchases>> purchases;
-  Map<String, ArrayList<StockSales>> sales;
+  Map<String, ArrayList<StockPurchase>> purchases;
+  Map<String, ArrayList<StockSale>> sales;
 
   /**
    * the constructor for the better portfolio that

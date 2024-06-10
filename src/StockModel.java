@@ -24,7 +24,7 @@ public interface StockModel {
    * @param stockPurchase        the amount of shares pf the given stock.
    */
   public void addStockToPortfolio(String portfolioName, String stockSymbol,
-                                  StockPurchases stockPurchase);
+                                  StockPurchase stockPurchase);
 
   public int getShares(String portfolioName, String stockSymbol, Date currentDate);
 
@@ -44,7 +44,7 @@ public interface StockModel {
    * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
    * @param shares      the amount of shares pf the given stock.
    */
-  public void createPortfolio(String name, String stockSymbol, StockPurchases shares);
+  public void createPortfolio(String name, String stockSymbol, StockPurchase shares);
 
   /**
    * Compares the name of a stock to our sources to see if it exists.

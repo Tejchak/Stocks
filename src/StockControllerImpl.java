@@ -157,7 +157,7 @@ public class StockControllerImpl implements StockController {
         String purchaseDate = getDate("Enter the date you would like to purchase: ");
         String[] purchaseDateLine = getValidTradingDay(stockData, purchaseDate, "purchase");
         Date correctDate = convertDate(purchaseDateLine[0]);
-        StockPurchases  currentPurchase = new StockPurchases(shares, correctDate);
+        StockPurchase  currentPurchase = new StockPurchase(shares, correctDate);
         model.addStockToPortfolio(portfolioName, stockSymbol, currentPurchase);
         break;
       case 3:
@@ -171,15 +171,14 @@ public class StockControllerImpl implements StockController {
         String symbol = getStockSymbol();
         stockData = getValidStock(symbol);
         shares = getValidPositiveNum("How many shares would you like to remove" +
-                "(you can only remove whole shares):");
+                "(you can only purchase whole shares):");
         String sellDate = getDate("Enter the date you would like to purchase: ");
         String[] sellDateLine = getValidTradingDay(stockData, sellDate, "purchase");
-        correctDate = convertDate(sellDateLine[0]);
-        while (model.getShares(pName, symbol, correctDate) < shares) {
+        while (model.getShares(pName, symbol) < shares) {
           view.displayResult("Invalid number: you only have " +
-                  model.getShares(pName, symbol, correctDate) + "shares available at the current date");
+                  model.getShares(pName, symbol) + "shares");
           shares = getValidPositiveNum("How many shares would you like to remove" +
-                  "(you can only remove whole shares):");
+                  "(you can only purchase whole shares):");
         }
         model.removeStockFromPortfolio(pName, symbol, share);
         break;
@@ -217,7 +216,7 @@ public class StockControllerImpl implements StockController {
     String[] purchaseDateLine = getValidTradingDay(stockData, purchaseDate, "purchase");
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     Date correctDate = convertDate(purchaseDateLine[0]);
-    StockPurchases currentPurchase = new StockPurchases(shares, correctDate);
+    StockPurchase currentPurchase = new StockPurchase(shares, correctDate);
     model.createPortfolio(name, stockSymbol, currentPurchase);
     view.displayResult("Successfully created portfolio");
   }

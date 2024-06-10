@@ -207,8 +207,8 @@ public class StockModelImpl implements StockModel {
             value = Double.parseDouble(sections[4]);
           }
         }
-        ArrayList<StockPurchases> l = portfolio.purchases.getOrDefault(stockSymbol, new ArrayList<StockPurchases>());
-        for (StockPurchases p : l) {
+        ArrayList<StockPurchase> l = portfolio.purchases.getOrDefault(stockSymbol, new ArrayList<StockPurchase>());
+        for (StockPurchase p : l) {
           if (p.purchaseDate.before(date)) {
             result += (value * p.shares);
           }
@@ -223,7 +223,7 @@ public class StockModelImpl implements StockModel {
     int totalShares = 0;
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(name)) {
-        for (StockPurchases purchase : p.purchases.getOrDefault(StockSymbol, new ArrayList<>())) {
+        for (StockPurchase purchase : p.purchases.getOrDefault(StockSymbol, new ArrayList<>())) {
           if (!purchase.purchaseDate.after(currentDate)) {
             totalShares += purchase.shares;
           }
@@ -240,9 +240,9 @@ public class StockModelImpl implements StockModel {
    * @param purchase the StockPurchases being made with the
    */
   @Override
-  public void createPortfolio(String name, String stockSymbol, StockPurchases purchase) {
+  public void createPortfolio(String name, String stockSymbol, StockPurchase purchase) {
     BetterPortfolio p = new BetterPortfolio(name);
-    ArrayList<StockPurchases> addition = new ArrayList<StockPurchases>();
+    ArrayList<StockPurchase> addition = new ArrayList<StockPurchase>();
     addition.add(purchase);
     p.purchases.put(stockSymbol, addition);
     this.portfolios.add(p);
@@ -274,10 +274,10 @@ public class StockModelImpl implements StockModel {
    */
   @Override
   public void addStockToPortfolio(String portfolioName, String stockSymbol,
-                                  StockPurchases stockPurchase) {
+                                  StockPurchase stockPurchase) {
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(portfolioName)) {
-        ArrayList<StockPurchases> purchasesList = p.purchases.getOrDefault(stockSymbol, new ArrayList<>());
+        ArrayList<StockPurchase> purchasesList = p.purchases.getOrDefault(stockSymbol, new ArrayList<>());
         purchasesList.add(stockPurchase);
         p.purchases.put(stockSymbol, purchasesList);
       }

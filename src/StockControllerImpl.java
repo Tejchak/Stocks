@@ -205,9 +205,10 @@ public class StockControllerImpl implements StockController {
             name = getStringInput("Portfolio " + name +
                     " does not exist. Please enter another name.");
           }
-          String valDate = getDate("Enter the date you would like to view this portfolio on: ");
+          String valDate = getDate("date you would like to view this portfolio on: ");
           Date day = this.convertDate(valDate);
-          model.portfolioAsDistribution(name, day);
+          view.displayResult(model.portfolioAsDistribution(name, day));
+          break;
       default: view.displayResult("Invalid input. Please enter a valid number.");
     }
   }

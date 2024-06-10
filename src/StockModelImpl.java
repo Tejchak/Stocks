@@ -208,13 +208,13 @@ public class StockModelImpl implements StockModel {
         }
         ArrayList<StockPurchase> l = portfolio.purchases.getOrDefault(stockSymbol, new ArrayList<StockPurchase>());
         for (StockPurchase p : l) {
-          if (p.purchaseDate.before(date)) {
+          if (!p.purchaseDate.after(date)) {
             result += (value * p.shares);
           }
         }
         ArrayList<StockSale> l2 = portfolio.sales.getOrDefault(stockSymbol, new ArrayList<StockSale>());
         for (StockSale s : l2) {
-          if (s.saledate.before(date)) {
+          if (!s.saledate.after(date)) {
             result -= (value * s.shares);
           }
         }
@@ -463,7 +463,7 @@ public class StockModelImpl implements StockModel {
       if (p.name.equals(pName)) {
         for (String symbol :p.purchases.keySet()) {
           if (!result.containsKey(symbol)) {
-            result.put(symbol, this.getBoughtShares(pName, symbol, date));
+            result.put(symbol, (this.getBoughtShares(pName, symbol, date) - this.getSoldShares(pName, symbol, date)) * this.));
           }
         }
       }

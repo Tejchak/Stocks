@@ -137,9 +137,14 @@ public class StockControllerImpl implements StockController {
                   " does not exist. Please enter another name.");
         }
         String stockSymbol = getStockSymbol();
+        String[] stockData = getValidStock(stockSymbol);
         shares = getValidPositiveNum("How many shares would you like to get" +
                 "(you can only purchase whole shares):");
-        model.addStockToPortfolio(portfolioName, stockSymbol, shares);
+        String purchaseDate = getDate("Enter the date you would like to purchase: ");
+        String[] purchaseDateLine = getValidTradingDay(stockData, purchaseDate, "purchase");
+        StockPurchases currentPurchase = new StockPurchases(shares, purchaseDateLine[0],
+                Double.parseDouble(purchaseDateLine[4]));
+        model.addStockToPortfolio(portfolioName, stockSymbol, currentPurchase);
         break;
       case 3:
         int share;

@@ -19,7 +19,7 @@ public class StockViewImpl implements StockView {
     System.out.println("1. Examine the gain or loss of a specific stock");
     System.out.println("2. Examine the x-day moving average of a stock");
     System.out.println("3. Find the x-day crossovers for a stock");
-    System.out.println("4. Examine or create a portfolio");
+    System.out.println("4. Examine, edit, or create a portfolio");
     System.out.println("5. Quit the program");
   }
 

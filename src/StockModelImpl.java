@@ -184,7 +184,7 @@ public class StockModelImpl implements StockModel {
    * @return the total value in USD.
    */
   @Override
-  public double calculatePortfolio(String n, String date) throws ParseException {
+  public double calculatePortfolio(String n, Date date) throws ParseException {
     double result = 0.0;
     BetterPortfolio portfolio = null;
     for (BetterPortfolio p : this.portfolios) {
@@ -196,19 +196,21 @@ public class StockModelImpl implements StockModel {
     }
     if (portfolio != null) {
       for (String stockSymbol : portfolio.purchases.keySet()) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String[] stockData = getStockData(stockSymbol);
         Double value = 0.0;
         for (int i = 0; i < stockData.length; i++) {
           String line = stockData[i];
-          if (line.substring(0, 10).equals(date)) {
+          Date computedDate = dateFormat.parse(line.substring(0, 10));
+          if (computedDate.equals(date)) {
             String[] sections = line.split(",");
             value = Double.parseDouble(sections[4]);
           }
         }
         ArrayList<StockPurchases> l = portfolio.purchases.getOrDefault(stockSymbol, new ArrayList<StockPurchases>());
         for (StockPurchases p : l) {
-          if (p.sellDate != null && p.sellDate.after()) {
-            result += (value *);
+          if (p.purchaseDate.before(date)) {
+            result += (value * p.shares);
           }
         }
       }

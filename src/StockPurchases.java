@@ -7,8 +7,6 @@ import java.util.Date;
 public class StockPurchases {
   int shares;
   Date purchaseDate;
-  Date sellDate;
-  Double closingValue;
 
   /**
    * Constructor for stock purchase that initializes the sellDate
@@ -19,6 +17,5 @@ public class StockPurchases {
   StockPurchases(int shares, Date purchaseDate) {
     this.shares = shares;
     this.purchaseDate = purchaseDate;
-    this.sellDate = null;
   }
 }

@@ -1,5 +1,6 @@
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Interface for a model that can do certain calculations about a stock or,
@@ -77,7 +78,7 @@ public interface StockModel {
    * @param date the date on which the value is being calculated.
    * @return the total value in USD.
    */
-  public double calculatePortfolio(String n, String date) throws ParseException;
+  public double calculatePortfolio(String n, Date date) throws ParseException;
 
   /**
    * Calculates the gain or loss of a stock from the startdate to the enddate.

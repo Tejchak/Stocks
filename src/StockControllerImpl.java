@@ -188,7 +188,12 @@ public class StockControllerImpl implements StockController {
     }
     int shares = getValidPositiveNum("How many shares would you like to share get" +
             "(you can only purchase whole shares):");
-    model.createPortfolio(name, stockSymbol, shares);
+    String purchaseDate = getDate("Enter the date you would like to purchase: ");
+    String[] stockData = getValidStock(stockSymbol);
+    String[] purchaseDateLine = getValidTradingDay(stockData, purchaseDate, "purchase");
+    StockPurchases currentPurchase = new StockPurchases(shares, purchaseDateLine[0],
+            Double.parseDouble(purchaseDateLine[4]));
+    model.createPortfolio(name, stockSymbol, currentPurchase);
     view.displayResult("Successfully created portfolio");
   }
 

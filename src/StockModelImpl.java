@@ -31,8 +31,8 @@ public class StockModelImpl implements StockModel {
    * Further the hashmap is the storage of stock info.
    */
   StockModelImpl() {
-    this.apiKey = "QCLLY08TISZBMXL9";
-    this.portfolios = new ArrayList<BetterPortfolio>();
+    this.apiKey = "F99D5A7QDFY52B58";
+    this.portfolios = new ArrayList<>();
     this.stocks = new HashMap<String, String[]>();
   }
 
@@ -212,12 +212,14 @@ public class StockModelImpl implements StockModel {
    * Creates a portfolio, and adds the given amount shares of the given stock.
    * @param name the name of the portfolio.
    * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
-   * @param shares the amount of shares pf the given stock.
+   * @param purchase the StockPurchases being made with the
    */
   @Override
-  public void createPortfolio(String name, String stockSymbol, int shares) {
-    BetterPortfolio p = new BetterPortfolio();
-    p.stocks.put(stockSymbol, shares);
+  public void createPortfolio(String name, String stockSymbol, StockPurchases purchase) {
+    BetterPortfolio p = new BetterPortfolio(name);
+    ArrayList<StockPurchases> addition = new ArrayList<StockPurchases>();
+    addition.add(purchase);
+    p.purchases.put(stockSymbol, addition);
     this.portfolios.add(p);
   }
 
@@ -243,14 +245,16 @@ public class StockModelImpl implements StockModel {
    * Adds the given stock to the portfolio.
    * @param portfolioName the name of the portfolio.
    * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
-   * @param shares the amount of shares pf the given stock.
+   * @param stockPurchase the stockPurchase
    */
   @Override
-  public void addStockToPortfolio(String portfolioName, String stockSymbol, StockPurchases stockPurchase) {
+  public void addStockToPortfolio(String portfolioName, String stockSymbol,
+                                  StockPurchases stockPurchase) {
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(portfolioName)) {
-        p.purchases.put(stockSymbol, p.purchases.getOrDefault(stockSymbol,
-                new ArrayList<StockPurchases>()).add(stockPurchase));
+        ArrayList<StockPurchases> purchasesList = p.purchases.getOrDefault(stockSymbol, new ArrayList<>());
+        purchasesList.add(stockPurchase);
+        p.purchases.put(stockSymbol, purchasesList);
       }
     }
   }

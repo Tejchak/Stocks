@@ -1,5 +1,6 @@
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
 /**
@@ -65,6 +66,17 @@ public class StockControllerImpl implements StockController {
   private String getStringInput(String prompt) {
     view.displayResult(prompt);
     return this.scanner.nextLine();
+  }
+
+  private Date convertDate(String date) {
+    Date newDate = new Date();
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    try {
+       newDate = dateFormat.parse(date);
+    } catch (ParseException e) {
+      throw new RuntimeException("Unable to parse date: " + date, e);
+    }
+    return newDate;
   }
 
   /**
@@ -144,13 +156,8 @@ public class StockControllerImpl implements StockController {
                 "(you can only purchase whole shares):");
         String purchaseDate = getDate("Enter the date you would like to purchase: ");
         String[] purchaseDateLine = getValidTradingDay(stockData, purchaseDate, "purchase");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        StockPurchases currentPurchase = null;
-        try {
-          currentPurchase = new StockPurchases(shares, dateFormat.parse(purchaseDateLine[0]));
-        } catch (ParseException e) {
-          throw new RuntimeException("Date could not be converted to a valid date.");
-        }
+        Date correctDate = convertDate(purchaseDateLine[0]);
+        StockPurchases  currentPurchase = new StockPurchases(shares, correctDate);
         model.addStockToPortfolio(portfolioName, stockSymbol, currentPurchase);
         break;
       case 3:
@@ -162,8 +169,11 @@ public class StockControllerImpl implements StockController {
                   " does not exist. Please enter another name.");
         }
         String symbol = getStockSymbol();
+        stockData = getValidStock(symbol);
         shares = getValidPositiveNum("How many shares would you like to remove" +
                 "(you can only purchase whole shares):");
+        String sellDate = getDate("Enter the date you would like to purchase: ");
+        String[] sellDateLine = getValidTradingDay(stockData, sellDate, "purchase");
         while (model.getShares(pName, symbol) < shares) {
           view.displayResult("Invalid number: you only have " +
                   model.getShares(pName, symbol) + "shares");
@@ -205,12 +215,8 @@ public class StockControllerImpl implements StockController {
     String[] stockData = getValidStock(stockSymbol);
     String[] purchaseDateLine = getValidTradingDay(stockData, purchaseDate, "purchase");
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    StockPurchases currentPurchase = null;
-    try {
-      currentPurchase = new StockPurchases(shares, dateFormat.parse(purchaseDateLine[0]));
-    } catch (ParseException e) {
-      throw new RuntimeException("Date could not be converted to a valid date.");
-    }
+    Date correctDate = convertDate(purchaseDateLine[0]);
+    StockPurchases currentPurchase = new StockPurchases(shares, correctDate);
     model.createPortfolio(name, stockSymbol, currentPurchase);
     view.displayResult("Successfully created portfolio");
   }

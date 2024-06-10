@@ -213,6 +213,12 @@ public class StockModelImpl implements StockModel {
             result += (value * p.shares);
           }
         }
+        ArrayList<StockSale> l2 = portfolio.sales.getOrDefault(stockSymbol, new ArrayList<StockSale>());
+        for (StockSale s : l2) {
+          if (s.saledate.before(date)) {
+            result -= (value * s.shares);
+          }
+        }
       }
     }
     return result;
@@ -401,7 +407,7 @@ public class StockModelImpl implements StockModel {
    */
   @Override
   public boolean existingPortfolio(String n) {
-    for (Portfolio p : this.portfolios) {
+    for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(n)) {
         return true;
       }

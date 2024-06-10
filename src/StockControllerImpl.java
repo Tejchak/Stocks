@@ -130,7 +130,7 @@ public class StockControllerImpl implements StockController {
    * Handles the portfolio menu options, including creating, adding,
    * removing, and calculating portfolio values.
    */
-  private void handlePortfolioMenu() {
+  private void handlePortfolioMenu() throws ParseException {
     view.portfolioMenu();
     int option = getValidPositiveNum("Please enter a number between 1 and 4");
     while (option != 1 && model.getPortfolios().isEmpty()) {
@@ -191,7 +191,7 @@ public class StockControllerImpl implements StockController {
         }
         String date = getDate("date you would like " +
                 "to calculate the value on: ");
-        view.displayResult(n + " is worth " + model.calculatePortfolio(n, date) + " USD");
+        view.displayResult(n + " is worth " + model.calculatePortfolio(n, this.convertDate(date)) + " USD");
         break;
       default: view.displayResult("Invalid input. Please enter a valid number.");
     }

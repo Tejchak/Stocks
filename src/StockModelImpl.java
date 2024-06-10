@@ -2,7 +2,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -59,6 +58,16 @@ public class StockModelImpl implements StockModel {
         this.stocks.put(stockSymbol, stockData);
         return stockData;
     }
+  }
+
+  @Override
+  public boolean portfolioContainsStock(String pName, String stockSymbol) {
+    for (BetterPortfolio portfolio : this.portfolios) {
+      if (portfolio.name.equals(pName)) {
+        return portfolio.purchases.containsKey(stockSymbol);
+      }
+    }
+    throw new RuntimeException("Could not find portfolio with name " + pName);
   }
 
 //gets the stock data from a csv file in the resources root folder.
@@ -202,7 +211,7 @@ public class StockModelImpl implements StockModel {
   }
 
   @Override
-  public int getBoughtShares(String name, String StockSymbol, Date currentDate) {
+  public double getBoughtShares(String name, String StockSymbol, Date currentDate) {
     int totalShares = 0;
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(name)) {
@@ -232,8 +241,8 @@ public class StockModelImpl implements StockModel {
   }
 
   @Override
-  public int getSoldShares(String name, String StockSymbol, Date currentDate) {
-    int totalShares = 0;
+  public double getSoldShares(String name, String StockSymbol, Date currentDate) {
+    double totalShares = 0;
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(name)) {
         for (StockSale sale : p.sales.getOrDefault(StockSymbol, new ArrayList<>())) {
@@ -276,6 +285,20 @@ public class StockModelImpl implements StockModel {
         p.sales.put(stockSymbol, soldList);
       }
     }
+  }
+
+  @Override
+  public void removeSales(String portfolioName, String stockSymbol, Date sellDate) {
+    for (BetterPortfolio p : this.portfolios) {
+      if (p.name.equals(portfolioName)) {
+        for (int i = 0; i < p.sales.get(stockSymbol).size(); i++) {
+          StockSale sale = p.sales.get(stockSymbol).get(i);
+          if (sale.saledate.after(sellDate)) {
+            p.sales.get(stockSymbol).remove(sale);
+          }
+        }
+      }
+      }
   }
 
   /**

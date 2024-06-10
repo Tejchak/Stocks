@@ -126,6 +126,36 @@ public class StockControllerImpl implements StockController {
     return input;
   }
 
+  private double getValidPositiveDouble(String prompt) {
+    double input = 0.0;
+    boolean validInput = false;
+    while (!validInput) {
+      view.displayResult(prompt);
+      if (scanner.hasNextDouble()) {
+        input = scanner.nextDouble();
+        scanner.nextLine();
+        if (input > 0) {
+          validInput = true;
+        } else {
+          view.displayResult("Invalid input. Please enter a positive number.");
+        }
+      } else if (scanner.hasNextInt()) {
+        input = scanner.nextInt();
+        scanner.nextLine();
+        if (input > 0) {
+          validInput = true;
+        } else {
+          view.displayResult("Invalid input. Please enter a positive number.");
+        }
+      } else {
+        view.displayResult("Invalid input. Please enter a positive number.");
+        scanner.next();
+      }
+    }
+    return input;
+  }
+
+
   /**
    * Handles the portfolio menu options, including creating, adding,
    * removing, and calculating portfolio values.
@@ -161,7 +191,7 @@ public class StockControllerImpl implements StockController {
         model.addStockToPortfolio(portfolioName, stockSymbol, currentPurchase);
         break;
       case 3:
-        int share;
+        double sellShares;
         String pName = getStringInput(
                 "Enter the name of the portfolio you would like to take away from: ");
         while (!model.existingPortfolio(pName)) {
@@ -169,23 +199,25 @@ public class StockControllerImpl implements StockController {
                   " does not exist. Please enter another name.");
         }
         String symbol = getStockSymbol();
+        while (!model.portfolioContainsStock(pName, symbol)) {
+          view.displayResult("Sorry it appears you haven't bought any shares of that stock");
+          symbol = getStockSymbol();
+        }
         stockData = getValidStock(symbol);
-        String sellDate = getDate("Enter the date you would like to sell: ");
+        String sellDate = getDate("date you would like to sell: ");
         String[] sellDateLine = getValidTradingDay(stockData, sellDate, "sell");
         Date currentSellDate = convertDate(sellDateLine[0]);
         Date finalDate = getValidSellDate(pName, symbol, currentSellDate, stockData);
-        shares = getValidPositiveNum("How many shares would you like to sell" +
-                "(you can only sell whole shares):");
-        int availableShares = model.getBoughtShares(pName, symbol, finalDate) -
+        sellShares = getValidPositiveDouble("How many shares would you like to sell:");
+        double availableShares = model.getBoughtShares(pName, symbol, finalDate) -
                 model.getSoldShares(pName, symbol, finalDate);
         if (availableShares > 0) {
-          while (availableShares < shares) {
+          while (availableShares < sellShares) {
             view.displayResult("Invalid number: you only have "
                     + availableShares + " shares available");
-            shares = getValidPositiveNum("How many shares would you like to sell" +
-                    "(you can only sell whole shares):");
+            sellShares = getValidPositiveDouble("How many shares would you like to sell:");
           }
-          StockSale sale = new StockSale(shares, finalDate);
+          StockSale sale = new StockSale(sellShares, finalDate);
           model.removeStockFromPortfolio(pName, symbol, sale);
         }
         else {
@@ -301,10 +333,31 @@ public class StockControllerImpl implements StockController {
       while (latestSellDate.after(sellDate)) {
         view.displayResult("Sell date cannot be before most recent sell date for this stock. "
                 + "You sold this stock on " + dateFormat.format(latestSellDate));
-        sellDate = convertDate(getValidTradingDay(stockData, getDate("sell"), "sell")[0]);
+        if (askRemoveSale(pName, stockSymbol, sellDate)) {
+          break;
+        }
+        else {
+          sellDate = convertDate(getValidTradingDay(stockData, getDate("sell"), "sell")[0]);
+        }
       }
     }
     return sellDate;
+  }
+
+  private boolean askRemoveSale(String pName, String stockSymbol, Date sellDate) {
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    view.displayResult("Would you like to remove your sales that are after the date " +
+            dateFormat.format(sellDate) + "?" + " Type y for yes and n for no");
+    String response = scanner.nextLine();
+    while (!response.equals("y") && !response.equals("n")) {
+      view.displayResult("Invalid input: Please type y/n.");
+      response = scanner.nextLine();
+    }
+    if (response.equals("y")) {
+      model.removeSales(pName, stockSymbol, sellDate);
+      return true;
+    }
+    return false;
   }
 
   /**

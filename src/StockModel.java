@@ -26,7 +26,9 @@ public interface StockModel {
   public void addStockToPortfolio(String portfolioName, String stockSymbol,
                                   StockPurchase stockPurchase);
 
-  public int getBoughtShares(String portfolioName, String stockSymbol, Date currentDate);
+  public double getBoughtShares(String portfolioName, String stockSymbol, Date currentDate);
+
+  public boolean portfolioContainsStock(String portfolioName, String stockSymbol);
 
   public Date getLatestSellDate(String portfolioName, String stockSymbol);
 
@@ -65,6 +67,8 @@ public interface StockModel {
    */
   public void removeStockFromPortfolio(String portfolioName,
                                        String stockSymbol, StockSale sale);
+
+  public void removeSales(String portfolioName, String stockSymbol, Date sellDate);
 
   /**
    * Checks if a portfolio exists in the model.
@@ -122,7 +126,7 @@ public interface StockModel {
    */
   public ArrayList<BetterPortfolio> getPortfolios();
 
-  public int getSoldShares(String name, String StockSymbol, Date currentDate);
+  public double getSoldShares(String name, String StockSymbol, Date currentDate);
 
   /**
    *

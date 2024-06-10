@@ -219,12 +219,14 @@ public class StockModelImpl implements StockModel {
   }
 
   @Override
-  public int getShares(String name, String StockSymbol) {
+  public int getShares(String name, String StockSymbol, Date currentDate) {
     int totalShares = 0;
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(name)) {
         for (StockPurchases purchase : p.purchases.getOrDefault(StockSymbol, new ArrayList<>())) {
-          totalShares += purchase.shares;
+          if (!purchase.purchaseDate.after(currentDate)) {
+            totalShares += purchase.shares;
+          }
         }
       }
     }

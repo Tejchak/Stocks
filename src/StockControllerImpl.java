@@ -171,14 +171,15 @@ public class StockControllerImpl implements StockController {
         String symbol = getStockSymbol();
         stockData = getValidStock(symbol);
         shares = getValidPositiveNum("How many shares would you like to remove" +
-                "(you can only purchase whole shares):");
+                "(you can only remove whole shares):");
         String sellDate = getDate("Enter the date you would like to purchase: ");
         String[] sellDateLine = getValidTradingDay(stockData, sellDate, "purchase");
-        while (model.getShares(pName, symbol) < shares) {
+        correctDate = convertDate(sellDateLine[0]);
+        while (model.getShares(pName, symbol, correctDate) < shares) {
           view.displayResult("Invalid number: you only have " +
-                  model.getShares(pName, symbol) + "shares");
+                  model.getShares(pName, symbol, correctDate) + "shares available at the current date");
           shares = getValidPositiveNum("How many shares would you like to remove" +
-                  "(you can only purchase whole shares):");
+                  "(you can only remove whole shares):");
         }
         model.removeStockFromPortfolio(pName, symbol, share);
         break;

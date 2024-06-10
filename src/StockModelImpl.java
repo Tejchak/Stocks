@@ -208,6 +208,18 @@ public class StockModelImpl implements StockModel {
     return result;
   }
 
+  public int getShares(String name, String StockSymbol) {
+    int totalShares = 0;
+    for (BetterPortfolio p : this.portfolios) {
+      if (p.name.equals(name)) {
+        for (StockPurchases purchase : p.purchases.getOrDefault(StockSymbol, new ArrayList<>())) {
+          totalShares += purchase.shares;
+        }
+      }
+    }
+    return totalShares;
+  }
+
   /**
    * Creates a portfolio, and adds the given amount shares of the given stock.
    * @param name the name of the portfolio.

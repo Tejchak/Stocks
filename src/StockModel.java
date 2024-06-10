@@ -28,6 +28,8 @@ public interface StockModel {
 
   public int getBoughtShares(String portfolioName, String stockSymbol, Date currentDate);
 
+  public Date getLatestSellDate(String portfolioName, String stockSymbol);
+
   /**
    * Gets the line of the given date.
    *

@@ -233,6 +233,20 @@ public class StockModelImpl implements StockModel {
     return totalShares;
   }
 
+  public Date getLatestSellDate(String pName, String stockSymbol) {
+    Date latestDate = null;
+    for (BetterPortfolio p : this.portfolios) {
+      if (p.name.equals(pName)) {
+        for (StockSale sale : p.sales.getOrDefault(stockSymbol, new ArrayList<>())) {
+          if (latestDate == null || sale.saledate.after(latestDate)) {
+            latestDate = sale.saledate;
+          }
+        }
+      }
+    }
+    return latestDate;
+  }
+
   /**
    * Creates a portfolio, and adds the given amount shares of the given stock.
    * @param name the name of the portfolio.

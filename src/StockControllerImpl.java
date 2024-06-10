@@ -173,11 +173,11 @@ public class StockControllerImpl implements StockController {
         String sellDate = getDate("Enter the date you would like to sell: ");
         String[] sellDateLine = getValidTradingDay(stockData, sellDate, "sell");
         Date currentSellDate = convertDate(sellDateLine[0]);
-        Date validSellDate = getValidSellDate(pName, symbol, currentSellDate, stockData);
+        Date finalDate = getValidSellDate(pName, symbol, currentSellDate, stockData);
         shares = getValidPositiveNum("How many shares would you like to sell" +
                 "(you can only sell whole shares):");
-        int availableShares = model.getBoughtShares(pName, symbol, currentSellDate) -
-                model.getSoldShares(pName, symbol, currentSellDate);
+        int availableShares = model.getBoughtShares(pName, symbol, finalDate) -
+                model.getSoldShares(pName, symbol, finalDate);
         if (availableShares > 0) {
           while (availableShares < shares) {
             view.displayResult("Invalid number: you only have "
@@ -185,7 +185,7 @@ public class StockControllerImpl implements StockController {
             shares = getValidPositiveNum("How many shares would you like to sell" +
                     "(you can only sell whole shares):");
           }
-          StockSale sale = new StockSale(shares, validSellDate);
+          StockSale sale = new StockSale(shares, finalDate);
           model.removeStockFromPortfolio(pName, symbol, sale);
         }
         else {
@@ -230,10 +230,10 @@ public class StockControllerImpl implements StockController {
       view.displayResult("Sorry it appears your stock doesn't exist in out database");
       stockSymbol = getStockSymbol();
     }
+    String[] stockData = getValidStock(stockSymbol);
     int shares = getValidPositiveNum("How many shares would you like to get" +
             "(you can only purchase whole shares):");
     String purchaseDate = getDate("date you would like to purchase: ");
-    String[] stockData = getValidStock(stockSymbol);
     String[] purchaseDateLine = getValidTradingDay(stockData, purchaseDate, "purchase");
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     Date correctDate = convertDate(purchaseDateLine[0]);

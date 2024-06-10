@@ -24,6 +24,8 @@ public interface StockModel {
   public void addStockToPortfolio(String portfolioName, String stockSymbol,
                                   StockPurchases stockPurchase);
 
+  public int getShares(String portfolioName, String stockSymbol);
+
   /**
    * Gets the line of the given date.
    *

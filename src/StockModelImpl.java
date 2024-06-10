@@ -184,7 +184,7 @@ public class StockModelImpl implements StockModel {
    * @return the total value in USD.
    */
   @Override
-  public double calculatePortfolio(String n, Date date) throws ParseException {
+  public double calculatePortfolio(String n, Date date) {
     double result = 0.0;
     BetterPortfolio portfolio = null;
     for (BetterPortfolio p : this.portfolios) {
@@ -201,8 +201,7 @@ public class StockModelImpl implements StockModel {
         Double value = 0.0;
         for (int i = 0; i < stockData.length; i++) {
           String line = stockData[i];
-          Date computedDate = dateFormat.parse(line.substring(0, 10));
-          if (computedDate.equals(date)) {
+          if (line.substring(0, 10).equals(dateFormat.format(date))) {
             String[] sections = line.split(",");
             value = Double.parseDouble(sections[4]);
           }
@@ -211,6 +210,12 @@ public class StockModelImpl implements StockModel {
         for (StockPurchase p : l) {
           if (p.purchaseDate.before(date)) {
             result += (value * p.shares);
+          }
+        }
+        ArrayList<StockSale> l2 = portfolio.sales.getOrDefault(stockSymbol, new ArrayList<StockSale>());
+        for (StockSale s : l2) {
+          if (s.saledate.before(date)) {
+            result -= (value * s.shares);
           }
         }
       }
@@ -233,6 +238,7 @@ public class StockModelImpl implements StockModel {
     return totalShares;
   }
 
+
   public Date getLatestSellDate(String pName, String stockSymbol) {
     Date latestDate = null;
     for (BetterPortfolio p : this.portfolios) {
@@ -245,6 +251,21 @@ public class StockModelImpl implements StockModel {
       }
     }
     return latestDate;
+  }
+
+  @Override
+  public int getSoldShares(String name, String StockSymbol, Date currentDate) {
+    int totalShares = 0;
+    for (BetterPortfolio p : this.portfolios) {
+      if (p.name.equals(name)) {
+        for (StockSale sale : p.sales.getOrDefault(StockSymbol, new ArrayList<>())) {
+          if (!sale.saledate.after(currentDate)) {
+            totalShares += sale.shares;
+          }
+        }
+      }
+    }
+    return totalShares;
   }
 
   /**
@@ -266,17 +287,14 @@ public class StockModelImpl implements StockModel {
    * Removes the given stock from a portfolio.
    * @param portfolioName the name of the portfolio.
    * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
-   * @param shares the amount of shares pf the given stock.
+   * @param stockSale the stockSale being added
    */
   @Override
-  public void removeStockFromPortfolio(String portfolioName, String stockSymbol, int shares) {
-    for (Portfolio p : this.portfolios) {
-      if (p.name.equals(portfolioName)) {
-        p.stocks.put(stockSymbol, p.stocks.getOrDefault(stockSymbol, 0) - shares);
-      }
-      if (p.stocks.get(stockSymbol) <= 0) {
-        p.stocks.remove(stockSymbol);
-      }
+  public void removeStockFromPortfolio(String portfolioName, String stockSymbol, StockSale stockSale) {
+    for (BetterPortfolio p : this.portfolios) {
+      ArrayList<StockSale> soldList = p.sales.getOrDefault(stockSymbol, new ArrayList<>());
+      soldList.add(stockSale);
+      p.sales.put(stockSymbol, soldList);
     }
   }
 
@@ -415,7 +433,7 @@ public class StockModelImpl implements StockModel {
    */
   @Override
   public boolean existingPortfolio(String n) {
-    for (Portfolio p : this.portfolios) {
+    for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(n)) {
         return true;
       }
@@ -427,13 +445,29 @@ public class StockModelImpl implements StockModel {
    * Gets a copy of the portfolios field.
    */
   @Override
-  public ArrayList<Portfolio> getPortfolios() {
-    ArrayList<Portfolio> result = new ArrayList<>();
-    for (Portfolio p : this.portfolios) {
-      Portfolio port = new Portfolio(p.name);
-      port.stocks = new HashMap<>(p.stocks);
+  public ArrayList<BetterPortfolio> getPortfolios() {
+    ArrayList<BetterPortfolio> result = new ArrayList<>();
+    for (BetterPortfolio p : this.portfolios) {
+      BetterPortfolio port = new BetterPortfolio(p.name);
+      port.purchases = new HashMap<>(p.purchases);
+      port.sales = new HashMap<>(p.sales);
       result.add(port);
     }
     return result;
+  }
+
+  @Override
+  public String portfolioAsDistribution(String pName, Date date) {
+    HashMap<String, Integer> result = new HashMap<String, Integer>();
+    for (BetterPortfolio p : this.portfolios) {
+      if (p.name.equals(pName)) {
+        for (String symbol :p.purchases.keySet()) {
+          if (!result.containsKey(symbol)) {
+            result.put(symbol, this.getBoughtShares(pName, symbol, date));
+          }
+        }
+      }
+    }
+    return result.toString();
   }
 }

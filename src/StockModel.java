@@ -61,9 +61,10 @@ public interface StockModel {
    *
    * @param portfolioName the name of the portfolio.
    * @param stockSymbol   the symbol of a stock as a string (Ex, AMC).
-   * @param shares        the amount of shares pf the given stock.
+   * @param sale        the stockSale being added.
    */
-  public void removeStockFromPortfolio(String portfolioName, String stockSymbol, int shares);
+  public void removeStockFromPortfolio(String portfolioName,
+                                       String stockSymbol, StockSale sale);
 
   /**
    * Checks if a portfolio exists in the model.
@@ -119,5 +120,14 @@ public interface StockModel {
   /**
    * Gets a copy of the portfolios field.
    */
-  public ArrayList<Portfolio> getPortfolios();
+  public ArrayList<BetterPortfolio> getPortfolios();
+
+  public int getSoldShares(String name, String StockSymbol, Date currentDate);
+
+  /**
+   *
+   * @param date
+   * @return
+   */
+  public String portfolioAsDistribution(String pName, Date date);
 }

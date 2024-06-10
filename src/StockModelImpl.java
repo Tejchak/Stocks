@@ -183,8 +183,8 @@ public class StockModelImpl implements StockModel {
   @Override
   public double calculatePortfolio(String n, String date) {
     double result = 0.0;
-    Portfolio portfolio = null;
-    for (Portfolio p : this.portfolios) {
+    BetterPortfolio portfolio = null;
+    for (BetterPortfolio p : this.portfolios) {
       while (portfolio == null) {
         if (p.name.equals(n)) {
           portfolio = p;
@@ -192,7 +192,7 @@ public class StockModelImpl implements StockModel {
       }
     }
     if (portfolio != null) {
-      for (String stockSymbol : portfolio.stocks.keySet()) {
+      for (String stockSymbol : portfolio.purchases.keySet()) {
         String[] stockData = getStockData(stockSymbol);
         Double value = 0.0;
         for (int i = 0; i < stockData.length; i++) {
@@ -202,7 +202,8 @@ public class StockModelImpl implements StockModel {
             value = Double.parseDouble(sections[4]);
           }
         }
-        result += (value * portfolio.stocks.getOrDefault(stockSymbol, 0));
+        ArrayList<StockPurchases> l = portfolio.purchases.getOrDefault(stockSymbol, new ArrayList<StockPurchases>());
+        result += (value * l.get());
       }
     }
     return result;

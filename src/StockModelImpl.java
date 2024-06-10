@@ -460,16 +460,30 @@ public class StockModelImpl implements StockModel {
 
   @Override
   public String portfolioAsDistribution(String pName, Date date) {
-    HashMap<String, Integer> result = new HashMap<String, Integer>();
+    HashMap<String, Double> result = new HashMap<String, Double>();
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(pName)) {
         for (String symbol :p.purchases.keySet()) {
           if (!result.containsKey(symbol)) {
-            result.put(symbol, (this.getBoughtShares(pName, symbol, date) - this.getSoldShares(pName, symbol, date)) * this.));
+            result.put(symbol, (this.getBoughtShares(pName, symbol, date) -
+                    this.getSoldShares(pName, symbol, date)) * getClosingValue(symbol, date));
           }
         }
       }
     }
-    return result.toString();
+    return Arrays.toString(result.toString().split(","));
+  }
+
+
+  private double getClosingValue(String stockSymbol, Date date) {
+    String[] stockData = getStockData(stockSymbol);
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    for (String line : stockData) {
+      String[] sections = line.split(",");
+      if (sections[0].equals(dateFormat.format(date))) {
+        return Double.parseDouble(sections[4]);
+      }
+    }
+    throw new IllegalArgumentException("Date does not exist for stock");
   }
 }

@@ -208,6 +208,7 @@ public class StockModelImpl implements StockModel {
     return result;
   }
 
+  @Override
   public int getShares(String name, String StockSymbol) {
     int totalShares = 0;
     for (BetterPortfolio p : this.portfolios) {

@@ -157,6 +157,7 @@ public class StockControllerImpl implements StockController {
         String symbol = getStockSymbol();
         share = getValidPositiveNum("How many shares would you like to remove" +
                 "(you can only purchase whole shares):");
+        
         model.removeStockFromPortfolio(pName, symbol, share);
         break;
       case 4:

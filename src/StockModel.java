@@ -118,4 +118,13 @@ public interface StockModel {
    * Gets a copy of the portfolios field.
    */
   public ArrayList<Portfolio> getPortfolios();
+
+  public int getSoldShares(String name, String StockSymbol, Date currentDate);
+
+  /**
+   *
+   * @param date
+   * @return
+   */
+  public String portfolioAsDistribution(String pName, Date date);
 }

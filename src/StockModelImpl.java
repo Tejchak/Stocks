@@ -184,7 +184,7 @@ public class StockModelImpl implements StockModel {
    * @return the total value in USD.
    */
   @Override
-  public double calculatePortfolio(String n, Date date) throws ParseException {
+  public double calculatePortfolio(String n, Date date) {
     double result = 0.0;
     BetterPortfolio portfolio = null;
     for (BetterPortfolio p : this.portfolios) {
@@ -201,8 +201,7 @@ public class StockModelImpl implements StockModel {
         Double value = 0.0;
         for (int i = 0; i < stockData.length; i++) {
           String line = stockData[i];
-          Date computedDate = dateFormat.parse(line.substring(0, 10));
-          if (computedDate.equals(date)) {
+          if (line.substring(0, 10).equals(dateFormat.format(date))) {
             String[] sections = line.split(",");
             value = Double.parseDouble(sections[4]);
           }
@@ -232,6 +231,21 @@ public class StockModelImpl implements StockModel {
         for (StockPurchase purchase : p.purchases.getOrDefault(StockSymbol, new ArrayList<>())) {
           if (!purchase.purchaseDate.after(currentDate)) {
             totalShares += purchase.shares;
+          }
+        }
+      }
+    }
+    return totalShares;
+  }
+
+  @Override
+  public int getSoldShares(String name, String StockSymbol, Date currentDate) {
+    int totalShares = 0;
+    for (BetterPortfolio p : this.portfolios) {
+      if (p.name.equals(name)) {
+        for (StockSale sale : p.sales.getOrDefault(StockSymbol, new ArrayList<>())) {
+          if (!sale.saledate.after(currentDate)) {
+            totalShares += sale.shares;
           }
         }
       }
@@ -427,5 +441,20 @@ public class StockModelImpl implements StockModel {
       result.add(port);
     }
     return result;
+  }
+
+  @Override
+  public String portfolioAsDistribution(String pName, Date date) {
+    HashMap<String, Integer> result = new HashMap<String, Integer>();
+    for (BetterPortfolio p : this.portfolios) {
+      if (p.name.equals(pName)) {
+        for (String symbol :p.purchases.keySet()) {
+          if (!result.containsKey(symbol)) {
+            result.put(symbol, this.getBoughtShares(pName, symbol, date));
+          }
+        }
+      }
+    }
+    return result.toString();
   }
 }

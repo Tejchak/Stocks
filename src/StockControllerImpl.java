@@ -132,7 +132,7 @@ public class StockControllerImpl implements StockController {
    */
   private void handlePortfolioMenu() throws ParseException {
     view.portfolioMenu();
-    int option = getValidPositiveNum("Please enter a number between 1 and 4");
+    int option = getValidPositiveNum("Please enter a number between 1 and 5");
     while (option != 1 && model.getPortfolios().isEmpty()) {
       view.displayResult("Must have an existing portfolio " +
               "before you can add, remove, or calculate.");
@@ -181,7 +181,7 @@ public class StockControllerImpl implements StockController {
           shares = getValidPositiveNum("How many shares would you like to remove" +
                   "(you can only remove whole shares):");
         }
-        model.removeStockFromPortfolio(pName, symbol, share);
+        model.removeStockFromPortfolio(pName, symbol, shares);
         break;
       case 4:
         String n = getStringInput("Enter the name of the portfolio you " +
@@ -194,6 +194,16 @@ public class StockControllerImpl implements StockController {
                 "to calculate the value on: ");
         view.displayResult(n + " is worth " + model.calculatePortfolio(n, this.convertDate(date)) + " USD");
         break;
+        case 5:
+          String name = getStringInput("Enter the name of the portfolio you " +
+                  "would like to calculate the value of: ");
+          while (!model.existingPortfolio(name)) {
+            name = getStringInput("Portfolio " + name +
+                    " does not exist. Please enter another name.");
+          }
+          String valDate = getDate("Enter the date you would like to view this portfolio on: ");
+          Date day = this.convertDate(valDate);
+          model.portfolioAsDistribution(name, day);
       default: view.displayResult("Invalid input. Please enter a valid number.");
     }
   }

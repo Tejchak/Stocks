@@ -170,22 +170,27 @@ public class StockControllerImpl implements StockController {
         }
         String symbol = getStockSymbol();
         stockData = getValidStock(symbol);
-        shares = getValidPositiveNum("How many shares would you like to sell" +
-                "(you can only sell whole shares):");
-        String sellDate = getDate("Enter the date you would like to purchase: ");
+        String sellDate = getDate("Enter the date you would like to sell: ");
         String[] sellDateLine = getValidTradingDay(stockData, sellDate, "sell");
         Date currentSellDate = convertDate(sellDateLine[0]);
         Date validSellDate = getValidSellDate(pName, symbol, currentSellDate, stockData);
+        shares = getValidPositiveNum("How many shares would you like to sell" +
+                "(you can only sell whole shares):");
         int availableShares = model.getBoughtShares(pName, symbol, currentSellDate) -
                 model.getSoldShares(pName, symbol, currentSellDate);
-        if (availableShares > shares) {
-          view.displayResult("Invalid number: you only have "
-                  + availableShares + "shares available");
-          shares = getValidPositiveNum("How many shares would you like to sell" +
-                  "(you can only sell whole shares):");
+        if (availableShares > 0) {
+          while (availableShares < shares) {
+            view.displayResult("Invalid number: you only have "
+                    + availableShares + " shares available");
+            shares = getValidPositiveNum("How many shares would you like to sell" +
+                    "(you can only sell whole shares):");
+          }
+          StockSale sale = new StockSale(shares, validSellDate);
+          model.removeStockFromPortfolio(pName, symbol, sale);
         }
-        StockSale sale = new StockSale(shares, validSellDate);
-        model.removeStockFromPortfolio(pName, symbol, sale);
+        else {
+          view.displayResult("Invalid number, you have no shares available at this time.");
+        }
         break;
       case 4:
         String n = getStringInput("Enter the name of the portfolio you " +
@@ -224,9 +229,9 @@ public class StockControllerImpl implements StockController {
       view.displayResult("Sorry it appears your stock doesn't exist in out database");
       stockSymbol = getStockSymbol();
     }
-    int shares = getValidPositiveNum("How many shares would you like to share get" +
+    int shares = getValidPositiveNum("How many shares would you like to get" +
             "(you can only purchase whole shares):");
-    String purchaseDate = getDate("Enter the date you would like to purchase: ");
+    String purchaseDate = getDate("date you would like to purchase: ");
     String[] stockData = getValidStock(stockSymbol);
     String[] purchaseDateLine = getValidTradingDay(stockData, purchaseDate, "purchase");
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -291,10 +296,12 @@ public class StockControllerImpl implements StockController {
   private Date getValidSellDate(String pName, String stockSymbol, Date sellDate, String[] stockData) {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     Date latestSellDate = model.getLatestSellDate(pName, stockSymbol);
-    while (latestSellDate.after(sellDate)) {
-      view.displayResult("Sell date cannot be after most recent sell date for this stocks"
-      + "You sold this stock on" + dateFormat.format(latestSellDate));
-      sellDate = convertDate(getValidTradingDay(stockData, dateFormat.format(sellDate), "sell")[0]);
+    if (latestSellDate != null) {
+      while (latestSellDate.after(sellDate)) {
+        view.displayResult("Sell date cannot be before most recent sell date for this stock. "
+                + "You sold this stock on " + dateFormat.format(latestSellDate));
+        sellDate = convertDate(getValidTradingDay(stockData, getDate("sell"), "sell")[0]);
+      }
     }
     return sellDate;
   }

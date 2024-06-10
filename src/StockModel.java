@@ -81,7 +81,7 @@ public interface StockModel {
    * @param date the date on which the value is being calculated.
    * @return the total value in USD.
    */
-  public double calculatePortfolio(String n, Date date) throws ParseException;
+  public double calculatePortfolio(String n, Date date);
 
   /**
    * Calculates the gain or loss of a stock from the startdate to the enddate.

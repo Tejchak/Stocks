@@ -225,12 +225,14 @@ public class StockModelImpl implements StockModel {
    * Creates a portfolio, and adds the given amount shares of the given stock.
    * @param name the name of the portfolio.
    * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
-   * @param shares the amount of shares pf the given stock.
+   * @param purchase the StockPurchases being made with the
    */
   @Override
-  public void createPortfolio(String name, String stockSymbol, int shares) {
-    Portfolio p = new Portfolio(name);
-    p.stocks.put(stockSymbol, shares);
+  public void createPortfolio(String name, String stockSymbol, StockPurchases purchase) {
+    BetterPortfolio p = new BetterPortfolio(name);
+    ArrayList<StockPurchases> addition = new ArrayList<StockPurchases>();
+    addition.add(purchase);
+    p.purchases.put(stockSymbol, addition);
     this.portfolios.add(p);
   }
 

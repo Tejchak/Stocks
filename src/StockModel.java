@@ -42,7 +42,7 @@ public interface StockModel {
    * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
    * @param shares      the amount of shares pf the given stock.
    */
-  public void createPortfolio(String name, String stockSymbol, int shares);
+  public void createPortfolio(String name, String stockSymbol, StockPurchases shares);
 
   /**
    * Compares the name of a stock to our sources to see if it exists.

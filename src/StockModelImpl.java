@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public class StockModelImpl implements StockModel {
   private final String apiKey;
-  private final ArrayList<Portfolio> portfolios;
+  private final ArrayList<BetterPortfolio> portfolios;
   private Map<String, String[]> stocks;
 
   /**
@@ -31,8 +31,8 @@ public class StockModelImpl implements StockModel {
    * Further the hashmap is the storage of stock info.
    */
   StockModelImpl() {
-    this.apiKey = "F99D5A7QDFY52B58";
-    this.portfolios = new ArrayList<>();
+    this.apiKey = "QCLLY08TISZBMXL9";
+    this.portfolios = new ArrayList<BetterPortfolio>();
     this.stocks = new HashMap<String, String[]>();
   }
 
@@ -216,7 +216,7 @@ public class StockModelImpl implements StockModel {
    */
   @Override
   public void createPortfolio(String name, String stockSymbol, int shares) {
-    Portfolio p = new Portfolio(name);
+    BetterPortfolio p = new BetterPortfolio();
     p.stocks.put(stockSymbol, shares);
     this.portfolios.add(p);
   }
@@ -246,10 +246,11 @@ public class StockModelImpl implements StockModel {
    * @param shares the amount of shares pf the given stock.
    */
   @Override
-  public void addStockToPortfolio(String portfolioName, String stockSymbol, int shares) {
-    for (Portfolio p : this.portfolios) {
+  public void addStockToPortfolio(String portfolioName, String stockSymbol, StockPurchases stockPurchase) {
+    for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(portfolioName)) {
-        p.stocks.put(stockSymbol, p.stocks.getOrDefault(stockSymbol, 0) + shares);
+        p.purchases.put(stockSymbol, p.purchases.getOrDefault(stockSymbol,
+                new ArrayList<StockPurchases>()).add(stockPurchase));
       }
     }
   }

@@ -292,9 +292,11 @@ public class StockModelImpl implements StockModel {
   @Override
   public void removeStockFromPortfolio(String portfolioName, String stockSymbol, StockSale stockSale) {
     for (BetterPortfolio p : this.portfolios) {
-      ArrayList<StockSale> soldList = p.sales.getOrDefault(stockSymbol, new ArrayList<>());
-      soldList.add(stockSale);
-      p.sales.put(stockSymbol, soldList);
+      if (p.name.equals(portfolioName)) {
+        ArrayList<StockSale> soldList = p.sales.getOrDefault(stockSymbol, new ArrayList<>());
+        soldList.add(stockSale);
+        p.sales.put(stockSymbol, soldList);
+      }
     }
   }
 

@@ -1,10 +1,10 @@
 import java.util.Date;
 
 public class StockSale {
-  int shares;
+  double shares;
   Date saledate;
 
-  StockSale(int shares, Date saledate) {
+  StockSale(double shares, Date saledate) {
     this.shares = shares;
     this.saledate = saledate;
   }

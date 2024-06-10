@@ -32,7 +32,7 @@ public class StockModelImpl implements StockModel {
    */
   StockModelImpl() {
     this.apiKey = "F99D5A7QDFY52B58";
-    this.portfolios = new ArrayList<Portfolio>();
+    this.portfolios = new ArrayList<>();
     this.stocks = new HashMap<String, String[]>();
   }
 

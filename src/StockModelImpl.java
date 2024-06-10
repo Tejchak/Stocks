@@ -452,7 +452,7 @@ public class StockModelImpl implements StockModel {
     return Arrays.toString(result.toString().split(","));
   }
 
-
+  //gets the closing value of a stock on a given day.
   private double getClosingValue(String stockSymbol, Date date) {
     String[] stockData = getStockData(stockSymbol);
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");

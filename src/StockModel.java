@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Interface for a model that can do certain calculations about a stock or,
@@ -24,7 +25,7 @@ public interface StockModel {
   public void addStockToPortfolio(String portfolioName, String stockSymbol,
                                   StockPurchases stockPurchase);
 
-  public int getShares(String portfolioName, String stockSymbol);
+  public int getShares(String portfolioName, String stockSymbol, Date currentDate);
 
   /**
    * Gets the line of the given date.

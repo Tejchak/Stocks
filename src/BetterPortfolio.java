@@ -9,6 +9,7 @@ import java.util.Map;
 public class BetterPortfolio {
   String name;
   Map<String, ArrayList<StockPurchases>> purchases;
+  Map<String, ArrayList<StockSales>> sales;
 
   /**
    * the constructor for the better portfolio that
@@ -18,5 +19,6 @@ public class BetterPortfolio {
   BetterPortfolio(String name){
     this.name = name;
     this.purchases = new HashMap<>();
+    this.sales = new HashMap<>();
   }
 }

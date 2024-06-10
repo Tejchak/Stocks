@@ -12,4 +12,5 @@ public class StockModelNew extends StockModelImpl {
     this.portfolios = new ArrayList<>();
     this.stocks = new HashMap<String, String[]>();
   }
+
 }

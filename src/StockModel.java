@@ -19,9 +19,10 @@ public interface StockModel {
    *
    * @param portfolioName the name of the portfolio.
    * @param stockSymbol   the symbol of a stock as a string (Ex, AMC).
-   * @param shares        the amount of shares pf the given stock.
+   * @param stockPurchase        the amount of shares pf the given stock.
    */
-  public void addStockToPortfolio(String portfolioName, String stockSymbol, int shares);
+  public void addStockToPortfolio(String portfolioName, String stockSymbol,
+                                  StockPurchases stockPurchase);
 
   /**
    * Gets the line of the given date.

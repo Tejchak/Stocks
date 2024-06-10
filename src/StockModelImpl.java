@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public class StockModelImpl implements StockModel {
   private final String apiKey;
-  private final ArrayList<Portfolio> portfolios;
+  private final ArrayList<BetterPortfolio> portfolios;
   private Map<String, String[]> stocks;
 
   /**
@@ -243,13 +243,16 @@ public class StockModelImpl implements StockModel {
    * Adds the given stock to the portfolio.
    * @param portfolioName the name of the portfolio.
    * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
-   * @param shares the amount of shares pf the given stock.
+   * @param stockPurchase the stockPurchase
    */
   @Override
-  public void addStockToPortfolio(String portfolioName, String stockSymbol, int shares) {
-    for (Portfolio p : this.portfolios) {
+  public void addStockToPortfolio(String portfolioName, String stockSymbol,
+                                  StockPurchases stockPurchase) {
+    for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(portfolioName)) {
-        p.stocks.put(stockSymbol, p.stocks.getOrDefault(stockSymbol, 0) + shares);
+        ArrayList<StockPurchases> purchasesList = p.purchases.getOrDefault(stockSymbol, new ArrayList<>());
+        purchasesList.add(stockPurchase);
+        p.purchases.put(stockSymbol, purchasesList);
       }
     }
   }

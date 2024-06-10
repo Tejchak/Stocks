@@ -1,11 +1,13 @@
+import java.util.Date;
+
 /**
  * Class representing the purchase of a stock in a portfolio, it contains
  * the amount of shares purchaseDate and sellDate.
  */
 public class StockPurchases {
   int shares;
-  String purchaseDate;
-  String sellDate;
+  Date purchaseDate;
+  Date sellDate;
   Double closingValue;
 
   /**
@@ -13,12 +15,10 @@ public class StockPurchases {
    * as an empty string.
    * @param shares the amount of shares being purchased.
    * @param purchaseDate the date of the purchase.
-   * @param closingValue the closingValue and the day it was purchased
    */
-  StockPurchases(int shares, String purchaseDate, Double closingValue) {
+  StockPurchases(int shares, Date purchaseDate) {
     this.shares = shares;
     this.purchaseDate = purchaseDate;
-    this.sellDate = "";
-    this.closingValue = closingValue;
+    this.sellDate = null;
   }
 }

@@ -3,6 +3,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
@@ -11,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.text.SimpleDateFormat;
 
@@ -599,5 +601,35 @@ public class StockModelImpl implements StockModel {
            this.getPortfolio(name).sales.put(stocksymbol, newSale);
        }
      }
+  }
+
+  @Override
+  public ArrayList<String> getListStocks(String name, LocalDate date) {
+    ArrayList<String> result = new ArrayList<>();
+    BetterPortfolio p = getPortfolio(name);
+    for (String symbol : p.purchases.keySet()) {
+      for (StockPurchase stockPurchase : p.purchases.get(symbol) ) {
+        if (!result.contains(symbol) && !stockPurchase.purchaseDate.after(date)) {
+          result.add(symbol);
+        }
+      }
+      for (StockSale sale : p.sales.get(symbol)) {
+        if (!sale.saledate.after(date)) {
+          result.remove(symbol);
+        }
+      }
+    }
+    return result;
+  }
+
+  @Override
+  public LocalDate moveToRecentTradingDay(LocalDate date) {
+    if (date.getDayOfWeek().equals(DayOfWeek.SATURDAY)) {
+      return date.minusDays(1);
+    }
+    if (date.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+      return date.minusDays(2);
+    }
+    return date;
   }
 }

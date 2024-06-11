@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.time.Period;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -264,8 +265,31 @@ public class StockControllerImpl implements StockController {
           na = getStringInput("Portfolio " + na +
                   " does not exist. Please enter another name.");
         }
+        String year = getStringInput("Enter the year you would like to rebalance: ");
+        String month = getStringInput("Enter the month you would like to rebalance: ");
+        String d = getStringInput("Enter the day you would like to rebalance: ");
+        LocalDate localDate = LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(d));
+        ArrayList<String> stocks = model.getListStocks(na, localDate);
+        view.displayResult("You will be asked to enter the weights of each stock in your portfolio." +
+                "Here is a list of all the stocks in your portfolio: " +
+                stocks.toString() +
+                "The total of your weights should add to 1");
         HashMap<String, Double> weights = new HashMap<>();
-//        model.rebalancePortfolio();
+        double totalweight = 0.0;
+        for (int i = 0; i < stocks.size(); i++) {
+          double val = 0;
+          val = getWeight("Enter a weight value between 0 and 1 for the stock "
+                  + stocks.get(i));
+          totalweight += val;
+          weights.put(stocks.get(i), val);
+          if (totalweight > 1 || (totalweight < 0 && i == stocks.size() - 1)) {
+            i = 0;
+            weights = new HashMap<>();
+            totalweight = 0.0;
+            view.displayResult("Weights total must be equal to 1, please try again.");
+          }
+        }
+        model.rebalancePortfolio(weights, );
         break;
       default: view.displayResult("Invalid input. Please enter a valid number.");
     }
@@ -446,6 +470,24 @@ public class StockControllerImpl implements StockController {
       }
     }
     return stockData;
+  }
+
+  private double getWeight(String prompt) {
+    double input = 0.0;
+    boolean validInput = false;
+    while (!validInput) {
+      view.displayResult(prompt);
+      if (scanner.hasNextDouble()) {
+        input = scanner.nextDouble();
+        scanner.nextLine();
+        if (input >= 0 && input <= 1) {
+          validInput = true;
+        } else {
+          view.displayResult("Invalid weight. Please enter a value between 0 and 1.");
+        }
+      }
+    }
+    return input;
   }
 
   /**

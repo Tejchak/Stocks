@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.text.SimpleDateFormat;
 
@@ -249,7 +250,7 @@ public class StockModelImpl implements StockModel {
 
   @Override
   public Map<String, Double> getPortfolioData(String pName, LocalDate start, LocalDate end, String timeStamp) {
-    Map<String, Double> data = new HashMap<>();
+    Map<String, Double> data = new LinkedHashMap<>();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     LocalDate currentDate = start;
     double currentValue = 0.0;

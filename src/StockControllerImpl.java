@@ -104,7 +104,27 @@ public class StockControllerImpl implements StockController {
    * @return the date entered by the user.
    */
   private String getDate(String prompt) {
-    return getStringInput("Type the " + prompt + " date (YYYY-MM-DD, e.g., 2024-05-09):");
+    view.displayResult("What is the " + prompt + " date");
+    int year = getValidPositiveNum("Type the year (e.g., 2017):");
+    int month = getValidPositiveNum("Type the month (e.g., 1):");
+    int day = getValidPositiveNum("Type the day (e.g., 1):");
+    String formattedDate = String.format("%04d-%02d-%02d", year, month, day);
+    return formattedDate;
+  }
+
+  private LocalDate getValidLocalDate(String prompt, String date) {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    LocalDate localDate = null;
+    while (true) {
+      try {
+         localDate = LocalDate.parse(date, formatter);
+        break;
+      } catch (Exception e) {
+        view.displayResult("Invalid date, please try again (year, then month, then day)");
+        date = getDate(prompt);
+      }
+    }
+    return localDate;
   }
 
   /**
@@ -282,11 +302,10 @@ public class StockControllerImpl implements StockController {
       pName = getStringInput("Portfolio " + pName +
               " does not exist. Please enter another name.");
     }
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     String startDate = getDate("start");
-    LocalDate start = LocalDate.parse(startDate, formatter);
+    LocalDate start = getValidLocalDate("start", startDate);
     String endDate = getDate("end");
-    LocalDate end = LocalDate.parse(endDate, formatter);
+    LocalDate end = getValidLocalDate("end", endDate);
     String timeStamp = model.getTimeStamp(start, end);
     Map<String, Double> data = model.getPortfolioData(pName, start, end, timeStamp);
     data.put(endDate, model.calculatePortfolio(pName, model.convertDate(endDate)));

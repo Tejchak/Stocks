@@ -133,5 +133,5 @@ public interface StockModel {
    * @param date
    * @return
    */
-  public String portfolioAsDistribution(String pName, Date date);
+  public String[] portfolioAsDistribution(String pName, Date date);
 }

@@ -460,7 +460,7 @@ public class StockModelImpl implements StockModel {
   }
 
   @Override
-  public String portfolioAsDistribution(String pName, Date date) {
+  public String[] portfolioAsDistribution(String pName, Date date) {
     HashMap<String, Double> result = new HashMap<String, Double>();
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(pName)) {
@@ -472,7 +472,7 @@ public class StockModelImpl implements StockModel {
         }
       }
     }
-    return Arrays.toString(result.toString().split(","));
+    return result.toString().split(",");
   }
 
   //gets the closing value of a stock on a given day.

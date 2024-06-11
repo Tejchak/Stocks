@@ -2,19 +2,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.ParseException;
 import java.time.LocalDate;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.text.SimpleDateFormat;
 
 import javax.xml.parsers.DocumentBuilder;
 
@@ -179,7 +175,7 @@ public class StockModelImpl implements StockModel {
    * @return the total value in USD.
    */
   @Override
-  public double calculatePortfolio(String n, Date date) {
+  public double calculatePortfolio(String n, LocalDate date) {
     double result = 0.0;
     BetterPortfolio portfolio = null;
     for (BetterPortfolio p : this.portfolios) {
@@ -189,25 +185,25 @@ public class StockModelImpl implements StockModel {
     }
     if (portfolio != null) {
       for (String stockSymbol : portfolio.purchases.keySet()) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String[] stockData = getStockData(stockSymbol);
         Double value = 0.0;
         for (int i = 0; i < stockData.length; i++) {
           String line = stockData[i];
-          if (line.substring(0, 10).equals(dateFormat.format(date))) {
+          if (line.substring(0, 10).equals(date.format(formatter))) {
             String[] sections = line.split(",");
             value = Double.parseDouble(sections[4]);
           }
         }
         ArrayList<StockPurchase> l = portfolio.purchases.getOrDefault(stockSymbol, new ArrayList<StockPurchase>());
         for (StockPurchase p : l) {
-          if (!p.purchaseDate.after(date)) {
+          if (!p.purchaseDate.isAfter(date)) {
             result += (value * p.shares);
           }
         }
         ArrayList<StockSale> l2 = portfolio.sales.getOrDefault(stockSymbol, new ArrayList<StockSale>());
         for (StockSale s : l2) {
-          if (!s.saledate.after(date)) {
+          if (!s.saledate.isAfter(date)) {
             result -= (value * s.shares);
           }
         }
@@ -236,14 +232,9 @@ public class StockModelImpl implements StockModel {
     return "";
   }
 
-  public Date convertDate(String date) {
-    Date newDate = new Date();
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    try {
-      newDate = dateFormat.parse(date);
-    } catch (ParseException e) {
-      throw new RuntimeException("Unable to parse date: " + date, e);
-    }
+  public LocalDate convertDate(String date) {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    LocalDate newDate = LocalDate.parse(date, formatter);
     return newDate;
   }
 
@@ -254,8 +245,7 @@ public class StockModelImpl implements StockModel {
     LocalDate currentDate = start;
     double currentValue = 0.0;
     while (currentDate.isBefore(end)) {
-      Date date = convertDate(currentDate.format(formatter));
-      currentValue = calculatePortfolio(pName, date);
+      currentValue = calculatePortfolio(pName, currentDate);
       data.put(currentDate.format(formatter), currentValue);
       switch(timeStamp) {
         case "Years":
@@ -281,12 +271,12 @@ public class StockModelImpl implements StockModel {
   }
 
   @Override
-  public double getBoughtShares(String name, String StockSymbol, Date currentDate) {
+  public double getBoughtShares(String name, String StockSymbol, LocalDate currentDate) {
     int totalShares = 0;
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(name)) {
         for (StockPurchase purchase : p.purchases.getOrDefault(StockSymbol, new ArrayList<>())) {
-          if (!purchase.purchaseDate.after(currentDate)) {
+          if (!purchase.purchaseDate.isAfter(currentDate)) {
             totalShares += purchase.shares;
           }
         }
@@ -296,12 +286,12 @@ public class StockModelImpl implements StockModel {
   }
 
 
-  public Date getLatestSellDate(String pName, String stockSymbol) {
-    Date latestDate = null;
+  public LocalDate getLatestSellDate(String pName, String stockSymbol) {
+    LocalDate latestDate = null;
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(pName)) {
         for (StockSale sale : p.sales.getOrDefault(stockSymbol, new ArrayList<>())) {
-          if (latestDate == null || sale.saledate.after(latestDate)) {
+          if (latestDate == null || sale.saledate.isAfter(latestDate)) {
             latestDate = sale.saledate;
           }
         }
@@ -311,12 +301,12 @@ public class StockModelImpl implements StockModel {
   }
 
   @Override
-  public double getSoldShares(String name, String StockSymbol, Date currentDate) {
+  public double getSoldShares(String name, String StockSymbol, LocalDate currentDate) {
     double totalShares = 0;
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(name)) {
         for (StockSale sale : p.sales.getOrDefault(StockSymbol, new ArrayList<>())) {
-          if (!sale.saledate.after(currentDate)) {
+          if (!sale.saledate.isAfter(currentDate)) {
             totalShares += sale.shares;
           }
         }
@@ -358,12 +348,12 @@ public class StockModelImpl implements StockModel {
   }
 
   @Override
-  public void removeSales(String portfolioName, String stockSymbol, Date sellDate) {
+  public void removeSales(String portfolioName, String stockSymbol, LocalDate sellDate) {
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(portfolioName)) {
         for (int i = 0; i < p.sales.get(stockSymbol).size(); i++) {
           StockSale sale = p.sales.get(stockSymbol).get(i);
-          if (sale.saledate.after(sellDate)) {
+          if (sale.saledate.isAfter(sellDate)) {
             p.sales.get(stockSymbol).remove(sale);
           }
         }
@@ -530,7 +520,7 @@ public class StockModelImpl implements StockModel {
   }
 
   @Override
-  public String[] portfolioAsDistribution(String pName, Date date) {
+  public String[] portfolioAsDistribution(String pName, LocalDate date) {
     HashMap<String, Double> result = new HashMap<String, Double>();
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(pName)) {
@@ -546,12 +536,12 @@ public class StockModelImpl implements StockModel {
   }
 
   //gets the closing value of a stock on a given day.
-  private double getClosingValue(String stockSymbol, Date date) {
+  private double getClosingValue(String stockSymbol, LocalDate date) {
     String[] stockData = getStockData(stockSymbol);
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     for (String line : stockData) {
       String[] sections = line.split(",");
-      if (sections[0].equals(dateFormat.format(date))) {
+      if (sections[0].equals(date.format(formatter))) {
         return Double.parseDouble(sections[4]);
       }
     }
@@ -579,7 +569,7 @@ public class StockModelImpl implements StockModel {
    * @param date the date that the rebalancing will take place on.
    */
   @Override
-  public void rebalancePortfolio(HashMap<String, Double> weights, String name, Date date) {
+  public void rebalancePortfolio(HashMap<String, Double> weights, String name, LocalDate date) {
      for (String stocksymbol : weights.keySet()) {
        double currentVal = (this.getBoughtShares(name, stocksymbol, date) - this.getSoldShares(name, stocksymbol, date))
                * getClosingValue(stocksymbol, date);

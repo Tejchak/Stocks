@@ -1,4 +1,4 @@
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  * Class representing the purchase of a stock in a portfolio, it contains
@@ -6,7 +6,7 @@ import java.util.Date;
  */
 public class StockPurchase {
   double shares;
-  Date purchaseDate;
+  LocalDate purchaseDate;
 
   /**
    * Constructor for stock purchase that initializes the sellDate
@@ -14,7 +14,7 @@ public class StockPurchase {
    * @param shares the amount of shares being purchased.
    * @param purchaseDate the date of the purchase.
    */
-  StockPurchase(double shares, Date purchaseDate) {
+  StockPurchase(double shares, LocalDate purchaseDate) {
     this.shares = shares;
     this.purchaseDate = purchaseDate;
   }

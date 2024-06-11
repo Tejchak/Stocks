@@ -3,7 +3,9 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.Date;
+
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Interface for a model that can do certain calculations about a stock or,
@@ -144,5 +146,10 @@ public interface StockModel {
    * @param date
    * @return
    */
-  public String portfolioAsDistribution(String pName, Date date);
+  public String[] portfolioAsDistribution(String pName, Date date);
+
+  /**
+   *
+   */
+  public void rebalancePortfolio(HashMap<String, Double> weights, String name, Date date);
 }

@@ -32,6 +32,8 @@ public class StockViewImpl implements StockView {
     System.out.println("3. Take away stock from a portfolio?");
     System.out.println("4. Calculate the value of a portfolio?");
     System.out.println("5. View the portfolio distribution");
+    System.out.println("6. Rebalance a portfolio");
+    System.out.println("7. Store a portfolio in an XML file");
   }
 
   /**

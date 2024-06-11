@@ -1,3 +1,8 @@
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -8,6 +13,13 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Scanner;
 import java.time.format.DateTimeFormatter;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 /**
  * Controller for the stock model that gets inputs and calls the model at certain points.
@@ -240,7 +252,9 @@ public class StockControllerImpl implements StockController {
           }
           String valDate = getDate("date you would like to view this portfolio on: ");
           Date day = model.convertDate(valDate);
-          view.displayResult(model.portfolioAsDistribution(name, day));
+          for (String s : model.portfolioAsDistribution(name, day)) {
+            view.displayResult(s);
+          }
           break;
       default: view.displayResult("Invalid input. Please enter a valid number.");
     }
@@ -474,5 +488,39 @@ public class StockControllerImpl implements StockController {
     } else {
       view.displayResult("The following are x-day Crossovers: " + crossovers.toString());
     }
+  }
+
+  //handles the storage of a portfolio
+  private void handlePortfolioStorage(BetterPortfolio portfolio) {
+    try {
+      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+      DocumentBuilder builder = factory.newDocumentBuilder();
+      Document doc = builder.parse(new File("portfolios.xml"));
+
+      NodeList nodeList = doc.getElementsByTagName(portfolio.name);
+
+      if (nodeList.getLength() == 0) {
+        Element root = doc.getDocumentElement();
+        Element newPort = doc.createElement(portfolio.name);
+        Element purchaes = doc.createElement("purchaes");
+        Element sales = doc.createElement("sales");
+        purchaes.setTextContent(portfolio.purchases.toString());
+        sales.setTextContent(portfolio.sales.toString());
+        newPort.appendChild(purchaes);
+        newPort.appendChild(sales);
+        root.appendChild(newPort);
+      }
+      else {
+        nodeList.item(0).setTextContent(portfolio.purchases.toString());
+        nodeList.item(1).setTextContent(portfolio.sales.toString());
+      }
+
+      TransformerFactory transformerFactory = TransformerFactory.newInstance();
+      Transformer transformer = transformerFactory.newTransformer();
+      DOMSource source = new DOMSource(doc);
+      StreamResult result = new StreamResult(new File("portfolios.xml"));
+      transformer.transform(source, result);
+    }
+    catch (Exception e) {}
   }
 }

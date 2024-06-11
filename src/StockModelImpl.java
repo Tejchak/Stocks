@@ -487,4 +487,47 @@ public class StockModelImpl implements StockModel {
     }
     throw new IllegalArgumentException("Date does not exist for stock");
   }
+
+  private BetterPortfolio getPortfolio(String name) {
+    for (BetterPortfolio p : this.portfolios) {
+      if (p.name.equals(name)) {
+        return p;
+      }
+    }
+    throw new IllegalArgumentException("Portfolio does not exist");
+  }
+
+  /**
+   * This method rebalances a portfolio to contain the correct value of each stock.
+   * It takes in the weights as a hashmap with the stock they represent, the name
+   * of the portfolio and the date that the rebalancing is taking place on.
+   * The method finds the current value of the stock in the portfolio and
+   * compares it to the goal value, based on this comparison it will
+   * either buy or sell stock.
+   * @param weights a hashmap of stocksymbols(String) to their weights as decimals(double).
+   * @param name the name of the portfolio being rebalanced.
+   * @param date the date that the rebalancing will take place on.
+   */
+  @Override
+  public void rebalancePortfolio(HashMap<String, Double> weights, String name, Date date) {
+     for (String stocksymbol : weights.keySet()) {
+       double currentVal = (this.getBoughtShares(name, stocksymbol, date) - this.getSoldShares(name, stocksymbol, date))
+               * getClosingValue(stocksymbol, date);
+       double goalVal = this.calculatePortfolio(name, date) * weights.get(stocksymbol);
+       if (goalVal > currentVal) {
+         double shares = (goalVal - currentVal) / getClosingValue(stocksymbol, date);
+         StockPurchase purchase = new StockPurchase(shares, date);
+         ArrayList<StockPurchase> newPurchase = this.getPortfolio(name).purchases.get(stocksymbol);
+         newPurchase.add(purchase);
+         this.getPortfolio(name).purchases.put(stocksymbol, newPurchase);
+       }
+         if (goalVal < currentVal) {
+           double shares2 = (currentVal - goalVal)/getClosingValue(stocksymbol, date);
+           StockSale sale = new StockSale(shares2, date);
+           ArrayList<StockSale> newSale = this.getPortfolio(name).sales.get(stocksymbol);
+           newSale.add(sale);
+           this.getPortfolio(name).sales.put(stocksymbol, newSale);
+       }
+     }
+  }
 }

@@ -5,8 +5,14 @@ import org.w3c.dom.NodeList;
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.time.Period;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 import java.util.Scanner;
+import java.time.format.DateTimeFormatter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -78,17 +84,6 @@ public class StockControllerImpl implements StockController {
   private String getStringInput(String prompt) {
     view.displayResult(prompt);
     return this.scanner.nextLine();
-  }
-
-  private Date convertDate(String date) {
-    Date newDate = new Date();
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    try {
-       newDate = dateFormat.parse(date);
-    } catch (ParseException e) {
-      throw new RuntimeException("Unable to parse date: " + date, e);
-    }
-    return newDate;
   }
 
   /**
@@ -198,7 +193,7 @@ public class StockControllerImpl implements StockController {
                 "(you can only purchase whole shares):");
         String purchaseDate = getDate("Enter the date you would like to purchase: ");
         String[] purchaseDateLine = getValidTradingDay(stockData, purchaseDate, "purchase");
-        Date correctDate = convertDate(purchaseDateLine[0]);
+        Date correctDate = model.convertDate(purchaseDateLine[0]);
         StockPurchase  currentPurchase = new StockPurchase(shares, correctDate);
         model.addStockToPortfolio(portfolioName, stockSymbol, currentPurchase);
         break;
@@ -216,9 +211,10 @@ public class StockControllerImpl implements StockController {
           symbol = getStockSymbol();
         }
         stockData = getValidStock(symbol);
-        String sellDate = getDate("date you would like to sell: ");
+        String sellDate = getDate("date you would like to sell (you must sell shares in "
+                + "Chronological order!): ");
         String[] sellDateLine = getValidTradingDay(stockData, sellDate, "sell");
-        Date currentSellDate = convertDate(sellDateLine[0]);
+        Date currentSellDate = model.convertDate(sellDateLine[0]);
         Date finalDate = getValidSellDate(pName, symbol, currentSellDate, stockData);
         sellShares = getValidPositiveDouble("How many shares would you like to sell:");
         double availableShares = model.getBoughtShares(pName, symbol, finalDate) -
@@ -245,9 +241,9 @@ public class StockControllerImpl implements StockController {
         }
         String date = getDate("date you would like " +
                 "to calculate the value on: ");
-        view.displayResult(n + " is worth " + model.calculatePortfolio(n, this.convertDate(date)) + " USD");
+        view.displayResult(n + " is worth " + model.calculatePortfolio(n, model.convertDate(date)) + " USD");
         break;
-        case 5:
+      case 5:
           String name = getStringInput("Enter the name of the portfolio you " +
                   "would like to calculate the value of: ");
           while (!model.existingPortfolio(name)) {
@@ -255,13 +251,47 @@ public class StockControllerImpl implements StockController {
                     " does not exist. Please enter another name.");
           }
           String valDate = getDate("date you would like to view this portfolio on: ");
-          Date day = convertDate(valDate);
+          Date day = model.convertDate(valDate);
           for (String s : model.portfolioAsDistribution(name, day)) {
             view.displayResult(s);
           }
           break;
       default: view.displayResult("Invalid input. Please enter a valid number.");
     }
+  }
+
+  private void handleBarChart() {
+    String pName = getStringInput(
+            "Enter the name of the portfolio you would like to add to: ");
+    while (!model.existingPortfolio(pName)) {
+      pName = getStringInput("Portfolio " + pName +
+              " does not exist. Please enter another name.");
+    }
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    String startDate = getDate("start");
+    LocalDate start = LocalDate.parse(startDate, formatter);
+    String endDate = getDate("end");
+    LocalDate end = LocalDate.parse(endDate, formatter);
+    Period period = Period.between(start, end);
+    String timeStamp = model.getTimeStamp(period);
+    Map<String, Double> data = model.getPortfolioData(pName, start, end, timeStamp);
+    data.put(endDate, model.calculatePortfolio(pName, model.convertDate(endDate)));
+    double highestValue = Collections.max(data.values());
+    double scale = highestValue / 50;
+    view.displayResult("Performance of portfolio " + pName + " from " +
+            startDate + " to " +
+            endDate);
+    for (Map.Entry<String, Double> entry : data.entrySet()) {
+      String date = entry.getKey();
+      Double value = entry.getValue();
+      StringBuilder line = new StringBuilder();
+      line.append(date).append(":").append(" ");
+      for (int i = 0; i < value / scale; i++) {
+        line.append("*");
+      }
+      view.displayResult(line.toString());
+    }
+    view.displayResult("Scale: * =  $" + scale);
   }
 
   /**
@@ -282,7 +312,7 @@ public class StockControllerImpl implements StockController {
     String purchaseDate = getDate("date you would like to purchase: ");
     String[] purchaseDateLine = getValidTradingDay(stockData, purchaseDate, "purchase");
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    Date correctDate = convertDate(purchaseDateLine[0]);
+    Date correctDate = model.convertDate(purchaseDateLine[0]);
     StockPurchase currentPurchase = new StockPurchase(shares, correctDate);
     model.createPortfolio(name, stockSymbol, currentPurchase);
     view.displayResult("Successfully created portfolio");
@@ -351,7 +381,7 @@ public class StockControllerImpl implements StockController {
           break;
         }
         else {
-          sellDate = convertDate(getValidTradingDay(stockData, getDate("sell"), "sell")[0]);
+          sellDate = model.convertDate(getValidTradingDay(stockData, getDate("sell"), "sell")[0]);
         }
       }
     }

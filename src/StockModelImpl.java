@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -182,10 +183,8 @@ public class StockModelImpl implements StockModel {
     double result = 0.0;
     BetterPortfolio portfolio = null;
     for (BetterPortfolio p : this.portfolios) {
-      while (portfolio == null) {
         if (p.name.equals(n)) {
           portfolio = p;
-        }
       }
     }
     if (portfolio != null) {
@@ -218,18 +217,18 @@ public class StockModelImpl implements StockModel {
   }
 
   @Override
-  public String getTimeStamp(Period period) {
-    if (period.getYears() >= 5) {
+  public String getTimeStamp(LocalDate start, LocalDate end) {
+    if (ChronoUnit.YEARS.between(start, end) >= 5) {
       return "Years";
     }
-    if (period.getMonths() >= 5) {
-      if (period.getMonths() <= 30) {
+    if (ChronoUnit.MONTHS.between(start, end) >= 5) {
+      if (ChronoUnit.MONTHS.between(start, end) <= 29) {
         return "Months";
       }
       return "Two months";
     }
-    if (period.getDays() >= 5) {
-      if (period.getDays() <= 30) {
+    if (ChronoUnit.DAYS.between(start, end) >= 5) {
+      if (ChronoUnit.DAYS.between(start, end) <= 29) {
         return "Days";
       }
       return "Weeks";
@@ -257,6 +256,7 @@ public class StockModelImpl implements StockModel {
     while (currentDate.isBefore(end)) {
       Date date = convertDate(currentDate.format(formatter));
       currentValue = calculatePortfolio(pName, date);
+      System.out.println("in while");
       data.put(currentDate.format(formatter), currentValue);
       switch(timeStamp) {
         case "Years":
@@ -278,6 +278,7 @@ public class StockModelImpl implements StockModel {
           throw new RuntimeException("Unknown time stamp: " + timeStamp);
       }
     }
+    System.out.println("got here");
     return data;
   }
 

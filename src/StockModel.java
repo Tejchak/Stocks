@@ -39,7 +39,7 @@ public interface StockModel {
                                               LocalDate startDate,
                                               LocalDate endDate, String timeStamp);
 
-  public String getTimeStamp(Period period);
+  public String getTimeStamp(LocalDate start, LocalDate end);
 
   public Date getLatestSellDate(String portfolioName, String stockSymbol);
 

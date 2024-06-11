@@ -10,6 +10,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.Period;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import java.time.format.DateTimeFormatter;
@@ -92,7 +93,8 @@ public class StockControllerImpl implements StockController {
    * @return the stock symbol entered by the user.
    */
   private String getStockSymbol() {
-    return getStringInput("Type the stock symbol (case insensitive, e.g., GOOG or goog):");
+    return getStringInput("Type the stock symbol (case insensitive, e.g., GOOG or goog):")
+            .toUpperCase();
   }
 
   /**
@@ -245,7 +247,7 @@ public class StockControllerImpl implements StockController {
         break;
       case 5:
           String name = getStringInput("Enter the name of the portfolio you " +
-                  "would like to calculate the value of: ");
+                  "would like to see as a distribution: ");
           while (!model.existingPortfolio(name)) {
             name = getStringInput("Portfolio " + name +
                     " does not exist. Please enter another name.");
@@ -256,13 +258,26 @@ public class StockControllerImpl implements StockController {
             view.displayResult(s);
           }
           break;
+      case 6:
+        String na = getStringInput("Enter the name of the portfolio you " +
+                "would like to rebalance: ");
+        while (!model.existingPortfolio(na)) {
+          na = getStringInput("Portfolio " + na +
+                  " does not exist. Please enter another name.");
+        }
+        HashMap<String, Double> weights = new HashMap<>();
+//        model.rebalancePortfolio();
+        break;
+      case 7:
+        handleBarChart();
+        break;
       default: view.displayResult("Invalid input. Please enter a valid number.");
     }
   }
 
   private void handleBarChart() {
     String pName = getStringInput(
-            "Enter the name of the portfolio you would like to add to: ");
+            "Enter the name of the portfolio you would like chart: ");
     while (!model.existingPortfolio(pName)) {
       pName = getStringInput("Portfolio " + pName +
               " does not exist. Please enter another name.");
@@ -272,12 +287,23 @@ public class StockControllerImpl implements StockController {
     LocalDate start = LocalDate.parse(startDate, formatter);
     String endDate = getDate("end");
     LocalDate end = LocalDate.parse(endDate, formatter);
-    Period period = Period.between(start, end);
-    String timeStamp = model.getTimeStamp(period);
+    String timeStamp = model.getTimeStamp(start, end);
     Map<String, Double> data = model.getPortfolioData(pName, start, end, timeStamp);
     data.put(endDate, model.calculatePortfolio(pName, model.convertDate(endDate)));
     double highestValue = Collections.max(data.values());
-    double scale = highestValue / 50;
+    double lowestValue = Collections.min(data.values());
+    double difference = highestValue - lowestValue;
+    int maxStars = 10;
+    double scale = (difference / maxStars);
+    while (scale > 1000 && maxStars != 50) {
+      maxStars += 10;
+      scale = (difference / maxStars);
+    }
+    if (scale >= 10) {
+      scale = Math.ceil(scale / 10) * 10;
+    } else {
+      scale = Math.ceil(scale * 10) / 10.0;
+    }
     view.displayResult("Performance of portfolio " + pName + " from " +
             startDate + " to " +
             endDate);
@@ -286,12 +312,16 @@ public class StockControllerImpl implements StockController {
       Double value = entry.getValue();
       StringBuilder line = new StringBuilder();
       line.append(date).append(":").append(" ");
-      for (int i = 0; i < value / scale; i++) {
+      for (int i = 1; i <= value / scale; i++) {
         line.append("*");
       }
       view.displayResult(line.toString());
     }
-    view.displayResult("Scale: * =  $" + scale);
+    String baseOutput = "";
+    if (lowestValue != 0) {
+       baseOutput = " Onto base amount of $" + Math.round(lowestValue);
+    }
+    view.displayResult("Scale: * =  $" + scale + baseOutput);
   }
 
   /**

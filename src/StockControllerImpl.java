@@ -255,8 +255,7 @@ public class StockControllerImpl implements StockController {
                     " does not exist. Please enter another name.");
           }
           String valDate = getDate("date you would like to view this portfolio on: ");
-          getValidTradingDay(model.getStockData(), )
-          Date day = this.convertDate(valDate);
+          Date day = convertDate(valDate);
           for (String s : model.portfolioAsDistribution(name, day)) {
             view.displayResult(s);
           }

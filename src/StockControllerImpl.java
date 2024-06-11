@@ -10,6 +10,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.Period;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import java.time.format.DateTimeFormatter;
@@ -245,7 +246,7 @@ public class StockControllerImpl implements StockController {
         break;
       case 5:
           String name = getStringInput("Enter the name of the portfolio you " +
-                  "would like to calculate the value of: ");
+                  "would like to see as a distribution: ");
           while (!model.existingPortfolio(name)) {
             name = getStringInput("Portfolio " + name +
                     " does not exist. Please enter another name.");
@@ -256,6 +257,16 @@ public class StockControllerImpl implements StockController {
             view.displayResult(s);
           }
           break;
+      case 6:
+        String na = getStringInput("Enter the name of the portfolio you " +
+                "would like to rebalance: ");
+        while (!model.existingPortfolio(na)) {
+          na = getStringInput("Portfolio " + na +
+                  " does not exist. Please enter another name.");
+        }
+        HashMap<String, Double> weights = new HashMap<>();
+//        model.rebalancePortfolio();
+        break;
       default: view.displayResult("Invalid input. Please enter a valid number.");
     }
   }

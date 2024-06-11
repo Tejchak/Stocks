@@ -272,7 +272,8 @@ public class StockControllerImpl implements StockController {
             name = getStringInput("Portfolio " + name +
                     " does not exist. Please enter another name.");
           }
-          String valDate = getDate("date you would like to view this portfolio on: ");
+          String valDate = getDate("date you would like to view this portfolio on (if "
+                  + "it as a weekend, we will use the closing time on Friday: ");
           LocalDate day = model.convertDate(valDate);
           for (String s : model.portfolioAsDistribution(name, day)) {
             view.displayResult(s);

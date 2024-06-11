@@ -256,7 +256,6 @@ public class StockModelImpl implements StockModel {
     while (currentDate.isBefore(end)) {
       Date date = convertDate(currentDate.format(formatter));
       currentValue = calculatePortfolio(pName, date);
-      System.out.println("in while");
       data.put(currentDate.format(formatter), currentValue);
       switch(timeStamp) {
         case "Years":
@@ -278,7 +277,6 @@ public class StockModelImpl implements StockModel {
           throw new RuntimeException("Unknown time stamp: " + timeStamp);
       }
     }
-    System.out.println("got here");
     return data;
   }
 

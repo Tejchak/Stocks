@@ -312,7 +312,7 @@ public class StockControllerImpl implements StockController {
       Double value = entry.getValue();
       StringBuilder line = new StringBuilder();
       line.append(date).append(":").append(" ");
-      for (int i = 1; i <= value / scale; i++) {
+      for (int i = 1; i <= (value - lowestValue) / scale; i++) {
         line.append("*");
       }
       view.displayResult(line.toString());

@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.text.SimpleDateFormat;
 
+import javax.xml.parsers.DocumentBuilder;
+
 /**
  * The implementation of the Stock model. This specific implementation uses the alphavantage api
  * and a resources root folder to obtain its stocks. Furthermore we also gave it a stocks field

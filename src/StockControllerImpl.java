@@ -94,7 +94,8 @@ public class StockControllerImpl implements StockController {
    * @return the stock symbol entered by the user.
    */
   private String getStockSymbol() {
-    return getStringInput("Type the stock symbol (case insensitive, e.g., GOOG or goog):");
+    return getStringInput("Type the stock symbol (case insensitive, e.g., GOOG or goog):")
+            .toUpperCase();
   }
 
   /**
@@ -104,7 +105,27 @@ public class StockControllerImpl implements StockController {
    * @return the date entered by the user.
    */
   private String getDate(String prompt) {
-    return getStringInput("Type the " + prompt + " date (YYYY-MM-DD, e.g., 2024-05-09):");
+    view.displayResult("What is the " + prompt + " date");
+    int year = getValidPositiveNum("Type the year (e.g., 2017):");
+    int month = getValidPositiveNum("Type the month (e.g., 1):");
+    int day = getValidPositiveNum("Type the day (e.g., 1):");
+    String formattedDate = String.format("%04d-%02d-%02d", year, month, day);
+    return formattedDate;
+  }
+
+  private LocalDate getValidLocalDate(String prompt, String date) {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    LocalDate localDate = null;
+    while (true) {
+      try {
+         localDate = LocalDate.parse(date, formatter);
+        break;
+      } catch (Exception e) {
+        view.displayResult("Invalid date, please try again (year, then month, then day)");
+        date = getDate(prompt);
+      }
+    }
+    return localDate;
   }
 
   /**
@@ -195,7 +216,7 @@ public class StockControllerImpl implements StockController {
                 "(you can only purchase whole shares):");
         String purchaseDate = getDate("Enter the date you would like to purchase: ");
         String[] purchaseDateLine = getValidTradingDay(stockData, purchaseDate, "purchase");
-        Date correctDate = model.convertDate(purchaseDateLine[0]);
+        LocalDate correctDate = model.convertDate(purchaseDateLine[0]);
         StockPurchase  currentPurchase = new StockPurchase(shares, correctDate);
         model.addStockToPortfolio(portfolioName, stockSymbol, currentPurchase);
         break;
@@ -216,8 +237,8 @@ public class StockControllerImpl implements StockController {
         String sellDate = getDate("date you would like to sell (you must sell shares in "
                 + "Chronological order!): ");
         String[] sellDateLine = getValidTradingDay(stockData, sellDate, "sell");
-        Date currentSellDate = model.convertDate(sellDateLine[0]);
-        Date finalDate = getValidSellDate(pName, symbol, currentSellDate, stockData);
+        LocalDate currentSellDate = model.convertDate(sellDateLine[0]);
+        LocalDate finalDate = getValidSellDate(pName, symbol, currentSellDate, stockData);
         sellShares = getValidPositiveDouble("How many shares would you like to sell:");
         double availableShares = model.getBoughtShares(pName, symbol, finalDate) -
                 model.getSoldShares(pName, symbol, finalDate);
@@ -253,7 +274,7 @@ public class StockControllerImpl implements StockController {
                     " does not exist. Please enter another name.");
           }
           String valDate = getDate("date you would like to view this portfolio on: ");
-          Date day = model.convertDate(valDate);
+          LocalDate day = model.convertDate(valDate);
           for (String s : model.portfolioAsDistribution(name, day)) {
             view.displayResult(s);
           }
@@ -289,7 +310,10 @@ public class StockControllerImpl implements StockController {
             view.displayResult("Weights total must be equal to 1, please try again.");
           }
         }
-        model.rebalancePortfolio(weights, );
+//        model.rebalancePortfolio(weights, );
+        break;
+      case 7:
+        handleBarChart();
         break;
       default: view.displayResult("Invalid input. Please enter a valid number.");
     }
@@ -297,22 +321,32 @@ public class StockControllerImpl implements StockController {
 
   private void handleBarChart() {
     String pName = getStringInput(
-            "Enter the name of the portfolio you would like to add to: ");
+            "Enter the name of the portfolio you would like chart: ");
     while (!model.existingPortfolio(pName)) {
       pName = getStringInput("Portfolio " + pName +
               " does not exist. Please enter another name.");
     }
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     String startDate = getDate("start");
-    LocalDate start = LocalDate.parse(startDate, formatter);
+    LocalDate start = getValidLocalDate("start", startDate);
     String endDate = getDate("end");
-    LocalDate end = LocalDate.parse(endDate, formatter);
-    Period period = Period.between(start, end);
-    String timeStamp = model.getTimeStamp(period);
+    LocalDate end = getValidLocalDate("end", endDate);
+    String timeStamp = model.getTimeStamp(start, end);
     Map<String, Double> data = model.getPortfolioData(pName, start, end, timeStamp);
     data.put(endDate, model.calculatePortfolio(pName, model.convertDate(endDate)));
     double highestValue = Collections.max(data.values());
-    double scale = highestValue / 50;
+    double lowestValue = Collections.min(data.values());
+    double difference = highestValue - lowestValue;
+    int maxStars = 10;
+    double scale = (difference / maxStars);
+    while (scale > 1000 && maxStars != 50) {
+      maxStars += 10;
+      scale = (difference / maxStars);
+    }
+    if (scale >= 10) {
+      scale = Math.ceil(scale / 10) * 10;
+    } else {
+      scale = Math.ceil(scale * 10) / 10.0;
+    }
     view.displayResult("Performance of portfolio " + pName + " from " +
             startDate + " to " +
             endDate);
@@ -321,12 +355,16 @@ public class StockControllerImpl implements StockController {
       Double value = entry.getValue();
       StringBuilder line = new StringBuilder();
       line.append(date).append(":").append(" ");
-      for (int i = 0; i < value / scale; i++) {
+      for (int i = 1; i <= (value - lowestValue) / scale; i++) {
         line.append("*");
       }
       view.displayResult(line.toString());
     }
-    view.displayResult("Scale: * =  $" + scale);
+    String baseOutput = "";
+    if (lowestValue != 0) {
+       baseOutput = " Onto base amount of $" + Math.round(lowestValue);
+    }
+    view.displayResult("Scale: * =  $" + scale + baseOutput);
   }
 
   /**
@@ -347,7 +385,7 @@ public class StockControllerImpl implements StockController {
     String purchaseDate = getDate("date you would like to purchase: ");
     String[] purchaseDateLine = getValidTradingDay(stockData, purchaseDate, "purchase");
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    Date correctDate = model.convertDate(purchaseDateLine[0]);
+    LocalDate correctDate = model.convertDate(purchaseDateLine[0]);
     StockPurchase currentPurchase = new StockPurchase(shares, correctDate);
     model.createPortfolio(name, stockSymbol, currentPurchase);
     view.displayResult("Successfully created portfolio");
@@ -405,11 +443,11 @@ public class StockControllerImpl implements StockController {
     return line;
   }
 
-  private Date getValidSellDate(String pName, String stockSymbol, Date sellDate, String[] stockData) {
+  private LocalDate getValidSellDate(String pName, String stockSymbol, LocalDate sellDate, String[] stockData) {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    Date latestSellDate = model.getLatestSellDate(pName, stockSymbol);
+    LocalDate latestSellDate = model.getLatestSellDate(pName, stockSymbol);
     if (latestSellDate != null) {
-      while (latestSellDate.after(sellDate)) {
+      while (latestSellDate.isAfter(sellDate)) {
         view.displayResult("Sell date cannot be before most recent sell date for this stock. "
                 + "You sold this stock on " + dateFormat.format(latestSellDate));
         if (askRemoveSale(pName, stockSymbol, sellDate)) {
@@ -423,7 +461,7 @@ public class StockControllerImpl implements StockController {
     return sellDate;
   }
 
-  private boolean askRemoveSale(String pName, String stockSymbol, Date sellDate) {
+  private boolean askRemoveSale(String pName, String stockSymbol, LocalDate sellDate) {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     view.displayResult("Would you like to remove your sales that are after the date " +
             dateFormat.format(sellDate) + "?" + " Type y for yes and n for no");

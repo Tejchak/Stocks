@@ -1,3 +1,4 @@
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -7,9 +8,9 @@ import java.util.Date;
  */
 public class StockSale {
   double shares;
-  Date saledate;
+  LocalDate saledate;
 
-  StockSale(double shares, Date saledate) {
+  StockSale(double shares, LocalDate saledate) {
     this.shares = shares;
     this.saledate = saledate;
   }

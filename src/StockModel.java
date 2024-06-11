@@ -2,7 +2,6 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
-import java.util.Date;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -31,7 +30,7 @@ public interface StockModel {
   public void addStockToPortfolio(String portfolioName, String stockSymbol,
                                   StockPurchase stockPurchase);
 
-  public double getBoughtShares(String portfolioName, String stockSymbol, Date currentDate);
+  public double getBoughtShares(String portfolioName, String stockSymbol, LocalDate currentDate);
 
   public boolean portfolioContainsStock(String portfolioName, String stockSymbol);
 
@@ -39,9 +38,9 @@ public interface StockModel {
                                               LocalDate startDate,
                                               LocalDate endDate, String timeStamp);
 
-  public String getTimeStamp(Period period);
+  public String getTimeStamp(LocalDate start, LocalDate end);
 
-  public Date getLatestSellDate(String portfolioName, String stockSymbol);
+  public LocalDate getLatestSellDate(String portfolioName, String stockSymbol);
 
   /**
    * Gets the line of the given date.
@@ -79,9 +78,9 @@ public interface StockModel {
   public void removeStockFromPortfolio(String portfolioName,
                                        String stockSymbol, StockSale sale);
 
-  public Date convertDate(String date);
+  public LocalDate convertDate(String date);
 
-  public void removeSales(String portfolioName, String stockSymbol, Date sellDate);
+  public void removeSales(String portfolioName, String stockSymbol, LocalDate sellDate);
 
   /**
    * Checks if a portfolio exists in the model.
@@ -98,7 +97,7 @@ public interface StockModel {
    * @param date the date on which the value is being calculated.
    * @return the total value in USD.
    */
-  public double calculatePortfolio(String n, Date date);
+  public double calculatePortfolio(String n, LocalDate date);
 
   /**
    * Calculates the gain or loss of a stock from the startdate to the enddate.
@@ -139,19 +138,19 @@ public interface StockModel {
    */
   public ArrayList<BetterPortfolio> getPortfolios();
 
-  public double getSoldShares(String name, String StockSymbol, Date currentDate);
+  public double getSoldShares(String name, String StockSymbol, LocalDate currentDate);
 
   /**
    *
    * @param date
    * @return
    */
-  public String[] portfolioAsDistribution(String pName, Date date);
+  public String[] portfolioAsDistribution(String pName, LocalDate date);
 
   /**
    *
    */
-  public void rebalancePortfolio(HashMap<String, Double> weights, String name, Date date);
+  public void rebalancePortfolio(HashMap<String, Double> weights, String name, LocalDate date);
 
   /**
    *
@@ -160,4 +159,5 @@ public interface StockModel {
 
 
   public LocalDate moveToRecentTradingDay(LocalDate date);
+
 }

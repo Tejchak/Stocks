@@ -2,6 +2,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -208,6 +212,70 @@ public class StockModelImpl implements StockModel {
       }
     }
     return result;
+  }
+
+  @Override
+  public String getTimeStamp(Period period) {
+    if (period.getYears() >= 5) {
+      return "Years";
+    }
+    if (period.getMonths() >= 5) {
+      if (period.getMonths() <= 30) {
+        return "Months";
+      }
+      return "Two months";
+    }
+    if (period.getDays() >= 5) {
+      if (period.getDays() <= 30) {
+        return "Days";
+      }
+      return "Weeks";
+    }
+    return "";
+  }
+
+  public Date convertDate(String date) {
+    Date newDate = new Date();
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    try {
+      newDate = dateFormat.parse(date);
+    } catch (ParseException e) {
+      throw new RuntimeException("Unable to parse date: " + date, e);
+    }
+    return newDate;
+  }
+
+  @Override
+  public Map<String, Double> getPortfolioData(String pName, LocalDate start, LocalDate end, String timeStamp) {
+    Map<String, Double> data = new HashMap<>();
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    LocalDate currentDate = start;
+    double currentValue = 0.0;
+    while (currentDate.isBefore(end)) {
+      Date date = convertDate(currentDate.format(formatter));
+      currentValue = calculatePortfolio(pName, date);
+      data.put(currentDate.format(formatter), currentValue);
+      switch(timeStamp) {
+        case "Years":
+          currentDate = currentDate.plusYears(1);
+          break;
+        case "Months":
+          currentDate = currentDate.plusMonths(1);
+          break;
+        case "Two months":
+          currentDate = currentDate.plusMonths(2);
+          break;
+        case "Weeks":
+          currentDate = currentDate.plusWeeks(1);
+          break;
+        case "Days":
+          currentDate = currentDate.plusDays(1);
+          break;
+        default:
+          throw new RuntimeException("Unknown time stamp: " + timeStamp);
+      }
+    }
+    return data;
   }
 
   @Override

@@ -1,6 +1,9 @@
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * Interface for a model that can do certain calculations about a stock or,
@@ -29,6 +32,12 @@ public interface StockModel {
   public double getBoughtShares(String portfolioName, String stockSymbol, Date currentDate);
 
   public boolean portfolioContainsStock(String portfolioName, String stockSymbol);
+
+  public Map<String, Double> getPortfolioData(String portfolioName,
+                                              LocalDate startDate,
+                                              LocalDate endDate, String timeStamp);
+
+  public String getTimeStamp(Period period);
 
   public Date getLatestSellDate(String portfolioName, String stockSymbol);
 
@@ -67,6 +76,8 @@ public interface StockModel {
    */
   public void removeStockFromPortfolio(String portfolioName,
                                        String stockSymbol, StockSale sale);
+
+  public Date convertDate(String date);
 
   public void removeSales(String portfolioName, String stockSymbol, Date sellDate);
 

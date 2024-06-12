@@ -183,6 +183,9 @@ public class StockControllerImpl implements StockController {
               "before you can add, remove, or calculate.");
       option = getValidPositiveNum("Please enter 1 or 9");
     }
+    if (!model.getPortfolios().isEmpty()) {
+      System.out.print(model.getPortfolios().get(0).name);
+    }
     switch (option) {
       case 1:
         handleNewPortfolio();
@@ -310,6 +313,7 @@ public class StockControllerImpl implements StockController {
         pName = getStringInput("Enter the name of the portfolio you " +
                 "would like to recover: ");
         model.loadPortfolioFromXML("Resources/vik.xml", pName);
+        break;
       default:
         view.displayResult("Invalid input. Please enter a valid number.");
     }

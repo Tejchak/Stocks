@@ -722,12 +722,17 @@ public class StockModelImpl implements StockModel {
       Document doc = dBuilder.parse(xmlFile);
       doc.getDocumentElement().normalize();
 
-      NodeList portfolioList = doc.getElementsByTagName("portfolios");
-      for (int i = 0; i < portfolioList.getLength(); i++) {
-
-      }
+      NodeList portfolioList = doc.getElementsByTagName("name");
       String portfolioName = doc.getDocumentElement().getAttribute("name");
-      BetterPortfolio portfolio = new BetterPortfolio(portfolioName);
+      for (int i = 0; i < portfolioList.getLength(); i++) {
+        if (portfolioName.equals(pName)) {
+          //nothing
+        }
+        else {
+          portfolioName = portfolioList.item(i).getTextContent();;
+        }
+      }
+      BetterPortfolio portfolio = new BetterPortfolio(pName);
 
       NodeList purchaseList = doc.getElementsByTagName("purchase");
       for (int i = 0; i < purchaseList.getLength(); i++) {
@@ -759,7 +764,7 @@ public class StockModelImpl implements StockModel {
 
       this.portfolios.add(portfolio);
     } catch (Exception e) {
-      System.out.println(e.toString());
+      System.out.println(e);
     }
   }
 }

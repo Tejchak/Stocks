@@ -161,5 +161,5 @@ public interface StockModel {
 
   public void portfolioToXML(String filePath);
 
-  public void loadPortfolioFromXML(String xmlFilePath, String pName);
+  public void loadPortfolioFromXML(String xmlFilePath);
 }

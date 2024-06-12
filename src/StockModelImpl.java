@@ -244,7 +244,7 @@ public class StockModelImpl implements StockModel {
       }
       return "Two months";
     }
-    if (ChronoUnit.DAYS.between(start, end) >= 5) {
+    if (ChronoUnit.DAYS.between(start, end) >= 1) {
       if (ChronoUnit.DAYS.between(start, end) <= 29) {
         return "Days";
       }
@@ -266,7 +266,7 @@ public class StockModelImpl implements StockModel {
     LocalDate currentDate = start;
     double currentValue = 0.0;
     while (currentDate.isBefore(end)) {
-      currentValue = calculatePortfolio(pName, currentDate);
+      currentValue = calculatePortfolio(pName, moveToRecentTradingDay(currentDate));
       data.put(currentDate.format(formatter), currentValue);
       switch(timeStamp) {
         case "Years":
@@ -720,7 +720,7 @@ public class StockModelImpl implements StockModel {
 
 
   @Override
-  public void loadPortfolioFromXML(String xmlFilePath, String pName) {
+  public void loadPortfolioFromXML(String xmlFilePath) {
     try {
       File xmlFile = new File(xmlFilePath);
       DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -735,9 +735,9 @@ public class StockModelImpl implements StockModel {
           Element portfolioElement = (Element) portfolioNode;
           String portfolioName = portfolioElement.getAttribute("name");
 
-          if (!portfolioName.equals(pName)) {
-            continue;
-          }
+//          if (!portfolioName.equals(pName)) {
+//            continue;
+//          }
 
           BetterPortfolio portfolio = new BetterPortfolio(portfolioName);
 

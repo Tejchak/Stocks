@@ -309,10 +309,8 @@ public class StockControllerImpl implements StockController {
         model.portfolioToXML(filePath);
         break;
       case 9:
-        pName = getStringInput("Enter the name of the portfolio you " +
-                "would like to recover: ");
          filePath = getStringInput("Type the filepath: ");
-        model.loadPortfolioFromXML(filePath, pName);
+        model.loadPortfolioFromXML(filePath);
         break;
       default:
         view.displayResult("Invalid input. Please enter a valid number.");
@@ -320,19 +318,25 @@ public class StockControllerImpl implements StockController {
   }
 
   private void handleBarChart() {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     String pName = getStringInput(
             "Enter the name of the portfolio you would like chart: ");
     while (!model.existingPortfolio(pName)) {
       pName = getStringInput("Portfolio " + pName +
               " does not exist. Please enter another name.");
     }
+    view.displayResult("Weekend dates will be calculated using the closing time on Friday");
     String startDate = getDate("start");
     LocalDate start = getValidLocalDate("start", startDate);
     String endDate = getDate("end");
     LocalDate end = getValidLocalDate("end", endDate);
+    while (!end.isAfter(start)) {
+      view.displayResult("End must be after start.");
+      end = getValidLocalDate("end", "jk");
+    }
     String timeStamp = model.getTimeStamp(start, end);
     Map<String, Double> data = model.getPortfolioData(pName, start, end, timeStamp);
-    data.put(endDate, model.calculatePortfolio(pName, model.convertDate(endDate)));
+    data.put(end.format(formatter), model.calculatePortfolio(pName, model.convertDate(endDate)));
     double highestValue = Collections.max(data.values());
     double lowestValue = Collections.min(data.values());
     double difference = highestValue - lowestValue;

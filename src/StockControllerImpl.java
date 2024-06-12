@@ -260,10 +260,11 @@ public class StockControllerImpl implements StockController {
           name = getStringInput("Portfolio " + name +
                   " does not exist. Please enter another name.");
         }
-        String valDate = getDate("date you would like to view this portfolio on: ");
+        String valDate = getDate("date you would like to view this portfolio on (if "
+                + "it as a weekend, we will use the closing time on Friday: ");
         LocalDate day = model.convertDate(valDate);
         for (String s : model.portfolioAsDistribution(name, day)) {
-          view.displayResult(s + "\n");
+          view.displayResult(s);
         }
         break;
       case 6:
@@ -303,16 +304,18 @@ public class StockControllerImpl implements StockController {
       case 8:
         pName = getStringInput("Enter the name of the portfolio you " +
                 "would like to store: ");
+        String filePath = getStringInput("Type the filepath: ");
         while (!model.existingPortfolio(pName)) {
           pName = getStringInput("Portfolio " + pName +
                   " does not exist. Please enter another name.");
         }
-        model.portfolioToXML("Resources/vik.xml");
+        model.portfolioToXML(filePath);
         break;
       case 9:
         pName = getStringInput("Enter the name of the portfolio you " +
                 "would like to recover: ");
-        model.loadPortfolioFromXML("Resources/vik.xml", pName);
+        filePath = getStringInput("Type the filepath: ");
+        model.loadPortfolioFromXML(filePath, pName);
         break;
       default:
         view.displayResult("Invalid input. Please enter a valid number.");
@@ -379,12 +382,11 @@ public class StockControllerImpl implements StockController {
       view.displayResult("Sorry it appears your stock doesn't exist in out database");
       stockSymbol = getStockSymbol();
     }
-    String[] stockData = getValidStock(stockSymbol);
+    String[] stockData = model.getStockData(stockSymbol);
     int shares = getValidPositiveNum("How many shares would you like to get" +
             "(you can only purchase whole shares):");
-    String purchaseDate = getDate("date you would like to purchase: ");
+    String purchaseDate = getDate("purchase: ");
     String[] purchaseDateLine = getValidTradingDay(stockData, purchaseDate, "purchase");
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     LocalDate correctDate = model.convertDate(purchaseDateLine[0]);
     StockPurchase currentPurchase = new StockPurchase(shares, correctDate);
     model.createPortfolio(name, stockSymbol, currentPurchase);
@@ -487,7 +489,6 @@ public class StockControllerImpl implements StockController {
     while (true) {
       try {
         stockData = model.getStockData(stockSymbol);
-        // System.out.println(Arrays.toString(stockData));
         if (!stockData[1].contains("\"Error Message\":") && !stockData[1].contains("Thank you for "
                 + "using Alpha Vantage!")) {
           break;

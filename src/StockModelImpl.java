@@ -177,7 +177,10 @@ public class StockModelImpl implements StockModel {
   @Override
   public boolean checkStockExists(String stockSymbol) {
     try {
-      getStockData(stockSymbol);
+      String[] data = getStockData(stockSymbol);
+      if (data.length < 5) {
+        return false;
+      }
     }
     catch (Exception e) {
       return false;
@@ -193,6 +196,7 @@ public class StockModelImpl implements StockModel {
    */
   @Override
   public double calculatePortfolio(String n, LocalDate date) {
+    date = moveToRecentTradingDay(date);
     double result = 0.0;
     BetterPortfolio portfolio = null;
     for (BetterPortfolio p : this.portfolios) {
@@ -539,6 +543,7 @@ public class StockModelImpl implements StockModel {
   @Override
   public String[] portfolioAsDistribution(String pName, LocalDate date) {
     HashMap<String, Double> result = new HashMap<String, Double>();
+    date = moveToRecentTradingDay(date);
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(pName)) {
         for (String symbol :p.purchases.keySet()) {
@@ -713,6 +718,7 @@ public class StockModelImpl implements StockModel {
     }
   }
 
+
   @Override
   public void loadPortfolioFromXML(String xmlFilePath, String pName) {
     try {
@@ -722,49 +728,53 @@ public class StockModelImpl implements StockModel {
       Document doc = dBuilder.parse(xmlFile);
       doc.getDocumentElement().normalize();
 
-      NodeList portfolioList = doc.getElementsByTagName("name");
-      String portfolioName = doc.getDocumentElement().getAttribute("name");
+
+      NodeList portfolioList = doc.getElementsByTagName("portfolio");
       for (int i = 0; i < portfolioList.getLength(); i++) {
-        if (portfolioName.equals(pName)) {
-          //nothing
-        }
-        else {
-          portfolioName = portfolioList.item(i).getTextContent();;
+        Node portfolioNode = portfolioList.item(i);
+        if (portfolioNode.getNodeType() == Node.ELEMENT_NODE) {
+          Element portfolioElement = (Element) portfolioNode;
+          String portfolioName = portfolioElement.getAttribute("name");
+
+          if (!portfolioName.equals(pName)) {
+            continue;
+          }
+
+          BetterPortfolio portfolio = new BetterPortfolio(portfolioName);
+
+          NodeList purchaseList = portfolioElement.getElementsByTagName("purchase");
+          for (int j = 0; j < purchaseList.getLength(); j++) {
+            Node purchaseNode = purchaseList.item(j);
+            if (purchaseNode.getNodeType() == Node.ELEMENT_NODE) {
+              Element purchaseElement = (Element) purchaseNode;
+              String stockSymbol = purchaseElement.getElementsByTagName("symbol").item(0).getTextContent();
+              double shares = Double.parseDouble(purchaseElement.getElementsByTagName("shares").item(0).getTextContent());
+              LocalDate purchaseDate = LocalDate.parse(purchaseElement.getElementsByTagName("date").item(0).getTextContent());
+
+              StockPurchase stockPurchase = new StockPurchase(shares, purchaseDate);
+              portfolio.purchases.computeIfAbsent(stockSymbol, k -> new ArrayList<>()).add(stockPurchase);
+            }
+          }
+
+          NodeList saleList = portfolioElement.getElementsByTagName("sale");
+          for (int j = 0; j < saleList.getLength(); j++) {
+            Node saleNode = saleList.item(j);
+            if (saleNode.getNodeType() == Node.ELEMENT_NODE) {
+              Element saleElement = (Element) saleNode;
+              String stockSymbol = saleElement.getElementsByTagName("symbol").item(0).getTextContent();
+              double shares = Double.parseDouble(saleElement.getElementsByTagName("shares").item(0).getTextContent());
+              LocalDate saleDate = LocalDate.parse(saleElement.getElementsByTagName("date").item(0).getTextContent());
+
+              StockSale stockSale = new StockSale(shares, saleDate);
+              portfolio.sales.computeIfAbsent(stockSymbol, k -> new ArrayList<>()).add(stockSale);
+            }
+          }
+
+          this.portfolios.add(portfolio);
         }
       }
-      BetterPortfolio portfolio = new BetterPortfolio(pName);
-
-      NodeList purchaseList = doc.getElementsByTagName("purchase");
-      for (int i = 0; i < purchaseList.getLength(); i++) {
-        Node purchaseNode = purchaseList.item(i);
-        if (purchaseNode.getNodeType() == Node.ELEMENT_NODE) {
-          Element purchaseElement = (Element) purchaseNode;
-          String stockSymbol = purchaseElement.getElementsByTagName("symbol").item(0).getTextContent();
-          double shares = Double.parseDouble(purchaseElement.getElementsByTagName("shares").item(0).getTextContent());
-          LocalDate purchaseDate = LocalDate.parse(purchaseElement.getElementsByTagName("date").item(0).getTextContent());
-
-          StockPurchase stockPurchase = new StockPurchase(shares, purchaseDate);
-          portfolio.purchases.computeIfAbsent(stockSymbol, k -> new ArrayList<>()).add(stockPurchase);
-        }
-      }
-
-      NodeList saleList = doc.getElementsByTagName("sale");
-      for (int i = 0; i < saleList.getLength(); i++) {
-        Node saleNode = saleList.item(i);
-        if (saleNode.getNodeType() == Node.ELEMENT_NODE) {
-          Element saleElement = (Element) saleNode;
-          String stockSymbol = saleElement.getElementsByTagName("symbol").item(0).getTextContent();
-          double shares = Double.parseDouble(saleElement.getElementsByTagName("shares").item(0).getTextContent());
-          LocalDate saleDate = LocalDate.parse(saleElement.getElementsByTagName("date").item(0).getTextContent());
-
-          StockSale stockSale = new StockSale(shares, saleDate);
-          portfolio.sales.computeIfAbsent(stockSymbol, k -> new ArrayList<>()).add(stockSale);
-        }
-      }
-
-      this.portfolios.add(portfolio);
     } catch (Exception e) {
-      System.out.println(e);
+      throw new RuntimeException("Error loading portfolio from the XML file.");
     }
   }
 }

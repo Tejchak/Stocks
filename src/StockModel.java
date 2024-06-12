@@ -157,7 +157,6 @@ public interface StockModel {
    */
   public ArrayList<String> getListStocks(String name, LocalDate date);
 
-
   public LocalDate moveToRecentTradingDay(LocalDate date);
 
   public void portfolioToXML(String filePath);

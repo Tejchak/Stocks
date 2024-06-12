@@ -218,14 +218,14 @@ public class StockModelImpl implements StockModel {
         }
         ArrayList<StockPurchase> l = portfolio.purchases.getOrDefault(stockSymbol, new ArrayList<StockPurchase>());
         for (StockPurchase p : l) {
-          if (!p.purchaseDate.isAfter(date)) {
-            result += (value * p.shares);
+          if (!p.getPurchaseDate().isAfter(date)) {
+            result += (value * p.getShares());
           }
         }
         ArrayList<StockSale> l2 = portfolio.sales.getOrDefault(stockSymbol, new ArrayList<StockSale>());
         for (StockSale s : l2) {
-          if (!s.saledate.isAfter(date)) {
-            result -= (value * s.shares);
+          if (!s.getSaledate().isAfter(date)) {
+            result -= (value * s.getShares());
           }
         }
       }
@@ -297,8 +297,8 @@ public class StockModelImpl implements StockModel {
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(name)) {
         for (StockPurchase purchase : p.purchases.getOrDefault(StockSymbol, new ArrayList<>())) {
-          if (!purchase.purchaseDate.isAfter(currentDate)) {
-            totalShares += purchase.shares;
+          if (!purchase.getPurchaseDate().isAfter(currentDate)) {
+            totalShares += purchase.getShares();
           }
         }
       }
@@ -312,8 +312,8 @@ public class StockModelImpl implements StockModel {
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(pName)) {
         for (StockSale sale : p.sales.getOrDefault(stockSymbol, new ArrayList<>())) {
-          if (latestDate == null || sale.saledate.isAfter(latestDate)) {
-            latestDate = sale.saledate;
+          if (latestDate == null || sale.getSaledate().isAfter(latestDate)) {
+            latestDate = sale.getSaledate();
           }
         }
       }
@@ -327,8 +327,8 @@ public class StockModelImpl implements StockModel {
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(name)) {
         for (StockSale sale : p.sales.getOrDefault(StockSymbol, new ArrayList<>())) {
-          if (!sale.saledate.isAfter(currentDate)) {
-            totalShares += sale.shares;
+          if (!sale.getSaledate().isAfter(currentDate)) {
+            totalShares += sale.getShares();
           }
         }
       }
@@ -374,7 +374,7 @@ public class StockModelImpl implements StockModel {
       if (p.name.equals(portfolioName)) {
         for (int i = 0; i < p.sales.get(stockSymbol).size(); i++) {
           StockSale sale = p.sales.get(stockSymbol).get(i);
-          if (sale.saledate.isAfter(sellDate)) {
+          if (sale.getSaledate().isAfter(sellDate)) {
             p.sales.get(stockSymbol).remove(sale);
           }
         }
@@ -677,11 +677,11 @@ public class StockModelImpl implements StockModel {
             purchaseElement.appendChild(symbolElement);
 
             Element sharesElement = doc.createElement("shares");
-            sharesElement.appendChild(doc.createTextNode(Double.toString(purchase.shares)));
+            sharesElement.appendChild(doc.createTextNode(Double.toString(purchase.getShares())));
             purchaseElement.appendChild(sharesElement);
 
             Element dateElement = doc.createElement("date");
-            dateElement.appendChild(doc.createTextNode(purchase.purchaseDate.toString()));
+            dateElement.appendChild(doc.createTextNode(purchase.getPurchaseDate().toString()));
             purchaseElement.appendChild(dateElement);
           }
         }
@@ -697,11 +697,11 @@ public class StockModelImpl implements StockModel {
             saleElement.appendChild(symbolElement);
 
             Element sharesElement = doc.createElement("shares");
-            sharesElement.appendChild(doc.createTextNode(Double.toString(sale.shares)));
+            sharesElement.appendChild(doc.createTextNode(Double.toString(sale.getShares())));
             saleElement.appendChild(sharesElement);
 
             Element dateElement = doc.createElement("date");
-            dateElement.appendChild(doc.createTextNode(sale.saledate.toString()));
+            dateElement.appendChild(doc.createTextNode(sale.getSaledate().toString()));
             saleElement.appendChild(dateElement);
           }
         }

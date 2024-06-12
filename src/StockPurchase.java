@@ -5,8 +5,8 @@ import java.time.LocalDate;
  * the amount of shares purchaseDate.
  */
 public class StockPurchase {
-  double shares;
-  LocalDate purchaseDate;
+  private double shares;
+  private LocalDate purchaseDate;
 
   /**
    * Constructor for stock purchase that initializes the sellDate
@@ -17,5 +17,13 @@ public class StockPurchase {
   StockPurchase(double shares, LocalDate purchaseDate) {
     this.shares = shares;
     this.purchaseDate = purchaseDate;
+  }
+
+  public double getShares() {
+    return shares;
+  }
+
+  public LocalDate getPurchaseDate() {
+    return purchaseDate;
   }
 }

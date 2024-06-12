@@ -701,7 +701,6 @@ public class StockModelImpl implements StockModel {
         }
       }
 
-      // Write the content into the XML file
       TransformerFactory transformerFactory = TransformerFactory.newInstance();
       Transformer transformer = transformerFactory.newTransformer();
       DOMSource source = new DOMSource(doc);
@@ -723,6 +722,10 @@ public class StockModelImpl implements StockModel {
       Document doc = dBuilder.parse(xmlFile);
       doc.getDocumentElement().normalize();
 
+      NodeList portfolioList = doc.getElementsByTagName("portfolios");
+      for (int i = 0; i < portfolioList.getLength(); i++) {
+
+      }
       String portfolioName = doc.getDocumentElement().getAttribute("name");
       BetterPortfolio portfolio = new BetterPortfolio(portfolioName);
 
@@ -756,7 +759,7 @@ public class StockModelImpl implements StockModel {
 
       this.portfolios.add(portfolio);
     } catch (Exception e) {
-      e.printStackTrace();
+      System.out.println(e.toString());
     }
   }
 }

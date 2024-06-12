@@ -4,7 +4,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.time.DayOfWeek;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -12,10 +11,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
+import java.io.File;
+import java.io.FileOutputStream;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * The implementation of the Stock model. This specific implementation uses the alphavantage api
@@ -619,4 +627,69 @@ public class StockModelImpl implements StockModel {
     }
     return date;
   }
+
+
+  @Override
+  public void portfolioToXML(String portfolioName, String fileName) {
+    try {
+      DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+      DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+      // Root element
+      Document doc = docBuilder.newDocument();
+      Element rootElement = doc.createElement("Portfolios");
+      doc.appendChild(rootElement);
+
+      // Portfolio element
+      Element portfolioElement = doc.createElement("Portfolio");
+      portfolioElement.setAttribute("name", portfolioName);
+      rootElement.appendChild(portfolioElement);
+
+      BetterPortfolio portfolio = getPortfolio(portfolioName);
+
+      // Add purchases
+      Element purchasesElement = doc.createElement("Purchases");
+      portfolioElement.appendChild(purchasesElement);
+
+      for (Map.Entry<String, ArrayList<StockPurchase>> entry : portfolio.purchases.entrySet()) {
+        String stockSymbol = entry.getKey();
+        for (StockPurchase purchase : entry.getValue()) {
+          Element purchaseElement = doc.createElement("Purchase");
+          purchaseElement.setAttribute("stockSymbol", stockSymbol);
+          purchaseElement.setAttribute("shares", String.valueOf(purchase.shares));
+          purchaseElement.setAttribute("purchaseDate", purchase.purchaseDate.toString());
+          purchasesElement.appendChild(purchaseElement);
+        }
+      }
+
+      // Add sales
+      Element salesElement = doc.createElement("Sales");
+      portfolioElement.appendChild(salesElement);
+
+      for (Map.Entry<String, ArrayList<StockSale>> entry : portfolio.sales.entrySet()) {
+        String stockSymbol = entry.getKey();
+        for (StockSale sale : entry.getValue()) {
+          Element saleElement = doc.createElement("Sale");
+          saleElement.setAttribute("stockSymbol", stockSymbol);
+          saleElement.setAttribute("shares", String.valueOf(sale.shares));
+          saleElement.setAttribute("saleDate", sale.saledate.toString());
+          salesElement.appendChild(saleElement);
+        }
+      }
+
+      // Write the content into XML file
+      TransformerFactory transformerFactory = TransformerFactory.newInstance();
+      Transformer transformer = transformerFactory.newTransformer();
+      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      DOMSource source = new DOMSource(doc);
+      StreamResult result = new StreamResult(new FileOutputStream(new File(fileName)));
+
+      transformer.transform(source, result);
+      System.out.println("Portfolio data saved to XML file: " + fileName);
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
 }

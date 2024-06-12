@@ -160,4 +160,5 @@ public interface StockModel {
 
   public LocalDate moveToRecentTradingDay(LocalDate date);
 
+  public void portfolioToXML(String portfolioName, String fileName);
 }

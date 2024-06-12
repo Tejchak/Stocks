@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Portfolios>
+    <Portfolio name="l">
+        <Purchases>
+            <Purchase purchaseDate="2024-05-09" shares="1.0" stockSymbol="L"/>
+        </Purchases>
+        <Sales/>
+    </Portfolio>
+</Portfolios>

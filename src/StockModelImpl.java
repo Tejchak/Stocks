@@ -230,7 +230,7 @@ public class StockModelImpl implements StockModel {
         }
       }
     }
-    return result;
+    return Math.round(result * 100) / 100.0;
   }
 
   @Override
@@ -244,7 +244,7 @@ public class StockModelImpl implements StockModel {
       }
       return "Two months";
     }
-    if (ChronoUnit.DAYS.between(start, end) >= 5) {
+    if (ChronoUnit.DAYS.between(start, end) >= 1) {
       if (ChronoUnit.DAYS.between(start, end) <= 29) {
         return "Days";
       }
@@ -266,7 +266,7 @@ public class StockModelImpl implements StockModel {
     LocalDate currentDate = start;
     double currentValue = 0.0;
     while (currentDate.isBefore(end)) {
-      currentValue = calculatePortfolio(pName, currentDate);
+      currentValue = calculatePortfolio(pName, moveToRecentTradingDay(currentDate));
       data.put(currentDate.format(formatter), currentValue);
       switch(timeStamp) {
         case "Years":
@@ -431,7 +431,7 @@ public class StockModelImpl implements StockModel {
     double startPrice = Double.parseDouble(startDateLine[4]);
     double endPrice = Double.parseDouble(endDateLine[4]);
     double gainLoss = endPrice - startPrice;
-    return gainLoss;
+    return Math.round(gainLoss * 100) / 100.0;
   }
 
   /**
@@ -468,7 +468,7 @@ public class StockModelImpl implements StockModel {
       xDays = xDays - (notCounted - xDays);
     }
     movingAverage /= xDays;
-    return movingAverage;
+    return Math.round(movingAverage * 100) / 100.0;
   }
 
   /**
@@ -548,8 +548,9 @@ public class StockModelImpl implements StockModel {
       if (p.name.equals(pName)) {
         for (String symbol :p.purchases.keySet()) {
           if (!result.containsKey(symbol)) {
-            result.put(symbol, (this.getBoughtShares(pName, symbol, date) -
-                    this.getSoldShares(pName, symbol, date)) * getClosingValue(symbol, date));
+            result.put(symbol, Math.round((this.getBoughtShares(pName, symbol, date) -
+                    this.getSoldShares(pName, symbol, date)) * getClosingValue(symbol, date)
+                    * 100) / 100.0);
           }
         }
       }
@@ -720,7 +721,7 @@ public class StockModelImpl implements StockModel {
 
 
   @Override
-  public void loadPortfolioFromXML(String xmlFilePath, String pName) {
+  public void loadPortfolioFromXML(String xmlFilePath) {
     try {
       File xmlFile = new File(xmlFilePath);
       DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -736,9 +737,9 @@ public class StockModelImpl implements StockModel {
           Element portfolioElement = (Element) portfolioNode;
           String portfolioName = portfolioElement.getAttribute("name");
 
-          if (!portfolioName.equals(pName)) {
-            continue;
-          }
+//          if (!portfolioName.equals(pName)) {
+//            continue;
+//          }
 
           BetterPortfolio portfolio = new BetterPortfolio(portfolioName);
 

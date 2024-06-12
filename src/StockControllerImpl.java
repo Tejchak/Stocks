@@ -301,16 +301,18 @@ public class StockControllerImpl implements StockController {
       case 8:
         pName = getStringInput("Enter the name of the portfolio you " +
                 "would like to store: ");
+        String filePath = getStringInput("Type the filepath: ");
         while (!model.existingPortfolio(pName)) {
           pName = getStringInput("Portfolio " + pName +
                   " does not exist. Please enter another name.");
         }
-        model.portfolioToXML("Resources/vik.xml");
+        model.portfolioToXML(filePath);
         break;
       case 9:
         pName = getStringInput("Enter the name of the portfolio you " +
                 "would like to recover: ");
-        model.loadPortfolioFromXML("Resources/vik.xml", pName);
+         filePath = getStringInput("Type the filepath: ");
+        model.loadPortfolioFromXML(filePath, pName);
         break;
       default:
         view.displayResult("Invalid input. Please enter a valid number.");

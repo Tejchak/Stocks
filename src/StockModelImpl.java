@@ -728,38 +728,50 @@ public class StockModelImpl implements StockModel {
       Document doc = dBuilder.parse(xmlFile);
       doc.getDocumentElement().normalize();
 
-      String portfolioName = doc.getDocumentElement().getAttribute("name");
-      BetterPortfolio portfolio = new BetterPortfolio(portfolioName);
+      NodeList portfolioList = doc.getElementsByTagName("portfolio");
+      for (int i = 0; i < portfolioList.getLength(); i++) {
+        Node portfolioNode = portfolioList.item(i);
+        if (portfolioNode.getNodeType() == Node.ELEMENT_NODE) {
+          Element portfolioElement = (Element) portfolioNode;
+          String portfolioName = portfolioElement.getAttribute("name");
 
-      NodeList purchaseList = doc.getElementsByTagName("purchase");
-      for (int i = 0; i < purchaseList.getLength(); i++) {
-        Node purchaseNode = purchaseList.item(i);
-        if (purchaseNode.getNodeType() == Node.ELEMENT_NODE) {
-          Element purchaseElement = (Element) purchaseNode;
-          String stockSymbol = purchaseElement.getElementsByTagName("symbol").item(0).getTextContent();
-          double shares = Double.parseDouble(purchaseElement.getElementsByTagName("shares").item(0).getTextContent());
-          LocalDate purchaseDate = LocalDate.parse(purchaseElement.getElementsByTagName("date").item(0).getTextContent());
+          if (!portfolioName.equals(pName)) {
+            continue;
+          }
 
-          StockPurchase stockPurchase = new StockPurchase(shares, purchaseDate);
-          portfolio.purchases.computeIfAbsent(stockSymbol, k -> new ArrayList<>()).add(stockPurchase);
+          BetterPortfolio portfolio = new BetterPortfolio(portfolioName);
+
+          NodeList purchaseList = portfolioElement.getElementsByTagName("purchase");
+          for (int j = 0; j < purchaseList.getLength(); j++) {
+            Node purchaseNode = purchaseList.item(j);
+            if (purchaseNode.getNodeType() == Node.ELEMENT_NODE) {
+              Element purchaseElement = (Element) purchaseNode;
+              String stockSymbol = purchaseElement.getElementsByTagName("symbol").item(0).getTextContent();
+              double shares = Double.parseDouble(purchaseElement.getElementsByTagName("shares").item(0).getTextContent());
+              LocalDate purchaseDate = LocalDate.parse(purchaseElement.getElementsByTagName("date").item(0).getTextContent());
+
+              StockPurchase stockPurchase = new StockPurchase(shares, purchaseDate);
+              portfolio.purchases.computeIfAbsent(stockSymbol, k -> new ArrayList<>()).add(stockPurchase);
+            }
+          }
+
+          NodeList saleList = portfolioElement.getElementsByTagName("sale");
+          for (int j = 0; j < saleList.getLength(); j++) {
+            Node saleNode = saleList.item(j);
+            if (saleNode.getNodeType() == Node.ELEMENT_NODE) {
+              Element saleElement = (Element) saleNode;
+              String stockSymbol = saleElement.getElementsByTagName("symbol").item(0).getTextContent();
+              double shares = Double.parseDouble(saleElement.getElementsByTagName("shares").item(0).getTextContent());
+              LocalDate saleDate = LocalDate.parse(saleElement.getElementsByTagName("date").item(0).getTextContent());
+
+              StockSale stockSale = new StockSale(shares, saleDate);
+              portfolio.sales.computeIfAbsent(stockSymbol, k -> new ArrayList<>()).add(stockSale);
+            }
+          }
+
+          this.portfolios.add(portfolio);
         }
       }
-
-      NodeList saleList = doc.getElementsByTagName("sale");
-      for (int i = 0; i < saleList.getLength(); i++) {
-        Node saleNode = saleList.item(i);
-        if (saleNode.getNodeType() == Node.ELEMENT_NODE) {
-          Element saleElement = (Element) saleNode;
-          String stockSymbol = saleElement.getElementsByTagName("symbol").item(0).getTextContent();
-          double shares = Double.parseDouble(saleElement.getElementsByTagName("shares").item(0).getTextContent());
-          LocalDate saleDate = LocalDate.parse(saleElement.getElementsByTagName("date").item(0).getTextContent());
-
-          StockSale stockSale = new StockSale(shares, saleDate);
-          portfolio.sales.computeIfAbsent(stockSymbol, k -> new ArrayList<>()).add(stockSale);
-        }
-      }
-
-      this.portfolios.add(portfolio);
     } catch (Exception e) {
       e.printStackTrace();
     }

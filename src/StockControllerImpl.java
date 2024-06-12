@@ -208,7 +208,7 @@ public class StockControllerImpl implements StockController {
       case 3:
         double sellShares;
         String pName = getStringInput(
-                "Enter the name of the portfolio you would like to take away from: ");
+                "Enter the name of the portfolio you would like to sell stock from: ");
         while (!model.existingPortfolio(pName)) {
           pName = getStringInput("Portfolio " + pName +
                   " does not exist. Please enter another name.");
@@ -248,7 +248,7 @@ public class StockControllerImpl implements StockController {
         }
         String date = getDate("date you would like " +
                 "to calculate the value on: ");
-        view.displayResult(n + " is worth " + model.calculatePortfolio(n, model.convertDate(date)) + " USD");
+        view.displayResult(n + " is worth $" + model.calculatePortfolio(n, model.convertDate(date)));
         break;
       case 5:
           String name = getStringInput("Enter the name of the portfolio you " +
@@ -260,6 +260,7 @@ public class StockControllerImpl implements StockController {
           String valDate = getDate("date you would like to view this portfolio on (if "
                   + "it as a weekend, we will use the closing time on Friday: ");
           LocalDate day = model.convertDate(valDate);
+          view.displayResult("The distribution in USD is:");
           for (String s : model.portfolioAsDistribution(name, day)) {
             view.displayResult(s);
           }
@@ -301,7 +302,7 @@ public class StockControllerImpl implements StockController {
       case 8:
         pName = getStringInput("Enter the name of the portfolio you " +
                 "would like to store: ");
-        String filePath = getStringInput("Type the filepath: ");
+        String filePath = getStringInput("Type the filepath (E.G. Resources/portfolios.xml): ");
         while (!model.existingPortfolio(pName)) {
           pName = getStringInput("Portfolio " + pName +
                   " does not exist. Please enter another name.");
@@ -309,7 +310,7 @@ public class StockControllerImpl implements StockController {
         model.portfolioToXML(filePath);
         break;
       case 9:
-         filePath = getStringInput("Type the filepath: ");
+         filePath = getStringInput("Type the filepath (E.G. Resources/portfolios.xml): ");
         model.loadPortfolioFromXML(filePath);
         break;
       default:
@@ -542,7 +543,7 @@ public class StockControllerImpl implements StockController {
     String[] endLine = getValidTradingDay(stockData, endDate, "end");
     String[] endDateLine = getValidEndDate(stockData, startDateLine[0], endLine);
     double gainLoss = model.stockGainLoss(stockData, startDateLine, endDateLine);
-    view.displayResult("The gain/loss over that period of time is " + gainLoss);
+    view.displayResult("The gain/loss over that period of time is $" + gainLoss);
   }
 
   //Handles the moving average and assigns the variables for the model.
@@ -556,7 +557,7 @@ public class StockControllerImpl implements StockController {
             "prior to " + earliestDate + " will not be included in calculating the moving average");
     int xDays = getValidPositiveNum("Type the number of days for moving average:");
     double movingAverage = model.movingAverage(stockData, startDate, xDays);
-    view.displayResult("The " + xDays + "-day moving average is " + movingAverage);
+    view.displayResult("The " + xDays + "-day moving average is $" + movingAverage);
   }
 
   //Handles the crossover

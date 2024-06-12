@@ -34,6 +34,8 @@ public class StockViewImpl implements StockView {
     System.out.println("5. View the portfolio distribution");
     System.out.println("6. Rebalance a portfolio");
     System.out.println("7. View a portfolio performance as a bar chart");
+    System.out.println("8. Store a portfolio");
+    System.out.println("9. Recover a portfolio");
   }
 
   /**

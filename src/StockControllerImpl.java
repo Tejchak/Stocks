@@ -1,27 +1,12 @@
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
-import java.io.File;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.time.Period;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import java.time.format.DateTimeFormatter;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 /**
  * Controller for the stock model that gets inputs and calls the model at certain points.
@@ -118,7 +103,7 @@ public class StockControllerImpl implements StockController {
     LocalDate localDate = null;
     while (true) {
       try {
-         localDate = LocalDate.parse(date, formatter);
+        localDate = LocalDate.parse(date, formatter);
         break;
       } catch (Exception e) {
         view.displayResult("Invalid date, please try again (year, then month, then day)");
@@ -192,11 +177,11 @@ public class StockControllerImpl implements StockController {
    */
   private void handlePortfolioMenu() {
     view.portfolioMenu();
-    int option = getValidPositiveNum("Please enter a number between 1 and 5");
-    while (option != 1 && model.getPortfolios().isEmpty()) {
+    int option = getValidPositiveNum("Please enter a number between 1 and 9");
+    while (option != 1 && option != 9 && model.getPortfolios().isEmpty()) {
       view.displayResult("Must have an existing portfolio " +
               "before you can add, remove, or calculate.");
-      option = getValidPositiveNum("Please enter a number between 1 and 4");
+      option = getValidPositiveNum("Please enter 1 or 9");
     }
     switch (option) {
       case 1:
@@ -217,7 +202,7 @@ public class StockControllerImpl implements StockController {
         String purchaseDate = getDate("Enter the date you would like to purchase: ");
         String[] purchaseDateLine = getValidTradingDay(stockData, purchaseDate, "purchase");
         LocalDate correctDate = model.convertDate(purchaseDateLine[0]);
-        StockPurchase  currentPurchase = new StockPurchase(shares, correctDate);
+        StockPurchase currentPurchase = new StockPurchase(shares, correctDate);
         model.addStockToPortfolio(portfolioName, stockSymbol, currentPurchase);
         break;
       case 3:
@@ -250,8 +235,7 @@ public class StockControllerImpl implements StockController {
           }
           StockSale sale = new StockSale(sellShares, finalDate);
           model.removeStockFromPortfolio(pName, symbol, sale);
-        }
-        else {
+        } else {
           view.displayResult("Invalid number, you have no shares available at this time.");
         }
         break;
@@ -281,42 +265,55 @@ public class StockControllerImpl implements StockController {
           }
           break;
       case 6:
-        String na = getStringInput("Enter the name of the portfolio you " +
+        pName = getStringInput("Enter the name of the portfolio you " +
                 "would like to rebalance: ");
-        while (!model.existingPortfolio(na)) {
-          na = getStringInput("Portfolio " + na +
+        while (!model.existingPortfolio(pName)) {
+          pName = getStringInput("Portfolio " + pName +
                   " does not exist. Please enter another name.");
         }
-        String year = getStringInput("Enter the year you would like to rebalance: ");
-        String month = getStringInput("Enter the month you would like to rebalance: ");
-        String d = getStringInput("Enter the day you would like to rebalance: ");
-        LocalDate localDate = LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(d));
-        ArrayList<String> stocks = model.getListStocks(na, localDate);
-        view.displayResult("You will be asked to enter the weights of each stock in your portfolio." +
-                "Here is a list of all the stocks in your portfolio: " +
-                stocks.toString() +
+        LocalDate localDate = model.convertDate(getDate("rebalance"));
+        ArrayList<String> stocks = model.getListStocks(pName, localDate);
+        view.displayResult("You will be asked to enter the weights of each stock in your portfolio. \n" +
+                "Here is a list of all the stocks in your portfolio: \n" +
+                stocks.toString() + "\n" +
                 "The total of your weights should add to 1");
         HashMap<String, Double> weights = new HashMap<>();
         double totalweight = 0.0;
-        for (int i = 0; i < stocks.size(); i++) {
-          double val = 0;
-          val = getWeight("Enter a weight value between 0 and 1 for the stock "
-                  + stocks.get(i));
-          totalweight += val;
-          weights.put(stocks.get(i), val);
-          if (totalweight > 1 || (totalweight < 0 && i == stocks.size() - 1)) {
-            i = 0;
-            weights = new HashMap<>();
-            totalweight = 0.0;
-            view.displayResult("Weights total must be equal to 1, please try again.");
+        while (totalweight != 1) {
+          for (int i = 0; i < stocks.size(); i++) {
+            double val = 0;
+            val = getWeight("Enter a weight value between 0 and 1 for the stock "
+                    + stocks.get(i));
+            totalweight += val;
+            weights.put(stocks.get(i), val);
+            if (totalweight > 1 || (totalweight < 1 && i == stocks.size() - 1)) {
+              weights = new HashMap<>();
+              totalweight = 0.0;
+              view.displayResult("Weights total must be equal to 1, please try again.");
+            }
           }
         }
-//        model.rebalancePortfolio(weights, );
+        model.rebalancePortfolio(weights, pName, localDate);
         break;
       case 7:
         handleBarChart();
         break;
-      default: view.displayResult("Invalid input. Please enter a valid number.");
+      case 8:
+        pName = getStringInput("Enter the name of the portfolio you " +
+                "would like to store: ");
+        while (!model.existingPortfolio(pName)) {
+          pName = getStringInput("Portfolio " + pName +
+                  " does not exist. Please enter another name.");
+        }
+        model.portfolioToXML("Resources/vik.xml");
+        break;
+      case 9:
+        pName = getStringInput("Enter the name of the portfolio you " +
+                "would like to recover: ");
+        model.loadPortfolioFromXML("Resources/vik.xml", pName);
+        break;
+      default:
+        view.displayResult("Invalid input. Please enter a valid number.");
     }
   }
 
@@ -363,7 +360,7 @@ public class StockControllerImpl implements StockController {
     }
     String baseOutput = "";
     if (lowestValue != 0) {
-       baseOutput = " Onto base amount of $" + Math.round(lowestValue);
+      baseOutput = " Onto base amount of $" + Math.round(lowestValue);
     }
     view.displayResult("Scale: * =  $" + scale + baseOutput);
   }
@@ -452,8 +449,7 @@ public class StockControllerImpl implements StockController {
                 + "You sold this stock on " + dateFormat.format(latestSellDate));
         if (askRemoveSale(pName, stockSymbol, sellDate)) {
           break;
-        }
-        else {
+        } else {
           sellDate = model.convertDate(getValidTradingDay(stockData, getDate("sell"), "sell")[0]);
         }
       }
@@ -579,39 +575,5 @@ public class StockControllerImpl implements StockController {
     } else {
       view.displayResult("The following are x-day Crossovers: " + crossovers.toString());
     }
-  }
-
-  //handles the storage of a portfolio
-  private void handlePortfolioStorage(BetterPortfolio portfolio) {
-    try {
-      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-      DocumentBuilder builder = factory.newDocumentBuilder();
-      Document doc = builder.parse(new File("portfolios.xml"));
-
-      NodeList nodeList = doc.getElementsByTagName(portfolio.name);
-
-      if (nodeList.getLength() == 0) {
-        Element root = doc.getDocumentElement();
-        Element newPort = doc.createElement(portfolio.name);
-        Element purchaes = doc.createElement("purchaes");
-        Element sales = doc.createElement("sales");
-        purchaes.setTextContent(portfolio.purchases.toString());
-        sales.setTextContent(portfolio.sales.toString());
-        newPort.appendChild(purchaes);
-        newPort.appendChild(sales);
-        root.appendChild(newPort);
-      }
-      else {
-        nodeList.item(0).setTextContent(portfolio.purchases.toString());
-        nodeList.item(1).setTextContent(portfolio.sales.toString());
-      }
-
-      TransformerFactory transformerFactory = TransformerFactory.newInstance();
-      Transformer transformer = transformerFactory.newTransformer();
-      DOMSource source = new DOMSource(doc);
-      StreamResult result = new StreamResult(new File("portfolios.xml"));
-      transformer.transform(source, result);
-    }
-    catch (Exception e) {}
   }
 }

@@ -7,11 +7,18 @@ import java.util.Date;
  * so that it can be easily tracked.
  */
 public class StockSale {
-  double shares;
-  LocalDate saledate;
+  private double shares;
+  private LocalDate saledate;
 
   StockSale(double shares, LocalDate saledate) {
     this.shares = shares;
     this.saledate = saledate;
+  }
+
+  public double getShares() {
+    return shares;
+  }
+  public LocalDate getSaledate() {
+    return saledate;
   }
 }

@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.time.Period;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -286,8 +287,31 @@ public class StockControllerImpl implements StockController {
           na = getStringInput("Portfolio " + na +
                   " does not exist. Please enter another name.");
         }
+        String year = getStringInput("Enter the year you would like to rebalance: ");
+        String month = getStringInput("Enter the month you would like to rebalance: ");
+        String d = getStringInput("Enter the day you would like to rebalance: ");
+        LocalDate localDate = LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(d));
+        ArrayList<String> stocks = model.getListStocks(na, localDate);
+        view.displayResult("You will be asked to enter the weights of each stock in your portfolio." +
+                "Here is a list of all the stocks in your portfolio: " +
+                stocks.toString() +
+                "The total of your weights should add to 1");
         HashMap<String, Double> weights = new HashMap<>();
-//        model.rebalancePortfolio();
+        double totalweight = 0.0;
+        for (int i = 0; i < stocks.size(); i++) {
+          double val = 0;
+          val = getWeight("Enter a weight value between 0 and 1 for the stock "
+                  + stocks.get(i));
+          totalweight += val;
+          weights.put(stocks.get(i), val);
+          if (totalweight > 1 || (totalweight < 0 && i == stocks.size() - 1)) {
+            i = 0;
+            weights = new HashMap<>();
+            totalweight = 0.0;
+            view.displayResult("Weights total must be equal to 1, please try again.");
+          }
+        }
+//        model.rebalancePortfolio(weights, );
         break;
       case 7:
         handleBarChart();
@@ -356,12 +380,11 @@ public class StockControllerImpl implements StockController {
       view.displayResult("Sorry it appears your stock doesn't exist in out database");
       stockSymbol = getStockSymbol();
     }
-    String[] stockData = getValidStock(stockSymbol);
+    String[] stockData = model.getStockData(stockSymbol);
     int shares = getValidPositiveNum("How many shares would you like to get" +
             "(you can only purchase whole shares):");
-    String purchaseDate = getDate("date you would like to purchase: ");
+    String purchaseDate = getDate("purchase: ");
     String[] purchaseDateLine = getValidTradingDay(stockData, purchaseDate, "purchase");
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     LocalDate correctDate = model.convertDate(purchaseDateLine[0]);
     StockPurchase currentPurchase = new StockPurchase(shares, correctDate);
     model.createPortfolio(name, stockSymbol, currentPurchase);
@@ -465,11 +488,11 @@ public class StockControllerImpl implements StockController {
     while (true) {
       try {
         stockData = model.getStockData(stockSymbol);
-        // System.out.println(Arrays.toString(stockData));
         if (!stockData[1].contains("\"Error Message\":") && !stockData[1].contains("Thank you for "
                 + "using Alpha Vantage!")) {
           break;
-        } else {
+        }
+        else {
           if (stockData[1].contains("\"Error Message\":")) {
             view.displayResult("Your symbol doesn't exist in our database. Please try again.");
           } else {
@@ -485,6 +508,24 @@ public class StockControllerImpl implements StockController {
       }
     }
     return stockData;
+  }
+
+  private double getWeight(String prompt) {
+    double input = 0.0;
+    boolean validInput = false;
+    while (!validInput) {
+      view.displayResult(prompt);
+      if (scanner.hasNextDouble()) {
+        input = scanner.nextDouble();
+        scanner.nextLine();
+        if (input >= 0 && input <= 1) {
+          validInput = true;
+        } else {
+          view.displayResult("Invalid weight. Please enter a value between 0 and 1.");
+        }
+      }
+    }
+    return input;
   }
 
   /**

@@ -151,4 +151,12 @@ public interface StockModel {
    *
    */
   public void rebalancePortfolio(HashMap<String, Double> weights, String name, LocalDate date);
+
+  /**
+   *
+   */
+  public ArrayList<String> getListStocks(String name, LocalDate date);
+
+  public LocalDate moveToRecentTradingDay(LocalDate date);
+
 }

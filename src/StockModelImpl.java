@@ -2,6 +2,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
+import java.time.DayOfWeek;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -9,9 +12,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import javax.xml.parsers.DocumentBuilder;
 
 /**
@@ -37,7 +40,7 @@ public class StockModelImpl implements StockModel {
    * Further the hashmap is the storage of stock info.
    */
   StockModelImpl() {
-    this.apiKey = "F99D5A7QDFY52B58";
+    this.apiKey = "QCLLY08TISZBMXL9";
     this.portfolios = new ArrayList<>();
     this.stocks = new HashMap<String, String[]>();
   }
@@ -160,7 +163,10 @@ public class StockModelImpl implements StockModel {
   @Override
   public boolean checkStockExists(String stockSymbol) {
     try {
-      getStockData(stockSymbol);
+      String[] data = getStockData(stockSymbol);
+      if (data.length < 5) {
+        return false;
+      }
     }
     catch (Exception e) {
       return false;
@@ -176,6 +182,7 @@ public class StockModelImpl implements StockModel {
    */
   @Override
   public double calculatePortfolio(String n, LocalDate date) {
+    date = moveToRecentTradingDay(date);
     double result = 0.0;
     BetterPortfolio portfolio = null;
     for (BetterPortfolio p : this.portfolios) {
@@ -522,6 +529,7 @@ public class StockModelImpl implements StockModel {
   @Override
   public String[] portfolioAsDistribution(String pName, LocalDate date) {
     HashMap<String, Double> result = new HashMap<String, Double>();
+    date = moveToRecentTradingDay(date);
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(pName)) {
         for (String symbol :p.purchases.keySet()) {
@@ -589,5 +597,35 @@ public class StockModelImpl implements StockModel {
            this.getPortfolio(name).sales.put(stocksymbol, newSale);
        }
      }
+  }
+
+  @Override
+  public ArrayList<String> getListStocks(String name, LocalDate date) {
+    ArrayList<String> result = new ArrayList<>();
+    BetterPortfolio p = getPortfolio(name);
+    for (String symbol : p.purchases.keySet()) {
+      for (StockPurchase stockPurchase : p.purchases.get(symbol) ) {
+        if (!result.contains(symbol) && !stockPurchase.purchaseDate.isAfter(date)) {
+          result.add(symbol);
+        }
+      }
+      for (StockSale sale : p.sales.get(symbol)) {
+        if (!sale.saledate.isAfter(date)) {
+          result.remove(symbol);
+        }
+      }
+    }
+    return result;
+  }
+
+  @Override
+  public LocalDate moveToRecentTradingDay(LocalDate date) {
+    if (date.getDayOfWeek().equals(DayOfWeek.SATURDAY)) {
+      return date.minusDays(1);
+    }
+    if (date.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+      return date.minusDays(2);
+    }
+    return date;
   }
 }

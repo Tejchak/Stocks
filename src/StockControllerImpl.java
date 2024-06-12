@@ -177,11 +177,11 @@ public class StockControllerImpl implements StockController {
    */
   private void handlePortfolioMenu() {
     view.portfolioMenu();
-    int option = getValidPositiveNum("Please enter a number between 1 and 5");
-    while (option != 1 && model.getPortfolios().isEmpty()) {
+    int option = getValidPositiveNum("Please enter a number between 1 and 9");
+    while (option != 1 && option != 9 && model.getPortfolios().isEmpty()) {
       view.displayResult("Must have an existing portfolio " +
               "before you can add, remove, or calculate.");
-      option = getValidPositiveNum("Please enter a number between 1 and 4");
+      option = getValidPositiveNum("Please enter 1 or 9");
     }
     switch (option) {
       case 1:
@@ -299,13 +299,17 @@ public class StockControllerImpl implements StockController {
         break;
       case 8:
         pName = getStringInput("Enter the name of the portfolio you " +
-                "would like to rebalance: ");
+                "would like to store: ");
         while (!model.existingPortfolio(pName)) {
           pName = getStringInput("Portfolio " + pName +
                   " does not exist. Please enter another name.");
         }
-        model.portfolioToXML(pName, "portfolios.xml");
+        model.portfolioToXML("Resources/vik.xml");
         break;
+      case 9:
+        pName = getStringInput("Enter the name of the portfolio you " +
+                "would like to recover: ");
+        model.loadPortfolioFromXML("Resources/vik.xml", pName);
       default:
         view.displayResult("Invalid input. Please enter a valid number.");
     }

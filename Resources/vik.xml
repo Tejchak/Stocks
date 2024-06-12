@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><Portfolios>
+    <Portfolio name="cheese">
+        <Purchases>
+            <Purchase purchaseDate="2024-05-22" shares="5.0" stockSymbol="GOOG"/>
+        </Purchases>
+        <Sales/>
+    </Portfolio>
+<portfolio name="tej">
+    <purchase><symbol>A,C</symbol><shares>5.0</shares><date>2020-12-24</date></purchase></portfolio></Portfolios>

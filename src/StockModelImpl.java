@@ -12,18 +12,24 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import java.io.File;
 import java.io.FileOutputStream;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * The implementation of the Stock model. This specific implementation uses the alphavantage api
@@ -630,66 +636,127 @@ public class StockModelImpl implements StockModel {
 
 
   @Override
-  public void portfolioToXML(String portfolioName, String fileName) {
+  public void portfolioToXML(String filePath) {
     try {
-      DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-      DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+      File xmlFile = new File(filePath);
+      DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+      DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+      Document doc;
 
-      // Root element
-      Document doc = docBuilder.newDocument();
-      Element rootElement = doc.createElement("Portfolios");
-      doc.appendChild(rootElement);
+      // Check if the file exists and has content
+      if (xmlFile.exists() && xmlFile.length() > 0) {
+        doc = dBuilder.parse(xmlFile);
+        doc.getDocumentElement().normalize();
+      } else {
+        doc = dBuilder.newDocument();
+        Element rootElement = doc.createElement("portfolios");
+        doc.appendChild(rootElement);
+      }
 
-      // Portfolio element
-      Element portfolioElement = doc.createElement("Portfolio");
-      portfolioElement.setAttribute("name", portfolioName);
-      rootElement.appendChild(portfolioElement);
+      Element rootElement = doc.getDocumentElement();
 
-      BetterPortfolio portfolio = getPortfolio(portfolioName);
+      for (BetterPortfolio portfolio : portfolios) {
+        Element portfolioElement = doc.createElement("portfolio");
+        portfolioElement.setAttribute("name", portfolio.name);
+        rootElement.appendChild(portfolioElement);
 
-      // Add purchases
-      Element purchasesElement = doc.createElement("Purchases");
-      portfolioElement.appendChild(purchasesElement);
+        for (String stockSymbol : portfolio.purchases.keySet()) {
+          List<StockPurchase> stockPurchases = portfolio.purchases.get(stockSymbol);
+          for (StockPurchase purchase : stockPurchases) {
+            Element purchaseElement = doc.createElement("purchase");
+            portfolioElement.appendChild(purchaseElement);
 
-      for (Map.Entry<String, ArrayList<StockPurchase>> entry : portfolio.purchases.entrySet()) {
-        String stockSymbol = entry.getKey();
-        for (StockPurchase purchase : entry.getValue()) {
-          Element purchaseElement = doc.createElement("Purchase");
-          purchaseElement.setAttribute("stockSymbol", stockSymbol);
-          purchaseElement.setAttribute("shares", String.valueOf(purchase.shares));
-          purchaseElement.setAttribute("purchaseDate", purchase.purchaseDate.toString());
-          purchasesElement.appendChild(purchaseElement);
+            Element symbolElement = doc.createElement("symbol");
+            symbolElement.appendChild(doc.createTextNode(stockSymbol));
+            purchaseElement.appendChild(symbolElement);
+
+            Element sharesElement = doc.createElement("shares");
+            sharesElement.appendChild(doc.createTextNode(Double.toString(purchase.shares)));
+            purchaseElement.appendChild(sharesElement);
+
+            Element dateElement = doc.createElement("date");
+            dateElement.appendChild(doc.createTextNode(purchase.purchaseDate.toString()));
+            purchaseElement.appendChild(dateElement);
+          }
+        }
+
+        for (String stockSymbol : portfolio.sales.keySet()) {
+          List<StockSale> stockSales = portfolio.sales.get(stockSymbol);
+          for (StockSale sale : stockSales) {
+            Element saleElement = doc.createElement("sale");
+            portfolioElement.appendChild(saleElement);
+
+            Element symbolElement = doc.createElement("symbol");
+            symbolElement.appendChild(doc.createTextNode(stockSymbol));
+            saleElement.appendChild(symbolElement);
+
+            Element sharesElement = doc.createElement("shares");
+            sharesElement.appendChild(doc.createTextNode(Double.toString(sale.shares)));
+            saleElement.appendChild(sharesElement);
+
+            Element dateElement = doc.createElement("date");
+            dateElement.appendChild(doc.createTextNode(sale.saledate.toString()));
+            saleElement.appendChild(dateElement);
+          }
         }
       }
 
-      // Add sales
-      Element salesElement = doc.createElement("Sales");
-      portfolioElement.appendChild(salesElement);
-
-      for (Map.Entry<String, ArrayList<StockSale>> entry : portfolio.sales.entrySet()) {
-        String stockSymbol = entry.getKey();
-        for (StockSale sale : entry.getValue()) {
-          Element saleElement = doc.createElement("Sale");
-          saleElement.setAttribute("stockSymbol", stockSymbol);
-          saleElement.setAttribute("shares", String.valueOf(sale.shares));
-          saleElement.setAttribute("saleDate", sale.saledate.toString());
-          salesElement.appendChild(saleElement);
-        }
-      }
-
-      // Write the content into XML file
+      // Write the content into the XML file
       TransformerFactory transformerFactory = TransformerFactory.newInstance();
       Transformer transformer = transformerFactory.newTransformer();
-      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
       DOMSource source = new DOMSource(doc);
-      StreamResult result = new StreamResult(new FileOutputStream(new File(fileName)));
-
+      StreamResult result = new StreamResult(xmlFile);
       transformer.transform(source, result);
-      System.out.println("Portfolio data saved to XML file: " + fileName);
 
-    } catch (Exception e) {
+      System.out.println("Portfolio data successfully appended to the XML file.");
+    } catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
       e.printStackTrace();
     }
   }
 
+  @Override
+  public void loadPortfolioFromXML(String xmlFilePath, String pName) {
+    try {
+      File xmlFile = new File(xmlFilePath);
+      DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+      DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+      Document doc = dBuilder.parse(xmlFile);
+      doc.getDocumentElement().normalize();
+
+      String portfolioName = doc.getDocumentElement().getAttribute("name");
+      BetterPortfolio portfolio = new BetterPortfolio(portfolioName);
+
+      NodeList purchaseList = doc.getElementsByTagName("purchase");
+      for (int i = 0; i < purchaseList.getLength(); i++) {
+        Node purchaseNode = purchaseList.item(i);
+        if (purchaseNode.getNodeType() == Node.ELEMENT_NODE) {
+          Element purchaseElement = (Element) purchaseNode;
+          String stockSymbol = purchaseElement.getElementsByTagName("symbol").item(0).getTextContent();
+          double shares = Double.parseDouble(purchaseElement.getElementsByTagName("shares").item(0).getTextContent());
+          LocalDate purchaseDate = LocalDate.parse(purchaseElement.getElementsByTagName("date").item(0).getTextContent());
+
+          StockPurchase stockPurchase = new StockPurchase(shares, purchaseDate);
+          portfolio.purchases.computeIfAbsent(stockSymbol, k -> new ArrayList<>()).add(stockPurchase);
+        }
+      }
+
+      NodeList saleList = doc.getElementsByTagName("sale");
+      for (int i = 0; i < saleList.getLength(); i++) {
+        Node saleNode = saleList.item(i);
+        if (saleNode.getNodeType() == Node.ELEMENT_NODE) {
+          Element saleElement = (Element) saleNode;
+          String stockSymbol = saleElement.getElementsByTagName("symbol").item(0).getTextContent();
+          double shares = Double.parseDouble(saleElement.getElementsByTagName("shares").item(0).getTextContent());
+          LocalDate saleDate = LocalDate.parse(saleElement.getElementsByTagName("date").item(0).getTextContent());
+
+          StockSale stockSale = new StockSale(shares, saleDate);
+          portfolio.sales.computeIfAbsent(stockSymbol, k -> new ArrayList<>()).add(stockSale);
+        }
+      }
+
+      this.portfolios.add(portfolio);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 }

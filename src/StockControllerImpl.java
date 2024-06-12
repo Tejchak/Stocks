@@ -118,7 +118,7 @@ public class StockControllerImpl implements StockController {
     LocalDate localDate = null;
     while (true) {
       try {
-         localDate = LocalDate.parse(date, formatter);
+        localDate = LocalDate.parse(date, formatter);
         break;
       } catch (Exception e) {
         view.displayResult("Invalid date, please try again (year, then month, then day)");
@@ -217,7 +217,7 @@ public class StockControllerImpl implements StockController {
         String purchaseDate = getDate("Enter the date you would like to purchase: ");
         String[] purchaseDateLine = getValidTradingDay(stockData, purchaseDate, "purchase");
         LocalDate correctDate = model.convertDate(purchaseDateLine[0]);
-        StockPurchase  currentPurchase = new StockPurchase(shares, correctDate);
+        StockPurchase currentPurchase = new StockPurchase(shares, correctDate);
         model.addStockToPortfolio(portfolioName, stockSymbol, currentPurchase);
         break;
       case 3:
@@ -250,8 +250,7 @@ public class StockControllerImpl implements StockController {
           }
           StockSale sale = new StockSale(sellShares, finalDate);
           model.removeStockFromPortfolio(pName, symbol, sale);
-        }
-        else {
+        } else {
           view.displayResult("Invalid number, you have no shares available at this time.");
         }
         break;
@@ -267,55 +266,57 @@ public class StockControllerImpl implements StockController {
         view.displayResult(n + " is worth " + model.calculatePortfolio(n, model.convertDate(date)) + " USD");
         break;
       case 5:
-          String name = getStringInput("Enter the name of the portfolio you " +
-                  "would like to see as a distribution: ");
-          while (!model.existingPortfolio(name)) {
-            name = getStringInput("Portfolio " + name +
-                    " does not exist. Please enter another name.");
-          }
-          String valDate = getDate("date you would like to view this portfolio on: ");
-          LocalDate day = model.convertDate(valDate);
-          for (String s : model.portfolioAsDistribution(name, day)) {
-            view.displayResult(s);
-          }
-          break;
-      case 6:
-        String na = getStringInput("Enter the name of the portfolio you " +
-                "would like to rebalance: ");
-        while (!model.existingPortfolio(na)) {
-          na = getStringInput("Portfolio " + na +
+        String name = getStringInput("Enter the name of the portfolio you " +
+                "would like to see as a distribution: ");
+        while (!model.existingPortfolio(name)) {
+          name = getStringInput("Portfolio " + name +
                   " does not exist. Please enter another name.");
         }
-        String year = getStringInput("Enter the year you would like to rebalance: ");
-        String month = getStringInput("Enter the month you would like to rebalance: ");
-        String d = getStringInput("Enter the day you would like to rebalance: ");
-        LocalDate localDate = LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(d));
-        ArrayList<String> stocks = model.getListStocks(na, localDate);
-        view.displayResult("You will be asked to enter the weights of each stock in your portfolio." +
-                "Here is a list of all the stocks in your portfolio: " +
-                stocks.toString() +
+        String valDate = getDate("date you would like to view this portfolio on: ");
+        LocalDate day = model.convertDate(valDate);
+        for (String s : model.portfolioAsDistribution(name, day)) {
+          view.displayResult(s + "\n");
+        }
+        break;
+      case 6:
+        pName = getStringInput("Enter the name of the portfolio you " +
+                "would like to rebalance: ");
+        while (!model.existingPortfolio(pName)) {
+          pName = getStringInput("Portfolio " + pName +
+                  " does not exist. Please enter another name.");
+        }
+        LocalDate localDate = model.convertDate(getDate("rebalance"));
+        ArrayList<String> stocks = model.getListStocks(pName, localDate);
+        view.displayResult("You will be asked to enter the weights of each stock in your portfolio. \n" +
+                "Here is a list of all the stocks in your portfolio: \n" +
+                stocks.toString() + "\n" +
                 "The total of your weights should add to 1");
         HashMap<String, Double> weights = new HashMap<>();
         double totalweight = 0.0;
-        for (int i = 0; i < stocks.size(); i++) {
-          double val = 0;
-          val = getWeight("Enter a weight value between 0 and 1 for the stock "
-                  + stocks.get(i));
-          totalweight += val;
-          weights.put(stocks.get(i), val);
-          if (totalweight > 1 || (totalweight < 0 && i == stocks.size() - 1)) {
-            i = 0;
-            weights = new HashMap<>();
-            totalweight = 0.0;
-            view.displayResult("Weights total must be equal to 1, please try again.");
+        while (totalweight != 1) {
+          for (int i = 0; i < stocks.size(); i++) {
+            double val = 0;
+            val = getWeight("Enter a weight value between 0 and 1 for the stock "
+                    + stocks.get(i));
+            totalweight += val;
+            weights.put(stocks.get(i), val);
+            if (totalweight > 1 || (totalweight < 1 && i == stocks.size() - 1)) {
+              weights = new HashMap<>();
+              totalweight = 0.0;
+              view.displayResult("Weights total must be equal to 1, please try again.");
+            }
           }
         }
-//        model.rebalancePortfolio(weights, );
+        model.rebalancePortfolio(weights, pName, localDate);
         break;
       case 7:
         handleBarChart();
         break;
-      default: view.displayResult("Invalid input. Please enter a valid number.");
+      case 8:
+        handlePortfolioStorage(new BetterPortfolio("I hate my life"));
+        break;
+      default:
+        view.displayResult("Invalid input. Please enter a valid number.");
     }
   }
 
@@ -362,7 +363,7 @@ public class StockControllerImpl implements StockController {
     }
     String baseOutput = "";
     if (lowestValue != 0) {
-       baseOutput = " Onto base amount of $" + Math.round(lowestValue);
+      baseOutput = " Onto base amount of $" + Math.round(lowestValue);
     }
     view.displayResult("Scale: * =  $" + scale + baseOutput);
   }
@@ -452,8 +453,7 @@ public class StockControllerImpl implements StockController {
                 + "You sold this stock on " + dateFormat.format(latestSellDate));
         if (askRemoveSale(pName, stockSymbol, sellDate)) {
           break;
-        }
-        else {
+        } else {
           sellDate = model.convertDate(getValidTradingDay(stockData, getDate("sell"), "sell")[0]);
         }
       }
@@ -600,8 +600,7 @@ public class StockControllerImpl implements StockController {
         newPort.appendChild(purchaes);
         newPort.appendChild(sales);
         root.appendChild(newPort);
-      }
-      else {
+      } else {
         nodeList.item(0).setTextContent(portfolio.purchases.toString());
         nodeList.item(1).setTextContent(portfolio.sales.toString());
       }
@@ -611,7 +610,7 @@ public class StockControllerImpl implements StockController {
       DOMSource source = new DOMSource(doc);
       StreamResult result = new StreamResult(new File("portfolios.xml"));
       transformer.transform(source, result);
+    } catch (Exception e) {
     }
-    catch (Exception e) {}
   }
 }

@@ -40,7 +40,7 @@ public class StockModelImpl implements StockModel {
    * Further the hashmap is the storage of stock info.
    */
   StockModelImpl() {
-    this.apiKey = "F99D5A7QDFY52B58";
+    this.apiKey = "QCLLY08TISZBMXL9";
     this.portfolios = new ArrayList<>();
     this.stocks = new HashMap<String, String[]>();
   }
@@ -573,10 +573,12 @@ public class StockModelImpl implements StockModel {
    */
   @Override
   public void rebalancePortfolio(HashMap<String, Double> weights, String name, LocalDate date) {
+    double total = this.calculatePortfolio(name, date);
+    date = moveToRecentTradingDay(date);
      for (String stocksymbol : weights.keySet()) {
        double currentVal = (this.getBoughtShares(name, stocksymbol, date) - this.getSoldShares(name, stocksymbol, date))
                * getClosingValue(stocksymbol, date);
-       double goalVal = this.calculatePortfolio(name, date) * weights.get(stocksymbol);
+       double goalVal = total * weights.get(stocksymbol);
        if (goalVal > currentVal) {
          double shares = (goalVal - currentVal) / getClosingValue(stocksymbol, date);
          StockPurchase purchase = new StockPurchase(shares, date);
@@ -587,7 +589,8 @@ public class StockModelImpl implements StockModel {
          if (goalVal < currentVal) {
            double shares2 = (currentVal - goalVal)/getClosingValue(stocksymbol, date);
            StockSale sale = new StockSale(shares2, date);
-           ArrayList<StockSale> newSale = this.getPortfolio(name).sales.get(stocksymbol);
+           ArrayList<StockSale> newSale = this.getPortfolio(name)
+                   .sales.getOrDefault(stocksymbol, new ArrayList<>());
            newSale.add(sale);
            this.getPortfolio(name).sales.put(stocksymbol, newSale);
        }
@@ -599,15 +602,8 @@ public class StockModelImpl implements StockModel {
     ArrayList<String> result = new ArrayList<>();
     BetterPortfolio p = getPortfolio(name);
     for (String symbol : p.purchases.keySet()) {
-      for (StockPurchase stockPurchase : p.purchases.get(symbol) ) {
-        if (!result.contains(symbol) && !stockPurchase.purchaseDate.isAfter(date)) {
-          result.add(symbol);
-        }
-      }
-      for (StockSale sale : p.sales.get(symbol)) {
-        if (!sale.saledate.isAfter(date)) {
-          result.remove(symbol);
-        }
+      if ((this.getBoughtShares(name, symbol, date) - this.getSoldShares(name, symbol, date)) > 0) {
+        result.add(symbol);
       }
     }
     return result;

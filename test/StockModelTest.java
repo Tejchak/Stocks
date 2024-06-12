@@ -339,4 +339,24 @@ public class StockModelTest {
     assertEquals("Years", stockModel.getTimeStamp(start, end));
   }
 
+  @Test
+  public void testRebalancePortfolio() {
+    LocalDate date = LocalDate.of(2015, 1, 6);
+    stockModel.createPortfolio("Jake", "GOOG", new StockPurchase(5, date));
+    HashMap<String, Double> weights = new HashMap<>();
+    weights.put("AAPL", 0.5);
+    weights.put("GOOG", 0.3);
+    weights.put("MSFT", 0.2);
+
+    stockModel.rebalancePortfolio(weights, "Jake", date);
+
+    double totalValue = stockModel.calculatePortfolio("Jake", date);
+    double expectedAAPLValue = totalValue * weights.get("AAPL");
+    double expectedGOOGLValue = totalValue * weights.get("GOOG");
+    double expectedMSFTValue = totalValue * weights.get("MSFT");
+
+    assertEquals(expectedAAPLValue, 62.575, 0.1);
+    assertEquals(expectedGOOGLValue, 37.545, 0.1);
+    assertEquals(expectedMSFTValue, 25.03, 0.1);
+  }
 }

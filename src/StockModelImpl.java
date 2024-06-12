@@ -602,7 +602,8 @@ public class StockModelImpl implements StockModel {
        if (goalVal > currentVal) {
          double shares = (goalVal - currentVal) / getClosingValue(stocksymbol, date);
          StockPurchase purchase = new StockPurchase(shares, date);
-         ArrayList<StockPurchase> newPurchase = this.getPortfolio(name).purchases.get(stocksymbol);
+         ArrayList<StockPurchase> newPurchase = this.getPortfolio(name)
+                 .purchases.getOrDefault(stocksymbol, new ArrayList<>());
          newPurchase.add(purchase);
          this.getPortfolio(name).purchases.put(stocksymbol, newPurchase);
        }

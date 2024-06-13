@@ -13,10 +13,10 @@ public class Main {
    *             Takes in a view, model and readable for scanning inputs
    */
   public static void main(String[] args) {
-    StockView view = new StockViewImpl();
+    StockViewImpl view = new StockViewImpl(System.out);
     Readable readable = new InputStreamReader(System.in);
-    StockModel model = new StockModelImpl();
-    StockController controller = new StockControllerImpl(model, view, readable);
+    StockModelTrader model = new StockModelNew();
+    StockControllerImpl controller = new StockControllerImpl(model, view, readable);
     controller.startProgram();
   }
 }

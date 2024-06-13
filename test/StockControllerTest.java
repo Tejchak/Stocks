@@ -8,8 +8,8 @@
   /**
    * Tests for the controller and view, by looking at outputs.
    */
-  public class StockControllerImplTest {
-    private StockModel mockModel;
+  public class StockControllerTest {
+    private StockModelTrader mockModel;
     private StockViewImpl mockView;
     private ByteArrayOutputStream outContent;
     private StockControllerImpl controller;
@@ -68,7 +68,7 @@
      */
     @Test
     public void testViewCorrectlyCreatedAndReceivesCorrectInputWithHandleGainLoss() {
-      StockModel model = new StockModelImpl();
+      StockModelTrader model = new StockModelNew();
       StockView view = new MockView();
       String input = "1\nAAPL\n2024\n05\n9\n2024\n5\n29\n5\n";
       Readable rd = new StringReader(input);
@@ -105,7 +105,7 @@
 
     @Test
     public void testInvalidSymbol() {
-      StockModel model = new StockModelImpl();
+      StockModelTrader model = new StockModelNew();
       StockView view = new MockView();
       String input = "1\nblob\naapl\n2024\n05\n9\n2024\n5\n29\n5\n";
       Readable rd = new StringReader(input);
@@ -149,7 +149,7 @@
      */
     @Test
     public void testXDayCrossOversModelToControllerToView() {
-      StockModel model = new StockModelImpl();
+      StockModelTrader model = new StockModelNew();
       StockView view = new MockView();
       String input = "3\nGOOG\n2024\n05\n9\n2024\n5\n29\n30\n5\n";
       Readable rd = new StringReader(input);
@@ -196,7 +196,7 @@
      */
     @Test
     public void testInvalidDay() {
-      StockModel model = new StockModelImpl();
+      StockModelTrader model = new StockModelNew();
       StockView view = new MockView();
       String input = "1\nAAPL\n2024\n5\n9\n2024\n6\n1\n2024\n6\n3\n5\n";
       Readable rd = new StringReader(input);
@@ -243,7 +243,7 @@
      */
     @Test
     public void testEndDateBeforeStartDate() {
-      StockModel model = new StockModelImpl();
+      StockModelTrader model = new StockModelNew();
       StockView view = new MockView();
       String input = "1\nAAL\n2024\n5\n9\n2023\n6\n01\n2024\n06\n03\n5\n";
       Readable rd = new StringReader(input);

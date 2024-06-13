@@ -28,7 +28,7 @@ public class StockModelImpl implements StockModel {
    * Further the hashmap is the storage of stock info.
    */
   StockModelImpl() {
-    this.apiKey = "F99D5A7QDFY52B58";
+    this.apiKey = "QCLLY08TISZBMXL9";
     this.portfolios = new ArrayList<Portfolio>();
     this.stocks = new HashMap<String, String[]>();
   }
@@ -55,7 +55,7 @@ public class StockModelImpl implements StockModel {
     }
   }
 
-  //gets the stock data from a csv file.
+  //gets the stock data from a csv file in the resources root folder.
   protected String[] getStockDataCSV(String stocksymbol) {
     StringBuilder result = new StringBuilder();
     URL url = null;
@@ -198,30 +198,12 @@ public class StockModelImpl implements StockModel {
         result += (value * portfolio.stocks.getOrDefault(stockSymbol, 0));
       }
     }
-    return result;
+    return Math.round(result * 100) / 100.0;
   }
 
-  /**
-   * Removes the given stock from a portfolio.
-   *
-   * @param portfolioName the name of the portfolio.
-   * @param stockSymbol   the symbol of a stock as a string (Ex, AMC).
-   * @param shares        the amount of shares pf the given stock.
-   */
-  @Override
-  public void removeStockFromPortfolio(String portfolioName, String stockSymbol, int shares) {
-    for (Portfolio p : this.portfolios) {
-      if (p.name.equals(portfolioName)) {
-        p.stocks.put(stockSymbol, p.stocks.getOrDefault(stockSymbol, 0) - shares);
-      }
-      if (p.stocks.get(stockSymbol) <= 0) {
-        p.stocks.remove(stockSymbol);
-      }
-    }
-  }
 
   /**
-   * Adds the given stock to the portfolio.
+   * Adds the given stock to the given portfolio.
    *
    * @param portfolioName the name of the portfolio.
    * @param stockSymbol   the symbol of a stock as a string (Ex, AMC).
@@ -345,6 +327,25 @@ public class StockModelImpl implements StockModel {
 
   }
 
+  /**
+   * Removes the given stock from a portfolio.
+   *
+   * @param portfolioName the name of the portfolio.
+   * @param stockSymbol   the symbol of a stock as a string (Ex, AMC).
+   * @param shares        the amount of shares pf the given stock.
+   */
+  @Override
+  public void removeStockFromPortfolio(String portfolioName, String stockSymbol, int shares) {
+    for (Portfolio p : this.portfolios) {
+      if (p.name.equals(portfolioName)) {
+        p.stocks.put(stockSymbol, p.stocks.getOrDefault(stockSymbol, 0) - shares);
+      }
+      if (p.stocks.get(stockSymbol) <= 0) {
+        p.stocks.remove(stockSymbol);
+      }
+    }
+  }
+
   //Checks if the highest price is above the moving average.
   private boolean isCrossover(String[] stockData,
                               String startDate, int xDays, Double highestPrice) {
@@ -366,4 +367,28 @@ public class StockModelImpl implements StockModel {
     }
     return false;
   }
+
+
+  /**
+   * Gets the closing value of a given stock or throws an exception
+   * if the date or stock name does not exist.
+   *
+   * @param stockSymbol the stock for which the closing value is being found.
+   * @param date        the date on which the value is being found.
+   * @return the double closing value of the stock on the day.
+   */
+  public double getClosingValue(String stockSymbol, LocalDate date) {
+    String[] stockData = getStockData(stockSymbol);
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    for (String line : stockData) {
+      String[] sections = line.split(",");
+      if (sections[0].equals(date.format(formatter))) {
+        return Double.parseDouble(sections[4]);
+      }
+    }
+    throw new IllegalArgumentException("Date does not exist for stock");
+  }
 }
+
+
+

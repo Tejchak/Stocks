@@ -19,14 +19,19 @@ import java.util.Map;
 public class StockModelTest {
   private static StockModelNew stockModelTrader;
 
-  public LocalDate convertDate(String date) {
+  /**
+   * Method that converts the date from a string to a LocalDate.
+   * @param date the string fromat of a date.
+   * @return the Local date from the given string.
+   */
+  private LocalDate convertDate(String date) {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     LocalDate newDate = LocalDate.parse(date, formatter);
     return newDate;
   }
 
   /**
-   * Sets up the tests.
+   * Sets up the model for all of the tests tests.
    */
   @Before
   public void setUp() {
@@ -197,8 +202,11 @@ public class StockModelTest {
             this.convertDate("2025-05-29")), 0.0001);
   }
 
+  /**
+   * Tests that import portfolio grabs the portfolio with the correct information.
+   */
   @Test
-  public void testimportPortfolios() {
+  public void testImportPortfolios() {
     assertEquals(0, stockModelTrader.getPortfolios().size());
     stockModelTrader.loadPortfolioFromXML("Resources/Jake.xml");
     assertEquals(2, stockModelTrader.getPortfolios().size());
@@ -211,6 +219,10 @@ public class StockModelTest {
             stockModelTrader.getPortfolios().get(0).purchases.get("L").get(0).getShares(), .01);
   }
 
+  /**
+   * Tests that the barchart hashmap contains
+   * the correct values and dates from a portfolio with years.
+   */
   @Test
   public void testBarChartYears() {
     stockModelTrader.loadPortfolioFromXML("Resources/Jake.xml");
@@ -228,6 +240,10 @@ public class StockModelTest {
             this.convertDate("2015-05-09"), this.convertDate("2024-05-09"), "Years"));
   }
 
+  /**
+   * Tests that the barchart hashmap contains
+   * the correct values and dates from a portfolio with months.
+   */
   @Test
   public void testBarChartMonths() {
     stockModelTrader.loadPortfolioFromXML("Resources/Jake.xml");
@@ -240,6 +256,10 @@ public class StockModelTest {
             this.convertDate("2024-01-09"), this.convertDate("2024-05-09"), "Months"));
   }
 
+  /**
+   * Tests that the barchart hashmap contains
+   * the correct values and dates from a portfolio with months.
+   */
   @Test
   public void testBarChartTwoMonths() {
     stockModelTrader.loadPortfolioFromXML("Resources/Jake.xml");
@@ -262,6 +282,11 @@ public class StockModelTest {
             this.convertDate("2022-01-09"), this.convertDate("2024-05-09"), "Two months"));
   }
 
+
+  /**
+   * Tests that the barchart hashmap contains
+   * the correct values and dates from a portfolio with days.
+   */
   @Test
   public void testBarChartDays() {
     stockModelTrader.loadPortfolioFromXML("Resources/Jake.xml");
@@ -285,6 +310,10 @@ public class StockModelTest {
             this.convertDate("2024-05-09"), this.convertDate("2024-05-24"), "Days"));
   }
 
+  /**
+   * Tests that the barchart hashmap contains
+   * the correct values and dates from a portfolio with weeks.
+   */
   @Test
   public void testBarChartWeeks() {
     stockModelTrader.loadPortfolioFromXML("Resources/Jake.xml");
@@ -302,6 +331,9 @@ public class StockModelTest {
             this.convertDate("2024-03-09"), this.convertDate("2024-05-09"), "Weeks"));
   }
 
+  /**
+   * Tests that get time stamp gets the correct string value for days.
+   */
   @Test
   public void testTimeStampDays() {
     LocalDate start = LocalDate.of(2015, 1, 1);
@@ -309,6 +341,9 @@ public class StockModelTest {
     assertEquals("Days", stockModelTrader.getTimeStamp(start, end));
   }
 
+  /**
+   * Tests that get time stamp gets the correct string value for weeks.
+   */
   @Test
   public void testTimeStampWeeks() {
     LocalDate start = LocalDate.of(2015, 1, 1);
@@ -316,6 +351,9 @@ public class StockModelTest {
     assertEquals("Weeks", stockModelTrader.getTimeStamp(start, end));
   }
 
+  /**
+   * Tests that get time stamp gets the correct string value for months.
+   */
   @Test
   public void testTimeStampMonths() {
     LocalDate start = LocalDate.of(2016, 1, 1);
@@ -323,6 +361,9 @@ public class StockModelTest {
     assertEquals("Months", stockModelTrader.getTimeStamp(start, end));
   }
 
+  /**
+   * Tests that get time stamp gets the correct string value for months.
+   */
   @Test
   public void testTimeStamp2Months() {
     LocalDate start = LocalDate.of(2015, 1, 1);
@@ -330,6 +371,9 @@ public class StockModelTest {
     assertEquals("Two months", stockModelTrader.getTimeStamp(start, end));
   }
 
+  /**
+   * Tests that get time stamp gets the correct string value.
+   */
   @Test
   public void testTimeStampYears() {
     LocalDate start = LocalDate.of(2015, 1, 1);
@@ -337,6 +381,60 @@ public class StockModelTest {
     assertEquals("Years", stockModelTrader.getTimeStamp(start, end));
   }
 
-}
+  /**
+   * Tests rebalance portfolio by finding the goal val and current val and
+   * making sure they are equal after rebalancing.
+   */
+  @Test
+  public void testRebalancePortfolio() {
+    LocalDate date = LocalDate.of(2020, 12, 24);
+    stockModelTrader.createPortfolio("Jake", "GOOG", new StockPurchase(5, date));
+    stockModelTrader.buyStock("Jake", "AAPL", new StockPurchase(5, date));
+    stockModelTrader.buyStock("Jake", "MSFT", new StockPurchase(5, date));
+
+    HashMap<String, Double> weights = new HashMap<>();
+    weights.put("AAPL", 0.5);
+    weights.put("GOOG", 0.3);
+    weights.put("MSFT", 0.2);
+
+    stockModelTrader.rebalancePortfolio(weights, "Jake", date);
+
+    double totalValue = stockModelTrader.calculatePortfolio("Jake", date);
+    double expectedAAPLValue = totalValue * weights.get("AAPL");
+    double expectedGOOGLValue = totalValue * weights.get("GOOG");
+    double expectedMSFTValue = totalValue * weights.get("MSFT");
+
+    double actualAAPL = stockModelTrader.getClosingValue("AAPL", date) *
+            (stockModelTrader.getBoughtShares("Jake", "AAPL", date)
+                    - stockModelTrader.getSoldShares("Jake", "AAPL", date));
+    double actualGOOG = stockModelTrader.getClosingValue("GOOG", date) *
+            (stockModelTrader.getBoughtShares("Jake", "GOOG", date)
+                    - stockModelTrader.getSoldShares("Jake", "GOOG", date));
+    double actualMSFT = stockModelTrader.getClosingValue("MSFT", date) *
+            (stockModelTrader.getBoughtShares("Jake", "MSFT", date)
+                    - stockModelTrader.getSoldShares("Jake", "MSFT", date));
+
+
+    assertEquals(expectedAAPLValue, actualAAPL, 0.1);
+    assertEquals(expectedGOOGLValue, actualGOOG, 0.1);
+    assertEquals(expectedMSFTValue, actualMSFT, 0.1);
+  }
+
+  /**
+   * Tests that the distribution is correct from the model.
+   */
+  @Test
+  public void testPortfolioDistribution() {
+    LocalDate date = LocalDate.of(2020, 12, 24);
+    stockModelTrader.createPortfolio("Jake", "GOOG", new StockPurchase(5, date));
+    stockModelTrader.buyStock("Jake", "AAPL", new StockPurchase(5, date));
+    stockModelTrader.buyStock("Jake", "MSFT", new StockPurchase(5, date));
+
+    String[] expected = {"{MSFT=1113.75",
+            " GOOG=434.71",
+            " AAPL=659.85}"};
+    assertEquals(expected, stockModelTrader.portfolioAsDistribution("Jake", date));
+    }
+  }
 
 

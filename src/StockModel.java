@@ -1,5 +1,6 @@
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Interface for a model that can do certain calculations about a stock or,
@@ -15,6 +16,7 @@ public interface StockModel {
    */
   public String[] getStockData(String stockSymbol);
 
+
   /**
    * Adds the given stock to the portfolio.
    *
@@ -23,6 +25,15 @@ public interface StockModel {
    * @param shares        the amount of shares pf the given stock.
    */
   public void addStockToPortfolio(String portfolioName, String stockSymbol, int shares);
+
+  /**
+   * Removes the given stock from a portfolio.
+   *
+   * @param portfolioName the name of the portfolio.
+   * @param stockSymbol   the symbol of a stock as a string (Ex, AMC).
+   * @param shares        the amount of shares pf the given stock.
+   */
+  public void removeStockFromPortfolio(String portfolioName, String stockSymbol, int shares);
 
   /**
    * Gets the line of the given date.
@@ -41,18 +52,9 @@ public interface StockModel {
    */
   public boolean checkStockExists(String stockSymbol);
 
-  /**
-   * Removes the given stock from a portfolio.
-   *
-   * @param portfolioName the name of the portfolio.
-   * @param stockSymbol   the symbol of a stock as a string (Ex, AMC).
-   * @param shares        the amount of shares pf the given stock.
-   */
-  public void removeStockFromPortfolio(String portfolioName, String stockSymbol, int shares);
 
   /**
    * Checks if a portfolio exists in the model.
-   *
    * @param n the name of the portfolio we're looking for.
    * @return true if it exists in the model, false if not.
    */
@@ -61,7 +63,7 @@ public interface StockModel {
   /**
    * Calculates the total value of a portfolio.
    *
-   * @param n    the name of the portfolio.
+   * @param n the name of the portfolio.
    * @param date the date on which the value is being calculated.
    * @return the total value in USD.
    */
@@ -100,4 +102,15 @@ public interface StockModel {
    */
   public StringBuilder xDayCrossover(String[] stockData,
                                      String startDate, String endDate, int xDays);
+
+
+
+  /**
+   * Gets the closing value of a given stock or throws an exception
+   * if the date or stock name does not exist.
+   * @param stockSymbol the stock for which the closing value is being found.
+   * @param date the date on which the value is being found.
+   * @return the double closing value of the stock on the day.
+   */
+  public double getClosingValue(String stockSymbol, LocalDate date);
 }

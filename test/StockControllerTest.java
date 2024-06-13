@@ -12,7 +12,7 @@
     private StockModelTrader mockModel;
     private StockViewImpl mockView;
     private ByteArrayOutputStream outContent;
-    private StockControllerImpl controller;
+    private StockController controller;
 
     /**
      * Static class representing a mock for the view.
@@ -273,6 +273,41 @@
               +  "Type the month (e.g., 1):\n"
               + "Type the day (e.g., 1):\n"
               + "The gain/loss over that period of time is $-2.95\n"
+              + "1. Examine the gain or loss of a specific stock\n"
+              + "2. Examine the x-day moving average of a stock\n"
+              + "3. Find the x-day crossovers for a stock\n"
+              + "4. Examine or create a portfolio\n"
+              + "5. Quit the program\n"
+              + "Please enter a number between 1 and 5\n";
+
+      assertEquals(expectedOutput, ((MockView) view).log.toString());
+    }
+
+    @Test
+    public void testInvalidFilePathForLoading() {
+      StockModelTrader model = new StockModelNew();
+      StockView view = new MockView();
+      String input = "4\n9\ninvalidpath\n5\n";
+      Readable rd = new StringReader(input);
+      StockController controller = new StockControllerNew(model, view, rd);
+
+      controller.startProgram();
+
+      String expectedOutput = "Welcome to the Stocks Program!\n"
+              + "1. Examine the gain or loss of a specific stock\n"
+              + "2. Examine the x-day moving average of a stock\n"
+              + "3. Find the x-day crossovers for a stock\n"
+              + "4. Examine or create a portfolio\n"
+              + "5. Quit the program\n"
+              + "Please enter a number between 1 and 5\n"
+              + "1. Create a new portfolio?\n"
+              + "2. Add stock to a portfolio?\n"
+              + "3. Take away stock from a portfolio?\n"
+              + "4. Calculate the value of a portfolio?\n"
+              + "Please enter a number between 1 and 9\n"
+              + "Type the filepath (E.G. Resources/portfolios.xml): \n"
+              + "Could not find file in xml format, please make sure the filepath is "
+              + "correct and you have followed our format.\n"
               + "1. Examine the gain or loss of a specific stock\n"
               + "2. Examine the x-day moving average of a stock\n"
               + "3. Find the x-day crossovers for a stock\n"

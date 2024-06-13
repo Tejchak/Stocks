@@ -1,11 +1,18 @@
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+/**
+ * New controller that adds the new features to our portfolio code.
+ * This allows the user to have accurate purchase and sale information
+ * for the stock portfolios. This also allows for, rebalancing, the
+ * view of the portfolio as a bar chart or a distribution, and the
+ * storage and importing of portfolios into a seperate file.
+ */
 public class StockControllerNew extends StockControllerImpl {
 
   /**
@@ -20,6 +27,7 @@ public class StockControllerNew extends StockControllerImpl {
     super(model, view, readable);
   }
 
+  //gets a valid positive double from the user input.
   protected double getValidPositiveDouble(String prompt) {
     double input = 0.0;
     boolean validInput = false;
@@ -48,8 +56,6 @@ public class StockControllerNew extends StockControllerImpl {
     }
     return input;
   }
-
-
 
 
   /**
@@ -98,6 +104,7 @@ public class StockControllerNew extends StockControllerImpl {
     }
   }
 
+  //Case for storing a portfolio. Will store to the file input
   protected void storePortfolio() {
     String pName = getStringInput("Enter the name of the portfolio you " +
             "would like to store: ");
@@ -106,12 +113,23 @@ public class StockControllerNew extends StockControllerImpl {
       pName = getStringInput("Portfolio " + pName +
               " does not exist. Please enter another name.");
     }
-    model.portfolioToXML(filePath);
+      try {
+        model.portfolioToXML(filePath);
+      } catch (Exception e) {
+        view.displayResult("Error writing to file");
+      }
   }
 
+  //Case for loading in files. Will not work
   protected void loadFile() {
     String filePath = getStringInput("Type the filepath (E.G. Resources/portfolios.xml): ");
-    model.loadPortfolioFromXML(filePath);
+    try {
+      model.loadPortfolioFromXML(filePath);
+    }
+    catch (Exception e) {
+      view.displayResult("Could not find file in xml format, please make sure the filepath is " +
+              "correct and you have followed our format.");
+    }
   }
 
   /**
@@ -139,6 +157,7 @@ public class StockControllerNew extends StockControllerImpl {
   }
 
 
+  //case for buying stock (Only whole shares).
   protected void buyStock() {
     int shares;
     String portfolioName = getStringInput(
@@ -158,6 +177,7 @@ public class StockControllerNew extends StockControllerImpl {
     model.buyStock(portfolioName, stockSymbol, currentPurchase);
   }
 
+  // case for selling stock (can be fractional or whole shares)
   protected void sellStock() {
     double sellShares;
     String pName = getStringInput(
@@ -193,6 +213,7 @@ public class StockControllerNew extends StockControllerImpl {
     }
   }
 
+  //Handles the calculation of a portfolio in the controller.
   protected void calculatePortfolio() {
     String n = getStringInput("Enter the name of the portfolio you " +
             "would like to calculate the value of: ");
@@ -200,11 +221,12 @@ public class StockControllerNew extends StockControllerImpl {
       n = getStringInput("Portfolio " + n +
               " does not exist. Please enter another name.");
     }
-    String date = getDate("date you would like " +
-            "to calculate the value on: ");
+    String date = getDate("desired");
+    LocalDate finalDate = getValidLocalDate("desired", date);
     view.displayResult(n + " is worth $" + model.calculatePortfolio(n, model.convertDate(date)));
   }
 
+  //case for viewing the distribution of a portfolio on an input dat
   protected void viewDistribution() {
     String name = getStringInput("Enter the name of the portfolio you " +
             "would like to see as a distribution: ");
@@ -212,15 +234,19 @@ public class StockControllerNew extends StockControllerImpl {
       name = getStringInput("Portfolio " + name +
               " does not exist. Please enter another name.");
     }
-    String valDate = getDate("date you would like to view this portfolio on (if "
-            + "it as a weekend, we will use the closing time on Friday: ");
-    LocalDate day = model.convertDate(valDate);
+    view.displayResult("Weekends will be calculated using the closing time on Friday");
+    String date = getDate("desired");
+    LocalDate finalDate = getValidLocalDate("desired", date);
     view.displayResult("The distribution in USD is:");
-    for (String s : model.portfolioAsDistribution(name, day)) {
+    for (String s : model.portfolioAsDistribution(name, finalDate)) {
+      if (s.contains("=")) {
+      s = s.replace("=", " = $");
+      }
       view.displayResult(s);
     }
   }
 
+  //Handles the rebalancing of a portfolio in the controller.
   protected void rebalance() {
     String pName = getStringInput("Enter the name of the portfolio you " +
             "would like to rebalance: ");
@@ -228,8 +254,8 @@ public class StockControllerNew extends StockControllerImpl {
       pName = getStringInput("Portfolio " + pName +
               " does not exist. Please enter another name.");
     }
-    LocalDate localDate = model.convertDate(getDate("rebalance"));
-    ArrayList<String> stocks = model.getListStocks(pName, localDate);
+    LocalDate localDate = getValidLocalDate("rebalance", getDate("rebalance"));
+    List<String> stocks = model.getListStocks(pName, localDate);
     view.displayResult("You will be asked to enter the weights of each stock in your portfolio. \n" +
             "Here is a list of all the stocks in your portfolio: \n" +
             stocks.toString() + "\n" +
@@ -251,8 +277,10 @@ public class StockControllerNew extends StockControllerImpl {
       }
     }
     model.rebalancePortfolio(weights, pName, localDate);
+    view.displayResult("Succesfully rebalanced");
   }
 
+  //gets a valid date that a stock can be sold on.
   protected LocalDate getValidSellDate(String pName, String stockSymbol, LocalDate sellDate, String[] stockData) {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     LocalDate latestSellDate = model.getLatestSellDate(pName, stockSymbol);
@@ -270,6 +298,7 @@ public class StockControllerNew extends StockControllerImpl {
     return sellDate;
   }
 
+  //Gets a valid weight for the rebalancing.
   protected double getWeight(String prompt) {
     double input = 0.0;
     boolean validInput = false;
@@ -288,6 +317,7 @@ public class StockControllerNew extends StockControllerImpl {
     return input;
   }
 
+  //Asks if the user wants to remove all of their sales after a date.
   private boolean askRemoveSale(String pName, String stockSymbol, LocalDate sellDate) {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     view.displayResult("Would you like to remove your sales that are after the date " +
@@ -304,6 +334,7 @@ public class StockControllerNew extends StockControllerImpl {
     return false;
   }
 
+  //Handles the creation of a bar chart for a user.
   protected void handleBarChart() {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     String pName = getStringInput(

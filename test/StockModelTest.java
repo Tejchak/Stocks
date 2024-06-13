@@ -339,10 +339,17 @@ public class StockModelTest {
     assertEquals("Years", stockModel.getTimeStamp(start, end));
   }
 
+  /**
+   * Tests rebalance portfolio by finding the goal val and current val and
+   * making sure they are equal.
+   */
   @Test
   public void testRebalancePortfolio() {
-    LocalDate date = LocalDate.of(2015, 1, 6);
+    LocalDate date = LocalDate.of(2020, 12, 24);
     stockModel.createPortfolio("Jake", "GOOG", new StockPurchase(5, date));
+    stockModel.addStockToPortfolio("Jake", "AAPL", new StockPurchase(5, date));
+    stockModel.addStockToPortfolio("Jake", "MSFT", new StockPurchase(5, date));
+
     HashMap<String, Double> weights = new HashMap<>();
     weights.put("AAPL", 0.5);
     weights.put("GOOG", 0.3);
@@ -355,8 +362,19 @@ public class StockModelTest {
     double expectedGOOGLValue = totalValue * weights.get("GOOG");
     double expectedMSFTValue = totalValue * weights.get("MSFT");
 
-    assertEquals(expectedAAPLValue, 62.575, 0.1);
-    assertEquals(expectedGOOGLValue, 37.545, 0.1);
-    assertEquals(expectedMSFTValue, 25.03, 0.1);
+    double actualAAPL = stockModel.getClosingValue("AAPL", date) *
+            (stockModel.getBoughtShares("Jake", "AAPL", date)
+                    - stockModel.getSoldShares("Jake", "AAPL", date));
+    double actualGOOG = stockModel.getClosingValue("GOOG", date) *
+            (stockModel.getBoughtShares("Jake", "GOOG", date)
+                    - stockModel.getSoldShares("Jake", "GOOG", date));
+    double actualMSFT = stockModel.getClosingValue("MSFT", date) *
+            (stockModel.getBoughtShares("Jake", "MSFT", date)
+                    - stockModel.getSoldShares("Jake", "MSFT", date));
+
+
+    assertEquals(expectedAAPLValue, actualAAPL, 0.1);
+    assertEquals(expectedGOOGLValue, actualGOOG, 0.1);
+    assertEquals(expectedMSFTValue, actualMSFT, 0.1);
   }
 }

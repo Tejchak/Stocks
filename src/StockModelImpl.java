@@ -293,7 +293,7 @@ public class StockModelImpl implements StockModel {
 
   @Override
   public double getBoughtShares(String name, String StockSymbol, LocalDate currentDate) {
-    int totalShares = 0;
+    double totalShares = 0;
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(name)) {
         for (StockPurchase purchase : p.purchases.getOrDefault(StockSymbol, new ArrayList<>())) {
@@ -386,7 +386,7 @@ public class StockModelImpl implements StockModel {
    * Adds the given stock to the portfolio.
    * @param portfolioName the name of the portfolio.
    * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
-   * @param stockPurchase the stockPurchase
+   * @param stockPurchase the stockPurchase containing the shares and the date.
    */
   @Override
   public void addStockToPortfolio(String portfolioName, String stockSymbol,
@@ -559,7 +559,7 @@ public class StockModelImpl implements StockModel {
   }
 
   //gets the closing value of a stock on a given day.
-  private double getClosingValue(String stockSymbol, LocalDate date) {
+  public double getClosingValue(String stockSymbol, LocalDate date) {
     String[] stockData = getStockData(stockSymbol);
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     for (String line : stockData) {
@@ -607,7 +607,7 @@ public class StockModelImpl implements StockModel {
          newPurchase.add(purchase);
          this.getPortfolio(name).purchases.put(stocksymbol, newPurchase);
        }
-         if (goalVal < currentVal) {
+       if (goalVal < currentVal) {
            double shares2 = (currentVal - goalVal)/getClosingValue(stocksymbol, date);
            StockSale sale = new StockSale(shares2, date);
            ArrayList<StockSale> newSale = this.getPortfolio(name)

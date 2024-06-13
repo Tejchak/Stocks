@@ -162,4 +162,6 @@ public interface StockModel {
   public void portfolioToXML(String filePath);
 
   public void loadPortfolioFromXML(String xmlFilePath);
+
+  public double getClosingValue(String stockSymbol, LocalDate date);
 }

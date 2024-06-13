@@ -17,7 +17,7 @@ import java.util.Map;
  * Class representing the tests for the model.
  */
 public class StockModelTest {
-  private static StockModelImpl stockModel;
+  private static StockModelNew stockModelTrader;
 
   public LocalDate convertDate(String date) {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -30,7 +30,7 @@ public class StockModelTest {
    */
   @Before
   public void setUp() {
-    stockModel = new StockModelImpl();
+    stockModelTrader = new StockModelNew();
   }
 
   /**
@@ -39,7 +39,7 @@ public class StockModelTest {
   @Test
   public void testGetStockDataFromCSV() {
     // This test assumes that a file named "AAPL.csv" is present in the classpath
-    String[] stockData = stockModel.getStockDataCSV("AAPL");
+    String[] stockData = stockModelTrader.getStockDataCSV("AAPL");
     assertNotNull(stockData);
     assertTrue(stockData.length > 0);
   }
@@ -50,7 +50,7 @@ public class StockModelTest {
   @Test
   public void testGetStockDataFromAPI() {
     // This test will make a real API call
-    String[] stockData = stockModel.getStockDataAPI("AAPL");
+    String[] stockData = stockModelTrader.getStockDataAPI("AAPL");
     assertNotNull(stockData);
     assertTrue(stockData.length > 0);
   }
@@ -62,7 +62,7 @@ public class StockModelTest {
   @Test
   public void testCheckStockExists() {
     // This test will make a real CSV call
-    assertTrue(stockModel.checkStockExists("AAPL"));
+    assertTrue(stockModelTrader.checkStockExists("AAPL"));
   }
 
   /**
@@ -71,10 +71,10 @@ public class StockModelTest {
   @Test
   public void testCreatePortfolio() {
     StockPurchase purchase = new StockPurchase(10, this.convertDate("2024-05-09"));
-    stockModel.createPortfolio("TestPortfolio", "AAPL", purchase);
-    assertTrue(stockModel.existingPortfolio("TestPortfolio"));
+    stockModelTrader.createPortfolio("TestPortfolio", "AAPL", purchase);
+    assertTrue(stockModelTrader.existingPortfolio("TestPortfolio"));
     assertEquals(10.0,
-            stockModel.getPortfolios().get(0).purchases.get("AAPL").get(0).getShares(), 0.01);
+            stockModelTrader.getPortfolios().get(0).purchases.get("AAPL").get(0).getShares(), 0.01);
 
   }
 
@@ -84,11 +84,11 @@ public class StockModelTest {
   @Test
   public void testGetPortfolio() {
     StockPurchase purchase = new StockPurchase(10, this.convertDate("2024-05-09"));
-    stockModel.getPortfolios().add(new BetterPortfolio("test"));
-    stockModel.createPortfolio("TestPortfolio", "AAPL", purchase);
-    stockModel.getPortfolios().get(0).name = "yo";
-    assertFalse(stockModel.existingPortfolio("test"));
-    assertFalse(stockModel.existingPortfolio("yo"));
+    stockModelTrader.getPortfolios().add(new BetterPortfolio("test"));
+    stockModelTrader.createPortfolio("TestPortfolio", "AAPL", purchase);
+    stockModelTrader.getPortfolios().get(0).name = "yo";
+    assertFalse(stockModelTrader.existingPortfolio("test"));
+    assertFalse(stockModelTrader.existingPortfolio("yo"));
   }
 
   /**
@@ -98,12 +98,12 @@ public class StockModelTest {
   public void testCalculatePortfolios() {
     StockPurchase purchase = new StockPurchase(10, this.convertDate("2024-05-09"));
     StockPurchase purchase2 = new StockPurchase(10, this.convertDate("2024-05-24"));
-    stockModel.createPortfolio("TestPortfolio", "AAPL", purchase);
+    stockModelTrader.createPortfolio("TestPortfolio", "AAPL", purchase);
     assertEquals(1902.89993,
-            stockModel.calculatePortfolio("TestPortfolio", this.convertDate("2024-05-29")), 0.0001);
-    stockModel.addStockToPortfolio("TestPortfolio", "GOOG", purchase2);
+            stockModelTrader.calculatePortfolio("TestPortfolio", this.convertDate("2024-05-29")), 0.0001);
+    stockModelTrader.buyStock("TestPortfolio", "GOOG", purchase2);
     assertEquals(3676.9,
-            stockModel.calculatePortfolio("TestPortfolio", this.convertDate("2024-05-29")), 0.0001);
+            stockModelTrader.calculatePortfolio("TestPortfolio", this.convertDate("2024-05-29")), 0.0001);
   }
 
   /**
@@ -116,7 +116,7 @@ public class StockModelTest {
             "2023-06-02,105,115,95,110,2000"
     };
 
-    String[] line = stockModel.getLine(stockData, "2023-06-01");
+    String[] line = stockModelTrader.getLine(stockData, "2023-06-01");
     assertNotNull(line);
     assertEquals("2023-06-01", line[0]);
   }
@@ -130,8 +130,8 @@ public class StockModelTest {
     String[] endDateLine = {"2023-06-02", "105", "115", "95", "110", "2000"};
     String[] endDateLine2 = {"2023-06-02", "105", "115", "95", "104", "2000"};
 
-    double gainLoss = stockModel.stockGainLoss(new String[0], startDateLine, endDateLine);
-    double gainLoss2 = stockModel.stockGainLoss(new String[0], startDateLine, endDateLine2);
+    double gainLoss = stockModelTrader.stockGainLoss(new String[0], startDateLine, endDateLine);
+    double gainLoss2 = stockModelTrader.stockGainLoss(new String[0], startDateLine, endDateLine2);
     assertEquals(5.0, gainLoss, 0.1);
     assertEquals(-1.0, gainLoss2, 0.1);
   }
@@ -147,7 +147,7 @@ public class StockModelTest {
             "2023-06-03,110,120,100,115,1500"
     };
 
-    double movingAverage = stockModel.movingAverage(stockData, "2023-06-01", 2);
+    double movingAverage = stockModelTrader.movingAverage(stockData, "2023-06-01", 2);
     assertEquals(107.5, movingAverage, 0.01);
   }
 
@@ -170,8 +170,8 @@ public class StockModelTest {
             "2013-09-03,21.279240,21.573887,21.269028,21.429178,21.429178,82210996"
     };
     Collections.reverse(Arrays.asList(stockData));
-    System.out.println(stockModel.movingAverage(stockData, "2013-08-19", 4));
-    StringBuilder crossovers = stockModel.xDayCrossover(stockData, "2013-08-19", "2013-08-22", 4);
+    System.out.println(stockModelTrader.movingAverage(stockData, "2013-08-19", 4));
+    StringBuilder crossovers = stockModelTrader.xDayCrossover(stockData, "2013-08-19", "2013-08-22", 4);
     assertEquals("2013-08-22, 2013-08-21, 2013-08-20, 2013-08-19, ", crossovers.toString());
   }
 
@@ -181,8 +181,8 @@ public class StockModelTest {
   @Test
   public void testExistingPortfolio() {
     StockPurchase purchase = new StockPurchase(10, this.convertDate("2024-05-09"));
-    stockModel.createPortfolio("TestPortfolio", "AAPL", purchase);
-    assertTrue(stockModel.existingPortfolio("TestPortfolio"));
+    stockModelTrader.createPortfolio("TestPortfolio", "AAPL", purchase);
+    assertTrue(stockModelTrader.existingPortfolio("TestPortfolio"));
   }
 
   /**
@@ -192,28 +192,28 @@ public class StockModelTest {
   @Test
   public void testAddStockToPortfolioDefaultToZero() {
     StockPurchase purchase = new StockPurchase(10, this.convertDate("2024-05-09"));
-    stockModel.createPortfolio("TestPortfolio", "AAPL", purchase);
-    assertEquals(0.0, stockModel.calculatePortfolio("TestPortfolio",
+    stockModelTrader.createPortfolio("TestPortfolio", "AAPL", purchase);
+    assertEquals(0.0, stockModelTrader.calculatePortfolio("TestPortfolio",
             this.convertDate("2025-05-29")), 0.0001);
   }
 
   @Test
   public void testimportPortfolios() {
-    assertEquals(0, stockModel.getPortfolios().size());
-    stockModel.loadPortfolioFromXML("Resources/Jake.xml");
-    assertEquals(2, stockModel.getPortfolios().size());
-    assertEquals("Jake", stockModel.getPortfolios().get(0).name);
-    assertEquals(1, stockModel.getPortfolios().get(0).purchases.size());
-    assertEquals(1, stockModel.getPortfolios().get(0).purchases.get("L").size());
+    assertEquals(0, stockModelTrader.getPortfolios().size());
+    stockModelTrader.loadPortfolioFromXML("Resources/Jake.xml");
+    assertEquals(2, stockModelTrader.getPortfolios().size());
+    assertEquals("Jake", stockModelTrader.getPortfolios().get(0).name);
+    assertEquals(1, stockModelTrader.getPortfolios().get(0).purchases.size());
+    assertEquals(1, stockModelTrader.getPortfolios().get(0).purchases.get("L").size());
     assertEquals(this.convertDate("2016-08-03"),
-            stockModel.getPortfolios().get(0).purchases.get("L").get(0).getPurchaseDate());
+            stockModelTrader.getPortfolios().get(0).purchases.get("L").get(0).getPurchaseDate());
     assertEquals(70,
-            stockModel.getPortfolios().get(0).purchases.get("L").get(0).getShares(), .01);
+            stockModelTrader.getPortfolios().get(0).purchases.get("L").get(0).getShares(), .01);
   }
 
   @Test
   public void testBarChartYears() {
-    stockModel.loadPortfolioFromXML("Resources/Jake.xml");
+    stockModelTrader.loadPortfolioFromXML("Resources/Jake.xml");
     Map<String, Double> expectedValue = new HashMap<String, Double>();
     expectedValue.put("2015-05-09", 0.0);
     expectedValue.put("2016-05-09", 0.0);
@@ -224,25 +224,25 @@ public class StockModelTest {
     expectedValue.put("2021-05-09", 11118.76);
     expectedValue.put("2022-05-09", 5820.7);
     expectedValue.put("2023-05-09", 5642.0);
-    assertEquals(expectedValue, stockModel.getPortfolioData("Tej",
+    assertEquals(expectedValue, stockModelTrader.getPortfolioData("Tej",
             this.convertDate("2015-05-09"), this.convertDate("2024-05-09"), "Years"));
   }
 
   @Test
   public void testBarChartMonths() {
-    stockModel.loadPortfolioFromXML("Resources/Jake.xml");
+    stockModelTrader.loadPortfolioFromXML("Resources/Jake.xml");
     Map<String, Double> expectedValue = new HashMap<String, Double>();
     expectedValue.put("2024-01-09", 4969.3);
     expectedValue.put("2024-02-09", 5092.5);
     expectedValue.put("2024-03-09", 5238.8);
     expectedValue.put("2024-04-09", 5263.3);
-    assertEquals(expectedValue, stockModel.getPortfolioData("Jake",
+    assertEquals(expectedValue, stockModelTrader.getPortfolioData("Jake",
             this.convertDate("2024-01-09"), this.convertDate("2024-05-09"), "Months"));
   }
 
   @Test
   public void testBarChartTwoMonths() {
-    stockModel.loadPortfolioFromXML("Resources/Jake.xml");
+    stockModelTrader.loadPortfolioFromXML("Resources/Jake.xml");
     Map<String, Double> expectedValue = new HashMap<String, Double>();
     expectedValue.put("2022-01-09", 4254.6);
     expectedValue.put("2022-03-09", 4272.1);
@@ -258,13 +258,13 @@ public class StockModelTest {
     expectedValue.put("2023-11-09", 4567.5);
     expectedValue.put("2024-01-09", 4969.3);
     expectedValue.put("2024-03-09", 5238.8);
-    assertEquals(expectedValue, stockModel.getPortfolioData("Jake",
+    assertEquals(expectedValue, stockModelTrader.getPortfolioData("Jake",
             this.convertDate("2022-01-09"), this.convertDate("2024-05-09"), "Two months"));
   }
 
   @Test
   public void testBarChartDays() {
-    stockModel.loadPortfolioFromXML("Resources/Jake.xml");
+    stockModelTrader.loadPortfolioFromXML("Resources/Jake.xml");
     Map<String, Double> expectedValue = new HashMap<String, Double>();
     expectedValue.put("2024-05-09", 5439.0);
     expectedValue.put("2024-05-10", 5458.6);
@@ -281,13 +281,13 @@ public class StockModelTest {
     expectedValue.put("2024-05-21", 5334.7);
     expectedValue.put("2024-05-22", 5312.3);
     expectedValue.put("2024-05-23", 5191.2);
-    assertEquals(expectedValue, stockModel.getPortfolioData("Jake",
+    assertEquals(expectedValue, stockModelTrader.getPortfolioData("Jake",
             this.convertDate("2024-05-09"), this.convertDate("2024-05-24"), "Days"));
   }
 
   @Test
   public void testBarChartWeeks() {
-    stockModel.loadPortfolioFromXML("Resources/Jake.xml");
+    stockModelTrader.loadPortfolioFromXML("Resources/Jake.xml");
     Map<String, Double> expectedValue = new HashMap<String, Double>();
     expectedValue.put("2024-03-09", 5238.8);
     expectedValue.put("2024-03-16", 5387.9);
@@ -298,7 +298,7 @@ public class StockModelTest {
     expectedValue.put("2024-04-20", 5294.8);
     expectedValue.put("2024-04-27", 5282.2);
     expectedValue.put("2024-05-04", 5348.0);
-    assertEquals(expectedValue, stockModel.getPortfolioData("Jake",
+    assertEquals(expectedValue, stockModelTrader.getPortfolioData("Jake",
             this.convertDate("2024-03-09"), this.convertDate("2024-05-09"), "Weeks"));
   }
 
@@ -306,35 +306,35 @@ public class StockModelTest {
   public void testTimeStampDays() {
     LocalDate start = LocalDate.of(2015, 1, 1);
     LocalDate end = LocalDate.of(2015, 1, 29);
-    assertEquals("Days", stockModel.getTimeStamp(start, end));
+    assertEquals("Days", stockModelTrader.getTimeStamp(start, end));
   }
 
   @Test
   public void testTimeStampWeeks() {
     LocalDate start = LocalDate.of(2015, 1, 1);
     LocalDate end = LocalDate.of(2015, 1, 31);
-    assertEquals("Weeks", stockModel.getTimeStamp(start, end));
+    assertEquals("Weeks", stockModelTrader.getTimeStamp(start, end));
   }
 
   @Test
   public void testTimeStampMonths() {
     LocalDate start = LocalDate.of(2016, 1, 1);
     LocalDate end = LocalDate.of(2017, 2, 28);
-    assertEquals("Months", stockModel.getTimeStamp(start, end));
+    assertEquals("Months", stockModelTrader.getTimeStamp(start, end));
   }
 
   @Test
   public void testTimeStamp2Months() {
     LocalDate start = LocalDate.of(2015, 1, 1);
     LocalDate end = LocalDate.of(2019, 1, 31);
-    assertEquals("Two months", stockModel.getTimeStamp(start, end));
+    assertEquals("Two months", stockModelTrader.getTimeStamp(start, end));
   }
 
   @Test
   public void testTimeStampYears() {
     LocalDate start = LocalDate.of(2015, 1, 1);
     LocalDate end = LocalDate.of(2024, 5, 24);
-    assertEquals("Years", stockModel.getTimeStamp(start, end));
+    assertEquals("Years", stockModelTrader.getTimeStamp(start, end));
   }
 
 }

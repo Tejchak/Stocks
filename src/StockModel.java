@@ -1,10 +1,5 @@
-import java.text.ParseException;
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.ArrayList;
-
-import java.util.Map;
-import java.util.HashMap;
 
 /**
  * Interface for a model that can do certain calculations about a stock or,
@@ -25,22 +20,9 @@ public interface StockModel {
    *
    * @param portfolioName the name of the portfolio.
    * @param stockSymbol   the symbol of a stock as a string (Ex, AMC).
-   * @param stockPurchase        the amount of shares pf the given stock.
+   * @param shares        the amount of shares pf the given stock.
    */
-  public void addStockToPortfolio(String portfolioName, String stockSymbol,
-                                  StockPurchase stockPurchase);
-
-  public double getBoughtShares(String portfolioName, String stockSymbol, LocalDate currentDate);
-
-  public boolean portfolioContainsStock(String portfolioName, String stockSymbol);
-
-  public Map<String, Double> getPortfolioData(String portfolioName,
-                                              LocalDate startDate,
-                                              LocalDate endDate, String timeStamp);
-
-  public String getTimeStamp(LocalDate start, LocalDate end);
-
-  public LocalDate getLatestSellDate(String portfolioName, String stockSymbol);
+  public void addStockToPortfolio(String portfolioName, String stockSymbol, int shares);
 
   /**
    * Gets the line of the given date.
@@ -50,15 +32,6 @@ public interface StockModel {
    * @return the line on a given date split up into its parts.
    */
   public String[] getLine(String[] stockData, String date);
-
-  /**
-   * Creates a portfolio, and adds the shares of the given stock.
-   *
-   * @param name        the name of the portfolio.
-   * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
-   * @param shares      the amount of shares pf the given stock.
-   */
-  public void createPortfolio(String name, String stockSymbol, StockPurchase shares);
 
   /**
    * Compares the name of a stock to our sources to see if it exists.
@@ -73,14 +46,9 @@ public interface StockModel {
    *
    * @param portfolioName the name of the portfolio.
    * @param stockSymbol   the symbol of a stock as a string (Ex, AMC).
-   * @param sale        the stockSale being added.
+   * @param shares        the amount of shares pf the given stock.
    */
-  public void removeStockFromPortfolio(String portfolioName,
-                                       String stockSymbol, StockSale sale);
-
-  public LocalDate convertDate(String date);
-
-  public void removeSales(String portfolioName, String stockSymbol, LocalDate sellDate);
+  public void removeStockFromPortfolio(String portfolioName, String stockSymbol, int shares);
 
   /**
    * Checks if a portfolio exists in the model.
@@ -133,33 +101,6 @@ public interface StockModel {
   public StringBuilder xDayCrossover(String[] stockData,
                                      String startDate, String endDate, int xDays);
 
-  /**
-   * Gets a copy of the portfolios field.
-   */
-  public ArrayList<BetterPortfolio> getPortfolios();
 
-  public double getSoldShares(String name, String StockSymbol, LocalDate currentDate);
-
-  /**
-   *
-   * @param date
-   * @return
-   */
-  public String[] portfolioAsDistribution(String pName, LocalDate date);
-
-  /**
-   *
-   */
-  public void rebalancePortfolio(HashMap<String, Double> weights, String name, LocalDate date);
-
-  /**
-   *
-   */
-  public ArrayList<String> getListStocks(String name, LocalDate date);
-
-  public LocalDate moveToRecentTradingDay(LocalDate date);
-
-  public void portfolioToXML(String filePath);
-
-  public void loadPortfolioFromXML(String xmlFilePath);
+  public LocalDate convertDate(String date);
 }

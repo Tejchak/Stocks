@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
  * Controller for the stock model that gets inputs and calls the model at certain points.
  */
 public class StockControllerImpl implements StockController {
-  private final StockModel model;
+  private final StockModelTrader model;
   private final StockView view;
   private final Scanner scanner;
 
@@ -24,7 +24,7 @@ public class StockControllerImpl implements StockController {
    * @param view     the view for the stock progrqm.
    * @param readable the information that the scanner will be taking.
    */
-  public StockControllerImpl(StockModel model, StockView view, Readable readable) {
+  public StockControllerImpl(StockModelTrader model, StockView view, Readable readable) {
     this.model = model;
     this.view = view;
     this.scanner = new Scanner(readable);
@@ -203,7 +203,7 @@ public class StockControllerImpl implements StockController {
         String[] purchaseDateLine = getValidTradingDay(stockData, purchaseDate, "purchase");
         LocalDate correctDate = model.convertDate(purchaseDateLine[0]);
         StockPurchase currentPurchase = new StockPurchase(shares, correctDate);
-        model.addStockToPortfolio(portfolioName, stockSymbol, currentPurchase);
+        model.buyStock(portfolioName, stockSymbol, currentPurchase);
         break;
       case 3:
         double sellShares;
@@ -234,7 +234,7 @@ public class StockControllerImpl implements StockController {
             sellShares = getValidPositiveDouble("How many shares would you like to sell:");
           }
           StockSale sale = new StockSale(sellShares, finalDate);
-          model.removeStockFromPortfolio(pName, symbol, sale);
+          model.sellStock(pName, symbol, sale);
         } else {
           view.displayResult("Invalid number, you have no shares available at this time.");
         }

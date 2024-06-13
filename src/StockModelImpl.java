@@ -33,12 +33,6 @@ public class StockModelImpl implements StockModel {
     this.stocks = new HashMap<String, String[]>();
   }
 
-  public LocalDate convertDate(String date) {
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    LocalDate newDate = LocalDate.parse(date, formatter);
-    return newDate;
-  }
-
   /**
    * Gets the information about a stock given its name.
    *

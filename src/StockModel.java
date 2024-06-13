@@ -100,7 +100,4 @@ public interface StockModel {
    */
   public StringBuilder xDayCrossover(String[] stockData,
                                      String startDate, String endDate, int xDays);
-
-
-  public LocalDate convertDate(String date);
 }

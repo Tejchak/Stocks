@@ -1,6 +1,7 @@
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public interface StockModelTrader extends StockModel {
@@ -144,7 +145,7 @@ public interface StockModelTrader extends StockModel {
      * @param date the date of which these stocks exist.
      * @return the list of stocks that currently exist.
      */
-    public ArrayList<String> getListStocks(String name, LocalDate date);
+    public List<String> getListStocks(String name, LocalDate date);
 
     /**
      * Moves a date from the weekend to a weekday.

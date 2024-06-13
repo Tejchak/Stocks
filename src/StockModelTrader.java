@@ -6,6 +6,7 @@ import java.util.Map;
 public interface StockModelTrader extends StockModel {
 
 
+    @Override
     public double getBoughtShares(String portfolioName, String stockSymbol, LocalDate currentDate);
 
     public boolean portfolioContainsStock(String portfolioName, String stockSymbol);

@@ -21,14 +21,19 @@ public class StockModelTest {
   private static StockModelImpl stockModel;
 
 
-  public LocalDate convertDate(String date) {
+  /**
+   * Method that converts the date from a string to a LocalDate.
+   * @param date the string fromat of a date.
+   * @return the Local date from the given string.
+   */
+  private LocalDate convertDate(String date) {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     LocalDate newDate = LocalDate.parse(date, formatter);
     return newDate;
   }
 
   /**
-   * Sets up the tests.
+   * Sets up the model for all of the tests tests.
    */
   @Before
   public void setUp() {
@@ -199,8 +204,11 @@ public class StockModelTest {
             this.convertDate("2025-05-29")), 0.0001);
   }
 
+  /**
+   * Tests that import portfolio grabs the portfolio with the correct information.
+   */
   @Test
-  public void testimportPortfolios() {
+  public void testImportPortfolios() {
     assertEquals(0, stockModel.getPortfolios().size());
     stockModel.loadPortfolioFromXML("Resources/Jake.xml");
     assertEquals(2, stockModel.getPortfolios().size());
@@ -213,6 +221,10 @@ public class StockModelTest {
             stockModel.getPortfolios().get(0).purchases.get("L").get(0).getShares(), .01);
   }
 
+  /**
+   * Tests that the barchart hashmap contains
+   * the correct values and dates from a portfolio with years.
+   */
   @Test
   public void testBarChartYears() {
     stockModel.loadPortfolioFromXML("Resources/Jake.xml");
@@ -230,6 +242,10 @@ public class StockModelTest {
             this.convertDate("2015-05-09"), this.convertDate("2024-05-09"), "Years"));
   }
 
+  /**
+   * Tests that the barchart hashmap contains
+   * the correct values and dates from a portfolio with months.
+   */
   @Test
   public void testBarChartMonths() {
     stockModel.loadPortfolioFromXML("Resources/Jake.xml");
@@ -242,6 +258,10 @@ public class StockModelTest {
             this.convertDate("2024-01-09"), this.convertDate("2024-05-09"), "Months"));
   }
 
+  /**
+   * Tests that the barchart hashmap contains
+   * the correct values and dates from a portfolio with months.
+   */
   @Test
   public void testBarChartTwoMonths() {
     stockModel.loadPortfolioFromXML("Resources/Jake.xml");
@@ -264,6 +284,11 @@ public class StockModelTest {
             this.convertDate("2022-01-09"), this.convertDate("2024-05-09"), "Two months"));
   }
 
+
+  /**
+   * Tests that the barchart hashmap contains
+   * the correct values and dates from a portfolio with days.
+   */
   @Test
   public void testBarChartDays() {
     stockModel.loadPortfolioFromXML("Resources/Jake.xml");
@@ -287,6 +312,10 @@ public class StockModelTest {
             this.convertDate("2024-05-09"), this.convertDate("2024-05-24"), "Days"));
   }
 
+  /**
+   * Tests that the barchart hashmap contains
+   * the correct values and dates from a portfolio with weeks.
+   */
   @Test
   public void testBarChartWeeks() {
     stockModel.loadPortfolioFromXML("Resources/Jake.xml");
@@ -304,6 +333,9 @@ public class StockModelTest {
             this.convertDate("2024-03-09"), this.convertDate("2024-05-09"), "Weeks"));
   }
 
+  /**
+   * Tests that get time stamp gets the correct string value for days.
+   */
   @Test
   public void testTimeStampDays() {
     LocalDate start = LocalDate.of(2015, 1, 1);
@@ -311,6 +343,9 @@ public class StockModelTest {
     assertEquals("Days", stockModel.getTimeStamp(start, end));
   }
 
+  /**
+   * Tests that get time stamp gets the correct string value for weeks.
+   */
   @Test
   public void testTimeStampWeeks() {
     LocalDate start = LocalDate.of(2015, 1, 1);
@@ -318,6 +353,9 @@ public class StockModelTest {
     assertEquals("Weeks", stockModel.getTimeStamp(start, end));
   }
 
+  /**
+   * Tests that get time stamp gets the correct string value for months.
+   */
   @Test
   public void testTimeStampMonths() {
     LocalDate start = LocalDate.of(2016, 1, 1);
@@ -325,6 +363,9 @@ public class StockModelTest {
     assertEquals("Months", stockModel.getTimeStamp(start, end));
   }
 
+  /**
+   * Tests that get time stamp gets the correct string value for months.
+   */
   @Test
   public void testTimeStamp2Months() {
     LocalDate start = LocalDate.of(2015, 1, 1);
@@ -332,6 +373,9 @@ public class StockModelTest {
     assertEquals("Two months", stockModel.getTimeStamp(start, end));
   }
 
+  /**
+   * Tests that get time stamp gets the correct string value.
+   */
   @Test
   public void testTimeStampYears() {
     LocalDate start = LocalDate.of(2015, 1, 1);
@@ -341,7 +385,7 @@ public class StockModelTest {
 
   /**
    * Tests rebalance portfolio by finding the goal val and current val and
-   * making sure they are equal.
+   * making sure they are equal after rebalancing.
    */
   @Test
   public void testRebalancePortfolio() {

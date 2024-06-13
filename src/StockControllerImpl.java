@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.time.format.DateTimeFormatter;
@@ -273,7 +274,7 @@ public class StockControllerImpl implements StockController {
                   " does not exist. Please enter another name.");
         }
         LocalDate localDate = model.convertDate(getDate("rebalance"));
-        ArrayList<String> stocks = model.getListStocks(pName, localDate);
+        List<String> stocks = model.getListStocks(pName, localDate);
         view.displayResult("You will be asked to enter the weights of each stock in your portfolio. \n" +
                 "Here is a list of all the stocks in your portfolio: \n" +
                 stocks.toString() + "\n" +
@@ -513,6 +514,7 @@ public class StockControllerImpl implements StockController {
     return stockData;
   }
 
+  //gets a valid weight value.
   private double getWeight(String prompt) {
     double input = 0.0;
     boolean validInput = false;

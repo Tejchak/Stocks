@@ -2,7 +2,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -16,10 +15,8 @@ import java.util.List;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import java.io.File;
-import java.io.FileOutputStream;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -44,7 +41,7 @@ import org.xml.sax.SAXException;
  */
 public class StockModelImpl implements StockModel {
   private final String apiKey;
-  private final ArrayList<BetterPortfolio> portfolios;
+  private final List<BetterPortfolio> portfolios;
   private Map<String, String[]> stocks;
 
   /**
@@ -81,6 +78,12 @@ public class StockModelImpl implements StockModel {
     }
   }
 
+  /**
+   * Checks if a portfolio contains a given stock.
+   * @param pName the name of the portfolio.
+   * @param stockSymbol the ticker of the stock.
+   * @return true if the portfolio contains the stock.
+   */
   @Override
   public boolean portfolioContainsStock(String pName, String stockSymbol) {
     for (BetterPortfolio portfolio : this.portfolios) {
@@ -233,6 +236,14 @@ public class StockModelImpl implements StockModel {
     return Math.round(result * 100) / 100.0;
   }
 
+  /**
+   * Gets the units that will be used for a barchart based
+   * on the amount of time between the start date
+   * and the end date.
+   * @param start the starting date.
+   * @param end the ending date.
+   * @return the String representing a time stamp between these times.
+   */
   @Override
   public String getTimeStamp(LocalDate start, LocalDate end) {
     if (ChronoUnit.YEARS.between(start, end) >= 5) {
@@ -253,12 +264,26 @@ public class StockModelImpl implements StockModel {
     return "";
   }
 
+  /**
+   * Method that converts the date from a string to a LocalDate.
+   * @param date the string format of a date.
+   * @return the Local date from the given string.
+   */
+  @Override
   public LocalDate convertDate(String date) {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     LocalDate newDate = LocalDate.parse(date, formatter);
     return newDate;
   }
 
+  /**
+   * Gets the data for a portfolio as a map, tej can you please.
+   * @param pName
+   * @param start
+   * @param end
+   * @param timeStamp
+   * @return
+   */
   @Override
   public Map<String, Double> getPortfolioData(String pName, LocalDate start, LocalDate end, String timeStamp) {
     Map<String, Double> data = new LinkedHashMap<>();
@@ -291,12 +316,20 @@ public class StockModelImpl implements StockModel {
     return data;
   }
 
+  /**
+   * Gets the amount of bought shares of a given stock in a portfolio
+   * only gets the shares that have been bought before the given date.
+   * @param name the name of the portfolio.
+   * @param stockSymbol the symbol for the stock.
+   * @param currentDate the date that the shares are being found on.
+   * @return the amount of bought shares.
+   */
   @Override
-  public double getBoughtShares(String name, String StockSymbol, LocalDate currentDate) {
+  public double getBoughtShares(String name, String stockSymbol, LocalDate currentDate) {
     double totalShares = 0;
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(name)) {
-        for (StockPurchase purchase : p.purchases.getOrDefault(StockSymbol, new ArrayList<>())) {
+        for (StockPurchase purchase : p.purchases.getOrDefault(stockSymbol, new ArrayList<>())) {
           if (!purchase.getPurchaseDate().isAfter(currentDate)) {
             totalShares += purchase.getShares();
           }
@@ -307,6 +340,14 @@ public class StockModelImpl implements StockModel {
   }
 
 
+  /**
+   * Gets the most recent date of a sale from a given portfolio of the
+   * given stock.
+   * @param pName the name of the portfolio.
+   * @param stockSymbol the stock being found.
+   * @return the date of the most recent sale.
+   */
+  @Override
   public LocalDate getLatestSellDate(String pName, String stockSymbol) {
     LocalDate latestDate = null;
     for (BetterPortfolio p : this.portfolios) {
@@ -321,6 +362,14 @@ public class StockModelImpl implements StockModel {
     return latestDate;
   }
 
+  /**
+   * Gets the amount of sold shares of a given stock in a portfolio
+   * only gets the shares that have been sold before the given date.
+   * @param name the name of the portfolio.
+   * @param StockSymbol the symbolf for the stock.
+   * @param currentDate the date that the shares are being found on.
+   * @return the amount of sold shares.
+   */
   @Override
   public double getSoldShares(String name, String StockSymbol, LocalDate currentDate) {
     double totalShares = 0;
@@ -368,6 +417,14 @@ public class StockModelImpl implements StockModel {
     }
   }
 
+  /**
+   * Removes all of the sales of a given stock in a portfolio after
+   * a given date, this is so users can go back on sales they
+   * previously made.
+   * @param portfolioName the name of the portfolio.
+   * @param stockSymbol the stock being removed.
+   * @param sellDate the date of which the sales are after.
+   */
   @Override
   public void removeSales(String portfolioName, String stockSymbol, LocalDate sellDate) {
     for (BetterPortfolio p : this.portfolios) {
@@ -383,7 +440,7 @@ public class StockModelImpl implements StockModel {
   }
 
   /**
-   * Adds the given stock to the portfolio.
+   * Adds the given stock to the given portfolio.
    * @param portfolioName the name of the portfolio.
    * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
    * @param stockPurchase the stockPurchase containing the shares and the date.
@@ -436,7 +493,7 @@ public class StockModelImpl implements StockModel {
 
   /**
    * Calculates the x-day moving average of a stock on a given day and with a
-   * given x
+   * given x.
    * @param stockData the data about a stock.
    * @param startDate the starting date as a String (YYYY-MM-DD).
    * @param xDays the amount of days the moving average is being calculated for.
@@ -526,10 +583,11 @@ public class StockModelImpl implements StockModel {
   }
 
   /**
-   * Gets a copy of the portfolios field.
+   * Gets a copy of the portfolios field that does not
+   * modify the original.
    */
   @Override
-  public ArrayList<BetterPortfolio> getPortfolios() {
+  public List<BetterPortfolio> getPortfolios() {
     ArrayList<BetterPortfolio> result = new ArrayList<>();
     for (BetterPortfolio p : this.portfolios) {
       BetterPortfolio port = new BetterPortfolio(p.name);
@@ -540,6 +598,13 @@ public class StockModelImpl implements StockModel {
     return result;
   }
 
+  /**
+   * Gets the portfolio as a distribution. Gets each stock in a portfolio finds it's value
+   * and matches them together then displays them in the form {stock=value}.
+   * @param pName the name of the portfolio.
+   * @param date the date for the distribution.
+   * @return the distribution as an array.
+   */
   @Override
   public String[] portfolioAsDistribution(String pName, LocalDate date) {
     HashMap<String, Double> result = new HashMap<String, Double>();
@@ -558,7 +623,13 @@ public class StockModelImpl implements StockModel {
     return result.toString().split(",");
   }
 
-  //gets the closing value of a stock on a given day.
+  /**
+   * Gets the closing value of a given stock or throws an exception
+   * if the date or stock name does not exist.
+   * @param stockSymbol the stock for which the closing value is being found.
+   * @param date the date on which the value is being found.
+   * @return the double closing value of the stock on the day.
+   */
   public double getClosingValue(String stockSymbol, LocalDate date) {
     String[] stockData = getStockData(stockSymbol);
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -571,6 +642,7 @@ public class StockModelImpl implements StockModel {
     throw new IllegalArgumentException("Date does not exist for stock");
   }
 
+  //gets a portfolio from a name
   private BetterPortfolio getPortfolio(String name) {
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(name)) {
@@ -618,8 +690,16 @@ public class StockModelImpl implements StockModel {
      }
   }
 
+  /**
+   * Gets a String list of stocks that are currently available to be sold,
+   * i.e there purchase date is before ethe given date and there sale date
+   * is not before.
+   * @param name the name of the portfolio where the stocks are being pulled from.
+   * @param date the date of which these stocks exist.
+   * @return the list of stocks that currently exist.
+   */
   @Override
-  public ArrayList<String> getListStocks(String name, LocalDate date) {
+  public List<String> getListStocks(String name, LocalDate date) {
     ArrayList<String> result = new ArrayList<>();
     BetterPortfolio p = getPortfolio(name);
     for (String symbol : p.purchases.keySet()) {
@@ -630,6 +710,13 @@ public class StockModelImpl implements StockModel {
     return result;
   }
 
+  /**
+   * Moves a date from the weekend to a weekday.
+   * There are some drawbacks to this method
+   * because it does not account for holidays unfortunately.
+   * @param date the date being moved.
+   * @return the edited date.
+   */
   @Override
   public LocalDate moveToRecentTradingDay(LocalDate date) {
     if (date.getDayOfWeek().equals(DayOfWeek.SATURDAY)) {
@@ -642,6 +729,12 @@ public class StockModelImpl implements StockModel {
   }
 
 
+  /**
+   * Saves the current state of the portfolios to an XML file.
+   * Will create a new file if the file doesn't exist, if the
+   * file does exist it will add to it with a new portfolio.
+   * @param filePath the name of the file to be saved.
+   */
   @Override
   public void portfolioToXML(String filePath) {
     try {
@@ -721,6 +814,12 @@ public class StockModelImpl implements StockModel {
   }
 
 
+  /**
+   * Loads the portfolios from an XML file.
+   * Will iterate through each portfolio in an xml file and pull the correct data
+   * for each one.
+   * @param xmlFilePath the string representing the path to the desired xml.
+   */
   @Override
   public void loadPortfolioFromXML(String xmlFilePath) {
     try {
@@ -737,10 +836,6 @@ public class StockModelImpl implements StockModel {
         if (portfolioNode.getNodeType() == Node.ELEMENT_NODE) {
           Element portfolioElement = (Element) portfolioNode;
           String portfolioName = portfolioElement.getAttribute("name");
-
-//          if (!portfolioName.equals(pName)) {
-//            continue;
-//          }
 
           BetterPortfolio portfolio = new BetterPortfolio(portfolioName);
 

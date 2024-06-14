@@ -1,6 +1,4 @@
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Interface for a model that can do certain calculations about a stock or,
@@ -17,7 +15,23 @@ public interface StockModel {
   public String[] getStockData(String stockSymbol);
 
 
- public void addStockToPortfolio(String portfolioName, String stockSymbol, int shares);
+  /**
+   * Adds the given stock to the portfolio.
+   *
+   * @param portfolioName the name of the portfolio.
+   * @param stockSymbol   the symbol of a stock as a string (Ex, AMC).
+   * @param shares        the amount of shares pf the given stock.
+   */
+  public void addStockToPortfolio(String portfolioName, String stockSymbol, int shares);
+
+  /**
+   * Removes the given stock from a portfolio.
+   *
+   * @param portfolioName the name of the portfolio.
+   * @param stockSymbol   the symbol of a stock as a string (Ex, AMC).
+   * @param shares        the amount of shares pf the given stock.
+   */
+  public void removeStockFromPortfolio(String portfolioName, String stockSymbol, int shares);
 
   /**
    * Gets the line of the given date.

@@ -28,7 +28,7 @@ public class StockModelImpl implements StockModel {
    * Further the hashmap is the storage of stock info.
    */
   StockModelImpl() {
-    this.apiKey = "F99D5A7QDFY52B58";
+    this.apiKey = "QCLLY08TISZBMXL9";
     this.portfolios = new ArrayList<Portfolio>();
     this.stocks = new HashMap<String, String[]>();
   }
@@ -325,6 +325,25 @@ public class StockModelImpl implements StockModel {
     }
     return crossovers;
 
+  }
+
+  /**
+   * Removes the given stock from a portfolio.
+   *
+   * @param portfolioName the name of the portfolio.
+   * @param stockSymbol   the symbol of a stock as a string (Ex, AMC).
+   * @param shares        the amount of shares pf the given stock.
+   */
+  @Override
+  public void removeStockFromPortfolio(String portfolioName, String stockSymbol, int shares) {
+    for (Portfolio p : this.portfolios) {
+      if (p.name.equals(portfolioName)) {
+        p.stocks.put(stockSymbol, p.stocks.getOrDefault(stockSymbol, 0) - shares);
+      }
+      if (p.stocks.get(stockSymbol) <= 0) {
+        p.stocks.remove(stockSymbol);
+      }
+    }
   }
 
   //Checks if the highest price is above the moving average.

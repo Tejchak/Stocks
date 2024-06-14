@@ -1,9 +1,15 @@
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A new that extends the previous StockModel interface. Since it extends the old interface and
+ * implements its own public methods, any classes of that implement StockModelTrader will be
+ * guaranteed to have all of the functions from both StockModel and StockModelTrader, allowing
+ * all of those functions to be called from the controller. We chose to make this new interface
+ * so as to adhere to SOLID principles and minimize our changes to the existing StockModel as much
+ * as possible.
+ */
 public interface StockModelTrader extends StockModel {
 
 
@@ -26,21 +32,23 @@ public interface StockModelTrader extends StockModel {
     public boolean portfolioContainsStock(String pName, String stockSymbol);
 
     /**
-     * Gets the data for a portfolio as a map, tej can you please.
-     * @param pName
-     * @param start
-     * @param end
-     * @param timeStamp
-     * @return
+     * Gets the data for a portfolio over a given period as a map. Each value in the map is a date.
+     * as a string and the corresponding value is the portfolio' value at that date.
+     * @param pName determines the portfolio we're getting data for.
+     * @param start determines the start date (first key-value pair in map).
+     * @param end determines the end date (last key-value pair in map).
+     * @param timeStamp determines how we.
+     * @return A map of the key value pairs.
      */
     public Map<String, Double> getPortfolioData(String pName,
                                                 LocalDate start,
                                                 LocalDate end, String timeStamp);
+
     /**
      * Gets a copy of the portfolios field that does not
      * modify the original.
      */
-    public ArrayList<BetterPortfolio> getPortfolios();
+    public List<BetterPortfolio> getPortfolios();
 
     /**
      * Gets the units that will be used for a barchart based
@@ -91,11 +99,11 @@ public interface StockModelTrader extends StockModel {
      * Gets the amount of sold shares of a given stock in a portfolio
      * only gets the shares that have been sold before the given date.
      * @param name the name of the portfolio.
-     * @param StockSymbol the symbol for the stock.
+     * @param stockSymbol the symbol for the stock.
      * @param currentDate the date that the shares are being found on.
      * @return the amount of sold shares.
      */
-    public double getSoldShares(String name, String StockSymbol, LocalDate currentDate);
+    public double getSoldShares(String name, String stockSymbol, LocalDate currentDate);
 
     /**
      * Gets the portfolio as a distribution. Gets each stock in a portfolio finds it's value

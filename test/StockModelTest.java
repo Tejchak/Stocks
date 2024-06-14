@@ -404,14 +404,14 @@ public class StockModelTest {
     double expectedGOOGLValue = totalValue * weights.get("GOOG");
     double expectedMSFTValue = totalValue * weights.get("MSFT");
 
-    double actualAAPL = stockModelTrader.getClosingValue("AAPL", date) *
-            (stockModelTrader.getBoughtShares("Jake", "AAPL", date)
+    double actualAAPL = stockModelTrader.getClosingValue("AAPL", date)
+            * (stockModelTrader.getBoughtShares("Jake", "AAPL", date)
                     - stockModelTrader.getSoldShares("Jake", "AAPL", date));
-    double actualGOOG = stockModelTrader.getClosingValue("GOOG", date) *
-            (stockModelTrader.getBoughtShares("Jake", "GOOG", date)
+    double actualGOOG = stockModelTrader.getClosingValue("GOOG", date)
+            * (stockModelTrader.getBoughtShares("Jake", "GOOG", date)
                     - stockModelTrader.getSoldShares("Jake", "GOOG", date));
-    double actualMSFT = stockModelTrader.getClosingValue("MSFT", date) *
-            (stockModelTrader.getBoughtShares("Jake", "MSFT", date)
+    double actualMSFT = stockModelTrader.getClosingValue("MSFT", date)
+            * (stockModelTrader.getBoughtShares("Jake", "MSFT", date)
                     - stockModelTrader.getSoldShares("Jake", "MSFT", date));
 
 
@@ -419,6 +419,22 @@ public class StockModelTest {
     assertEquals(expectedGOOGLValue, actualGOOG, 0.1);
     assertEquals(expectedMSFTValue, actualMSFT, 0.1);
   }
-}
+
+  /**
+   * Tests that the distribution is correct from the model.
+   */
+  @Test
+  public void testPortfolioDistribution() {
+    LocalDate date = LocalDate.of(2020, 12, 24);
+    stockModelTrader.createPortfolio("Jake", "GOOG", new StockPurchase(5, date));
+    stockModelTrader.buyStock("Jake", "AAPL", new StockPurchase(5, date));
+    stockModelTrader.buyStock("Jake", "MSFT", new StockPurchase(5, date));
+
+    String[] expected = {"{MSFT=1113.75",
+            " GOOG=434.71",
+            " AAPL=659.85}"};
+    assertEquals(expected, stockModelTrader.portfolioAsDistribution("Jake", date));
+    }
+  }
 
 

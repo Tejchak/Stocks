@@ -19,10 +19,18 @@ public class StockPurchase {
     this.purchaseDate = purchaseDate;
   }
 
+  /**
+   * Gets the shares bought with the stockPurchase.
+   * @return as a double.
+   */
   public double getShares() {
     return shares;
   }
 
+  /**
+   * Gets the date the purchase occured.
+   * @return as a LocalDate.
+   */
   public LocalDate getPurchaseDate() {
     return purchaseDate;
   }

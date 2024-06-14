@@ -67,8 +67,8 @@ public class StockControllerNew extends StockControllerImpl {
     view.portfolioMenu();
     int option = getValidPositiveNum("Please enter a number between 1 and 9");
     while (option != 1 && option != 9 && model.getPortfolios().isEmpty()) {
-      view.displayResult("Must have an existing portfolio " +
-              "before you can add, remove, or calculate.");
+      view.displayResult("Must have an existing portfolio "
+              + "before you can add, remove, or calculate.");
       option = getValidPositiveNum("Please enter 1 or 9");
     }
     switch (option) {
@@ -110,8 +110,8 @@ public class StockControllerNew extends StockControllerImpl {
             "would like to store: ");
     String filePath = getStringInput("Type the filepath (E.G. Resources/portfolios.xml): ");
     while (!model.existingPortfolio(pName)) {
-      pName = getStringInput("Portfolio " + pName +
-              " does not exist. Please enter another name.");
+      pName = getStringInput("Portfolio " + pName
+              + " does not exist. Please enter another name.");
     }
       try {
         model.portfolioToXML(filePath);
@@ -127,8 +127,8 @@ public class StockControllerNew extends StockControllerImpl {
       model.loadPortfolioFromXML(filePath);
     }
     catch (Exception e) {
-      view.displayResult("Could not find file in xml format, please make sure the filepath is " +
-              "correct and you have followed our format.");
+      view.displayResult("Could not find file in xml format, please make sure the filepath is "
+              + "correct and you have followed our format.");
     }
   }
 
@@ -146,8 +146,8 @@ public class StockControllerNew extends StockControllerImpl {
       stockSymbol = getStockSymbol();
     }
     String[] stockData = model.getStockData(stockSymbol);
-    int shares = getValidPositiveNum("How many shares would you like to get" +
-            "(you can only purchase whole shares):");
+    int shares = getValidPositiveNum("How many shares would you like to get"
+            + "(you can only purchase whole shares):");
     String purchaseDate = getDate("purchase: ");
     String[] purchaseDateLine = getValidTradingDay(stockData, purchaseDate, "purchase");
     LocalDate correctDate = model.convertDate(purchaseDateLine[0]);
@@ -163,13 +163,13 @@ public class StockControllerNew extends StockControllerImpl {
     String portfolioName = getStringInput(
             "Enter the name of the portfolio you would like to add to: ");
     while (!model.existingPortfolio(portfolioName)) {
-      portfolioName = getStringInput("Portfolio " + portfolioName +
-              " does not exist. Please enter another name.");
+      portfolioName = getStringInput("Portfolio " + portfolioName
+              + " does not exist. Please enter another name.");
     }
     String stockSymbol = getStockSymbol();
     String[] stockData = getValidStock(stockSymbol);
-    shares = getValidPositiveNum("How many shares would you like to get" +
-            "(you can only purchase whole shares):");
+    shares = getValidPositiveNum("How many shares would you like to get"
+            + "(you can only purchase whole shares):");
     String purchaseDate = getDate("Enter the date you would like to purchase: ");
     String[] purchaseDateLine = getValidTradingDay(stockData, purchaseDate, "purchase");
     LocalDate correctDate = model.convertDate(purchaseDateLine[0]);
@@ -183,8 +183,8 @@ public class StockControllerNew extends StockControllerImpl {
     String pName = getStringInput(
             "Enter the name of the portfolio you would like to sell stock from: ");
     while (!model.existingPortfolio(pName)) {
-      pName = getStringInput("Portfolio " + pName +
-              " does not exist. Please enter another name.");
+      pName = getStringInput("Portfolio " + pName
+              + " does not exist. Please enter another name.");
     }
     String symbol = getStockSymbol();
     while (!model.portfolioContainsStock(pName, symbol)) {
@@ -218,8 +218,8 @@ public class StockControllerNew extends StockControllerImpl {
     String n = getStringInput("Enter the name of the portfolio you " +
             "would like to calculate the value of: ");
     while (!model.existingPortfolio(n)) {
-      n = getStringInput("Portfolio " + n +
-              " does not exist. Please enter another name.");
+      n = getStringInput("Portfolio " + n
+              + " does not exist. Please enter another name.");
     }
     String date = getDate("desired");
     LocalDate finalDate = getValidLocalDate("desired", date);
@@ -228,8 +228,8 @@ public class StockControllerNew extends StockControllerImpl {
 
   //case for viewing the distribution of a portfolio on an input dat
   protected void viewDistribution() {
-    String name = getStringInput("Enter the name of the portfolio you " +
-            "would like to see as a distribution: ");
+    String name = getStringInput("Enter the name of the portfolio you "
+            + "would like to see as a distribution: ");
     while (!model.existingPortfolio(name)) {
       name = getStringInput("Portfolio " + name +
               " does not exist. Please enter another name.");
@@ -251,13 +251,13 @@ public class StockControllerNew extends StockControllerImpl {
     String pName = getStringInput("Enter the name of the portfolio you " +
             "would like to rebalance: ");
     while (!model.existingPortfolio(pName)) {
-      pName = getStringInput("Portfolio " + pName +
-              " does not exist. Please enter another name.");
+      pName = getStringInput("Portfolio " + pName
+              + " does not exist. Please enter another name.");
     }
     LocalDate localDate = getValidLocalDate("rebalance", getDate("rebalance"));
     List<String> stocks = model.getListStocks(pName, localDate);
-    view.displayResult("You will be asked to enter the weights of each stock in your portfolio. \n" +
-            "Here is a list of all the stocks in your portfolio: \n" +
+    view.displayResult("You will be asked to enter the weights of each stock in your portfolio. \n"
+            + "Here is a list of all the stocks in your portfolio: \n" +
             stocks.toString() + "\n" +
             "The total of your weights should add to 1");
     HashMap<String, Double> weights = new HashMap<>();
@@ -320,8 +320,8 @@ public class StockControllerNew extends StockControllerImpl {
   //Asks if the user wants to remove all of their sales after a date.
   private boolean askRemoveSale(String pName, String stockSymbol, LocalDate sellDate) {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    view.displayResult("Would you like to remove your sales that are after the date " +
-            dateFormat.format(sellDate) + "?" + " Type y for yes and n for no");
+    view.displayResult("Would you like to remove your sales that are after the date "
+            + dateFormat.format(sellDate) + "?" + " Type y for yes and n for no");
     String response = scanner.nextLine();
     while (!response.equals("y") && !response.equals("n")) {
       view.displayResult("Invalid input: Please type y/n.");
@@ -340,8 +340,8 @@ public class StockControllerNew extends StockControllerImpl {
     String pName = getStringInput(
             "Enter the name of the portfolio you would like chart: ");
     while (!model.existingPortfolio(pName)) {
-      pName = getStringInput("Portfolio " + pName +
-              " does not exist. Please enter another name.");
+      pName = getStringInput("Portfolio " + pName
+              + " does not exist. Please enter another name.");
     }
     view.displayResult("Weekend dates will be calculated using the closing time on Friday");
     String startDate = getDate("start");
@@ -369,8 +369,8 @@ public class StockControllerNew extends StockControllerImpl {
     } else {
       scale = Math.ceil(scale * 10) / 10.0;
     }
-    view.displayResult("Performance of portfolio " + pName + " from " +
-            startDate + " to " +
+    view.displayResult("Performance of portfolio " + pName + " from "
+            + startDate + " to " +
             end.format(formatter));
     for (Map.Entry<String, Double> entry : data.entrySet()) {
       String date = entry.getKey();

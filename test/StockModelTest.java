@@ -404,14 +404,14 @@ public class StockModelTest {
     double expectedGOOGLValue = totalValue * weights.get("GOOG");
     double expectedMSFTValue = totalValue * weights.get("MSFT");
 
-    double actualAAPL = stockModelTrader.getClosingValue("AAPL", date) *
-            (stockModelTrader.getBoughtShares("Jake", "AAPL", date)
+    double actualAAPL = stockModelTrader.getClosingValue("AAPL", date)
+            * (stockModelTrader.getBoughtShares("Jake", "AAPL", date)
                     - stockModelTrader.getSoldShares("Jake", "AAPL", date));
-    double actualGOOG = stockModelTrader.getClosingValue("GOOG", date) *
-            (stockModelTrader.getBoughtShares("Jake", "GOOG", date)
+    double actualGOOG = stockModelTrader.getClosingValue("GOOG", date)
+            * (stockModelTrader.getBoughtShares("Jake", "GOOG", date)
                     - stockModelTrader.getSoldShares("Jake", "GOOG", date));
-    double actualMSFT = stockModelTrader.getClosingValue("MSFT", date) *
-            (stockModelTrader.getBoughtShares("Jake", "MSFT", date)
+    double actualMSFT = stockModelTrader.getClosingValue("MSFT", date)
+            * (stockModelTrader.getBoughtShares("Jake", "MSFT", date)
                     - stockModelTrader.getSoldShares("Jake", "MSFT", date));
 
 

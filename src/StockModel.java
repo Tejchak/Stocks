@@ -1,6 +1,4 @@
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Interface for a model that can do certain calculations about a stock or,

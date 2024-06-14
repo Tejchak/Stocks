@@ -143,8 +143,8 @@ public class StockControllerImpl implements StockController {
     view.portfolioMenu();
     int option = getValidPositiveNum("Please enter a number between 1 and 9");
     while (option != 1 && option != 9 && model.getPortfolios().isEmpty()) {
-      view.displayResult("Must have an existing portfolio " +
-              "before you can add, remove, or calculate.");
+      view.displayResult("Must have an existing portfolio "
+              + "before you can add, remove, or calculate.");
       option = getValidPositiveNum("Please enter 1 or 9");
     }
     switch (option) {
@@ -156,12 +156,12 @@ public class StockControllerImpl implements StockController {
         String portfolioName = getStringInput(
                 "Enter the name of the portfolio you would like to add to: ");
         while (!model.existingPortfolio(portfolioName)) {
-          portfolioName = getStringInput("Portfolio " + portfolioName +
-                  " does not exist. Please enter another name.");
+          portfolioName = getStringInput("Portfolio " + portfolioName
+                  + " does not exist. Please enter another name.");
         }
         String stockSymbol = getStockSymbol();
-        shares = getValidPositiveNum("How many shares would you like to get" +
-                "(you can only purchase whole shares):");
+        shares = getValidPositiveNum("How many shares would you like to get"
+                + "(you can only purchase whole shares):");
         model.addStockToPortfolio(portfolioName, stockSymbol, shares);
         break;
       case 3:
@@ -169,8 +169,8 @@ public class StockControllerImpl implements StockController {
         String pName = getStringInput(
                 "Enter the name of the portfolio you would like to take away from: ");
         while (!model.existingPortfolio(pName)) {
-          pName = getStringInput("Portfolio " + pName +
-                  " does not exist. Please enter another name.");
+          pName = getStringInput("Portfolio " + pName
+                  + " does not exist. Please enter another name.");
         }
         String symbol = getStockSymbol();
         share = getValidPositiveNum("How many shares would you like to remove" +
@@ -178,15 +178,16 @@ public class StockControllerImpl implements StockController {
         model.removeStockFromPortfolio(pName, symbol, share);
         break;
       case 4:
-        String n = getStringInput("Enter the name of the portfolio you " +
-                "would like to calculate the value of: ");
+        String n = getStringInput("Enter the name of the portfolio you "
+                + "would like to calculate the value of: ");
         while (!model.existingPortfolio(n)) {
           n = getStringInput("Portfolio " + n +
                   " does not exist. Please enter another name.");
         }
-        String date = getDate("date you would like " +
-                "to calculate the value on: ");
-        view.displayResult(n + " is worth $" + model.calculatePortfolio(n, model.convertDate(date)));
+        String date = getDate("date you would like "
+                + "to calculate the value on: ");
+        view.displayResult(n + " is worth $" + model.calculatePortfolio(n,
+                model.convertDate(date)));
         break;
       default:
         view.displayResult("Invalid input. Please enter a valid number.");

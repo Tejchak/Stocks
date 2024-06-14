@@ -1,5 +1,4 @@
 import java.time.LocalDate;
-import java.util.Date;
 
 /**
  * A class representing the sale of a stock,
@@ -10,14 +9,28 @@ public class StockSale {
   private double shares;
   private LocalDate saledate;
 
-  StockSale(double shares, LocalDate saledate) {
+  /**
+   * Creates a stock sale.
+   * @param shares represent the number of shares sold.
+   * @param saledate represents the date they were sold.
+   */
+  public StockSale(double shares, LocalDate saledate) {
     this.shares = shares;
     this.saledate = saledate;
   }
 
+  /**
+   * Gets the stocksales shares.
+   * @return as a double.
+   */
   public double getShares() {
     return shares;
   }
+
+  /**
+   * Gets the date the stockSale occured.
+   * @return as a local date.
+   */
   public LocalDate getSaledate() {
     return saledate;
   }

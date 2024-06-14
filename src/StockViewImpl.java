@@ -6,6 +6,7 @@ import java.io.IOException;
  */
 public class StockViewImpl implements StockView {
   private final Appendable appendable;
+
   /**
    * Constructor with no params, just used for dispatch.
    */

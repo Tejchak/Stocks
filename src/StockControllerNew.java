@@ -223,7 +223,7 @@ public class StockControllerNew extends StockControllerImpl {
     }
     String date = getDate("desired");
     LocalDate finalDate = getValidLocalDate("desired", date);
-    view.displayResult(n + " is worth $" + model.calculatePortfolio(n, model.convertDate(date)));
+    view.displayResult(n + " is worth $" + model.calculatePortfolio(n, finalDate));
   }
 
   //case for viewing the distribution of a portfolio on an input dat
@@ -260,7 +260,7 @@ public class StockControllerNew extends StockControllerImpl {
             + "Here is a list of all the stocks in your portfolio: \n" +
             stocks.toString() + "\n" +
             "The total of your weights should add to 1");
-    HashMap<String, Double> weights = new HashMap<>();
+    Map<String, Double> weights = new HashMap<>();
     double totalweight = 0.0;
     while (totalweight != 1) {
       for (int i = 0; i < stocks.size(); i++) {

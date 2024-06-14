@@ -16,3 +16,14 @@ NKE.csv, NVDA.csv, RIVN.csv, SBUX.csv, T.csv, TSLA.csv. These stocks are known t
 so we wanted a way to access their data even when the api key can't send querries and when there
 is no wifi. Our stocks don't have any restriction on which data is available, the user can obtain
 whatever data is available on Alphavantage, which is usually all the way back to 2013.
+
+Import and Export:
+When importing files and saving portfolios you must specify the filepath relative to where the jar
+is we. We have our jar in the Assignment4Stock_jar folder so if you wanted to save file to resources
+for example, the file path would be ../filename.xml. Further when importing from a file it must be an
+xml and have format of:
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><portfolios>
+<portfolio name="Jake"><purchase><symbol>L</symbol><shares>70.0</shares><date>2016-08-03</date></purchase></portfolio>
+<portfolio name="Tej"><purchase><symbol>GOOG</symbol><shares>80.0</shares><date>2020-04-07</date></purchase>
+<purchase><symbol>BLUE</symbol><shares>50.0</shares><date>2017-08-03</date></purchase>
+<sale><symbol>GOOG</symbol><shares>30.0</shares><date>2022-03-03</date></sale></portfolio></portfolios>

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,7 +19,7 @@ import java.util.Map;
  */
 public class StockModelImpl implements StockModel {
   private final String apiKey;
-  private final ArrayList<Portfolio> portfolios;
+  private final List<Portfolio> portfolios;
   private Map<String, String[]> stocks;
 
   /**

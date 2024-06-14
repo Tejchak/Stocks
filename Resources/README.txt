@@ -15,7 +15,9 @@ by the user cannot be found in both our StocksInfo folder and Alphavantage, the 
 user and asks them to type in a different stock. Dates can also be a little tricky so we give the
 user an example of a valid date and ask them to try again if they type in an incorrect date. The
 program also prompts the user to type a different date if they date they typed was not a trading day
-for the given stock. For actions requiring a date range the program performs a check to make sure
+for the given stock. When doing portfolio calculations, however, the value is calculated using the
+most recent trading day (and the program tells the user this before asking for the date.
+For actions requiring a date range the program performs a check to make sure
  the end-dat is after the start date. In all those cases the user is given a unique message
 informing them of what the problem was. The program also continues to loop until the user presses
 5 at the main menu. For example, after outputting for the user the gain or loss of a stock it will
@@ -23,3 +25,16 @@ return the user to the main menu where they can perform another action or type 5
 program. The x-day moving average is only calculated with the days available in Alphavantage so
 we inform the user of the furthest back date available and inform them that any prior days will not
 be used in its calculation. The same also for the x-day moving crossover.
+With the new changes the user is now able to buy and sell shares of stock on given dates. They must
+sell shares in strictly chronological order (i.e. 2015 then 2016). If the user tries to go back and
+sell shares before their previous sell date a message will appear asking if the user would like to
+get rid of the shares they have after the current sellDate, or if they want to type in a new date.
+Our program can also give the distribution of a portfolio on a given date. The distribution will
+contain the name of the Stocks in given portfolio, the value of each of those stocks in the
+portfolio, and those value added up equal the total value of the portfolio. If the user wants to
+see the total value of a portfolio over time they can graph it as a bar chart. The bar chart will
+take in the name of the portfolio they want to see, and the start and end date they are looking at.
+One of the best of features of our program is that a user can re-balance a portfolio to contain
+the weighting of there choosing for every stock, and the program will automatically sell and
+purchase the correct amount of each. The controller will ask the user to enter the weight for
+each stock one by one and check that the weights add up to one.

@@ -34,7 +34,7 @@ import org.xml.sax.SAXException;
  * querries (which is why we have the csv files and stocks field)
  */
 public class StockModelNew extends StockModelImpl implements StockModelTrader {
-  private final ArrayList<BetterPortfolio> portfolios;
+  private final List<BetterPortfolio> portfolios;
 
   /**
    * Constructor for the model, initializes the key as
@@ -92,14 +92,14 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
             value = Double.parseDouble(sections[4]);
           }
         }
-        ArrayList<StockPurchase> l = portfolio.purchases.getOrDefault(stockSymbol,
+        List<StockPurchase> l = portfolio.purchases.getOrDefault(stockSymbol,
                 new ArrayList<StockPurchase>());
         for (StockPurchase p : l) {
           if (!p.getPurchaseDate().isAfter(date)) {
             result += (value * p.getShares());
           }
         }
-        ArrayList<StockSale> l2 = portfolio.sales.getOrDefault(stockSymbol,
+        List<StockSale> l2 = portfolio.sales.getOrDefault(stockSymbol,
                 new ArrayList<StockSale>());
         for (StockSale s : l2) {
           if (!s.getSaledate().isAfter(date)) {
@@ -261,7 +261,7 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
   @Override
   public void createPortfolio(String name, String stockSymbol, StockPurchase purchase) {
     BetterPortfolio p = new BetterPortfolio(name);
-    ArrayList<StockPurchase> addition = new ArrayList<StockPurchase>();
+    List<StockPurchase> addition = new ArrayList<StockPurchase>();
     addition.add(purchase);
     p.purchases.put(stockSymbol, addition);
     this.portfolios.add(p);
@@ -277,7 +277,7 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
   public void sellStock(String portfolioName, String stockSymbol, StockSale stockSale) {
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(portfolioName)) {
-        ArrayList<StockSale> soldList = p.sales.getOrDefault(stockSymbol, new ArrayList<>());
+        List<StockSale> soldList = p.sales.getOrDefault(stockSymbol, new ArrayList<>());
         soldList.add(stockSale);
         p.sales.put(stockSymbol, soldList);
       }
@@ -309,7 +309,7 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
                                   StockPurchase stockPurchase) {
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(portfolioName)) {
-        ArrayList<StockPurchase> purchasesList = p.purchases.getOrDefault(stockSymbol,
+        List<StockPurchase> purchasesList = p.purchases.getOrDefault(stockSymbol,
                 new ArrayList<>());
         purchasesList.add(stockPurchase);
         p.purchases.put(stockSymbol, purchasesList);
@@ -337,8 +337,8 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
    * modify the original.
    */
   @Override
-  public ArrayList<BetterPortfolio> getPortfolios() {
-    ArrayList<BetterPortfolio> result = new ArrayList<>();
+  public List<BetterPortfolio> getPortfolios() {
+    List<BetterPortfolio> result = new ArrayList<>();
     for (BetterPortfolio p : this.portfolios) {
       BetterPortfolio port = new BetterPortfolio(p.name);
       port.purchases = new HashMap<>(p.purchases);
@@ -357,7 +357,7 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
    */
   @Override
   public String[] portfolioAsDistribution(String pName, LocalDate date) {
-    HashMap<String, Double> result = new HashMap<String, Double>();
+    Map<String, Double> result = new HashMap<String, Double>();
     date = moveToRecentTradingDay(date);
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(pName)) {
@@ -424,14 +424,14 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
       if (goalVal > currentVal) {
         double shares = (goalVal - currentVal) / getClosingValue(stocksymbol, date);
         StockPurchase purchase = new StockPurchase(shares, date);
-        ArrayList<StockPurchase> newPurchase = this.getPortfolio(name).purchases.get(stocksymbol);
+        List<StockPurchase> newPurchase = this.getPortfolio(name).purchases.get(stocksymbol);
         newPurchase.add(purchase);
         this.getPortfolio(name).purchases.put(stocksymbol, newPurchase);
       }
       if (goalVal < currentVal) {
         double shares2 = (currentVal - goalVal) / getClosingValue(stocksymbol, date);
         StockSale sale = new StockSale(shares2, date);
-        ArrayList<StockSale> newSale = this.getPortfolio(name)
+        List<StockSale> newSale = this.getPortfolio(name)
                 .sales.getOrDefault(stocksymbol, new ArrayList<>());
         newSale.add(sale);
         this.getPortfolio(name).sales.put(stocksymbol, newSale);
@@ -449,7 +449,7 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
    */
   @Override
   public List<String> getListStocks(String name, LocalDate date) {
-    ArrayList<String> result = new ArrayList<>();
+    List<String> result = new ArrayList<>();
     BetterPortfolio p = getPortfolio(name);
     for (String symbol : p.purchases.keySet()) {
       if ((this.getBoughtShares(name, symbol, date) - this.getSoldShares(name, symbol, date)) > 0) {

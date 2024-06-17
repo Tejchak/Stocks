@@ -113,11 +113,11 @@ public class StockControllerNew extends StockControllerImpl {
       pName = getStringInput("Portfolio " + pName
               + " does not exist. Please enter another name.");
     }
-      try {
-        model.portfolioToXML(filePath);
-      } catch (Exception e) {
-        view.displayResult("Error writing to file");
-      }
+    try {
+      model.portfolioToXML(filePath);
+    } catch (Exception e) {
+      view.displayResult("Error writing to file");
+    }
   }
 
   //Case for loading in files. Will not work
@@ -125,8 +125,7 @@ public class StockControllerNew extends StockControllerImpl {
     String filePath = getStringInput("Type the filepath (E.G. Resources/portfolios.xml): ");
     try {
       model.loadPortfolioFromXML(filePath);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       view.displayResult("Could not find file in xml format, please make sure the filepath is "
               + "correct and you have followed our format.");
     }
@@ -240,7 +239,7 @@ public class StockControllerNew extends StockControllerImpl {
     view.displayResult("The distribution in USD is:");
     for (String s : model.portfolioAsDistribution(name, finalDate)) {
       if (s.contains("=")) {
-      s = s.replace("=", " = $");
+        s = s.replace("=", " = $");
       }
       view.displayResult(s);
     }
@@ -281,7 +280,8 @@ public class StockControllerNew extends StockControllerImpl {
   }
 
   //gets a valid date that a stock can be sold on.
-  protected LocalDate getValidSellDate(String pName, String stockSymbol, LocalDate sellDate, String[] stockData) {
+  protected LocalDate getValidSellDate(String pName,
+                                       String stockSymbol, LocalDate sellDate, String[] stockData) {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     LocalDate latestSellDate = model.getLatestSellDate(pName, stockSymbol);
     if (latestSellDate != null) {

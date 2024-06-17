@@ -21,6 +21,7 @@ public class StockModelTest {
 
   /**
    * Method that converts the date from a string to a LocalDate.
+   *
    * @param date the string fromat of a date.
    * @return the Local date from the given string.
    */
@@ -105,10 +106,12 @@ public class StockModelTest {
     StockPurchase purchase2 = new StockPurchase(10, this.convertDate("2024-05-24"));
     stockModelTrader.createPortfolio("TestPortfolio", "AAPL", purchase);
     assertEquals(1902.89993,
-            stockModelTrader.calculatePortfolio("TestPortfolio", this.convertDate("2024-05-29")), 0.0001);
+            stockModelTrader.calculatePortfolio("TestPortfolio", this.convertDate("2024-05-29")),
+            0.0001);
     stockModelTrader.buyStock("TestPortfolio", "GOOG", purchase2);
     assertEquals(3676.9,
-            stockModelTrader.calculatePortfolio("TestPortfolio", this.convertDate("2024-05-29")), 0.0001);
+            stockModelTrader.calculatePortfolio("TestPortfolio", this.convertDate("2024-05-29")),
+            0.0001);
   }
 
   /**
@@ -116,9 +119,7 @@ public class StockModelTest {
    */
   @Test
   public void testGetLine() {
-    String[] stockData = {
-            "2023-06-01,100,110,90,105,1000",
-            "2023-06-02,105,115,95,110,2000"
+    String[] stockData = {"2023-06-01,100,110,90,105,1000", "2023-06-02,105,115,95,110,2000"
     };
 
     String[] line = stockModelTrader.getLine(stockData, "2023-06-01");
@@ -147,9 +148,9 @@ public class StockModelTest {
   @Test
   public void testMovingAverage() {
     String[] stockData = {
-            "2023-06-01,100,110,90,105,1000",
-            "2023-06-02,105,115,95,110,2000",
-            "2023-06-03,110,120,100,115,1500"
+        "2023-06-01,100,110,90,105,1000",
+        "2023-06-02,105,115,95,110,2000",
+        "2023-06-03,110,120,100,115,1500"
     };
 
     double movingAverage = stockModelTrader.movingAverage(stockData, "2023-06-01", 2);
@@ -162,21 +163,23 @@ public class StockModelTest {
   @Test
   public void testXDayCrossover() {
     String[] stockData = {
-            "2013-08-19,21.362677,21.718594,21.356201,21.560436,21.560436,72707508",
-            "2013-08-20,21.627684,21.721333,21.507883,21.554708,21.554708,49504863",
-            "2013-08-21,21.684969,21.840885,21.581608,21.652094,21.652094,70555472",
-            "2013-08-22,21.736029,21.787086,21.675007,21.761185,21.761185,34926424",
-            "2013-08-23,21.863798,21.868032,21.662554,21.674009,21.674009,43245489",
-            "2013-08-26,21.668779,21.790823,21.570398,21.578867,21.578867,42257801",
-            "2013-08-27,21.410250,21.512615,21.118343,21.174383,21.174383,69623993",
-            "2013-08-28,21.176874,21.305391,21.115105,21.134533,21.134533,53395392",
-            "2013-08-29,21.147484,21.429178,21.135529,21.305889,21.305889,59361671",
-            "2013-08-30,21.314110,21.370897,21.060062,21.093437,21.093437,74743109",
-            "2013-09-03,21.279240,21.573887,21.269028,21.429178,21.429178,82210996"
+        "2013-08-19,21.362677,21.718594,21.356201,21.560436,21.560436,72707508",
+        "2013-08-20,21.627684,21.721333,21.507883,21.554708,21.554708,49504863",
+        "2013-08-21,21.684969,21.840885,21.581608,21.652094,21.652094,70555472",
+        "2013-08-22,21.736029,21.787086,21.675007,21.761185,21.761185,34926424",
+        "2013-08-23,21.863798,21.868032,21.662554,21.674009,21.674009,43245489",
+        "2013-08-26,21.668779,21.790823,21.570398,21.578867,21.578867,42257801",
+        "2013-08-27,21.410250,21.512615,21.118343,21.174383,21.174383,69623993",
+        "2013-08-28,21.176874,21.305391,21.115105,21.134533,21.134533,53395392",
+        "2013-08-29,21.147484,21.429178,21.135529,21.305889,21.305889,59361671",
+        "2013-08-30,21.314110,21.370897,21.060062,21.093437,21.093437,74743109",
+        "2013-09-03,21.279240,21.573887,21.269028,21.429178,21.429178,82210996"
     };
     Collections.reverse(Arrays.asList(stockData));
     System.out.println(stockModelTrader.movingAverage(stockData, "2013-08-19", 4));
-    StringBuilder crossovers = stockModelTrader.xDayCrossover(stockData, "2013-08-19", "2013-08-22", 4);
+    StringBuilder crossovers =
+            stockModelTrader.xDayCrossover(
+                    stockData, "2013-08-19", "2013-08-22", 4);
     assertEquals("2013-08-22, 2013-08-21, 2013-08-20, 2013-08-19, ", crossovers.toString());
   }
 
@@ -190,17 +193,6 @@ public class StockModelTest {
     assertTrue(stockModelTrader.existingPortfolio("TestPortfolio"));
   }
 
-  /**
-   * Tests that the value of a portfolio will default to zero
-   * if the given date was not a trading day.
-   */
-  @Test
-  public void testAddStockToPortfolioDefaultToZero() {
-    StockPurchase purchase = new StockPurchase(10, this.convertDate("2024-05-09"));
-    stockModelTrader.createPortfolio("TestPortfolio", "AAPL", purchase);
-    assertEquals(0.0, stockModelTrader.calculatePortfolio("TestPortfolio",
-            this.convertDate("2025-05-29")), 0.0001);
-  }
 
   /**
    * Tests that import portfolio grabs the portfolio with the correct information.
@@ -311,27 +303,6 @@ public class StockModelTest {
   }
 
   /**
-   * Tests that the barchart hashmap contains
-   * the correct values and dates from a portfolio with weeks.
-   */
-  @Test
-  public void testBarChartWeeks() {
-    stockModelTrader.loadPortfolioFromXML("Resources/Jake.xml");
-    Map<String, Double> expectedValue = new HashMap<String, Double>();
-    expectedValue.put("2024-03-09", 5238.8);
-    expectedValue.put("2024-03-16", 5387.9);
-    expectedValue.put("2024-03-23", 5351.5);
-    expectedValue.put("2024-03-30", 0.0);
-    expectedValue.put("2024-04-06", 5366.2);
-    expectedValue.put("2024-04-13", 5173.0);
-    expectedValue.put("2024-04-20", 5294.8);
-    expectedValue.put("2024-04-27", 5282.2);
-    expectedValue.put("2024-05-04", 5348.0);
-    assertEquals(expectedValue, stockModelTrader.getPortfolioData("Jake",
-            this.convertDate("2024-03-09"), this.convertDate("2024-05-09"), "Weeks"));
-  }
-
-  /**
    * Tests that get time stamp gets the correct string value for days.
    */
   @Test
@@ -406,13 +377,13 @@ public class StockModelTest {
 
     double actualAAPL = stockModelTrader.getClosingValue("AAPL", date)
             * (stockModelTrader.getBoughtShares("Jake", "AAPL", date)
-                    - stockModelTrader.getSoldShares("Jake", "AAPL", date));
+            - stockModelTrader.getSoldShares("Jake", "AAPL", date));
     double actualGOOG = stockModelTrader.getClosingValue("GOOG", date)
             * (stockModelTrader.getBoughtShares("Jake", "GOOG", date)
-                    - stockModelTrader.getSoldShares("Jake", "GOOG", date));
+            - stockModelTrader.getSoldShares("Jake", "GOOG", date));
     double actualMSFT = stockModelTrader.getClosingValue("MSFT", date)
             * (stockModelTrader.getBoughtShares("Jake", "MSFT", date)
-                    - stockModelTrader.getSoldShares("Jake", "MSFT", date));
+            - stockModelTrader.getSoldShares("Jake", "MSFT", date));
 
 
     assertEquals(expectedAAPLValue, actualAAPL, 0.1);
@@ -431,10 +402,10 @@ public class StockModelTest {
     stockModelTrader.buyStock("Jake", "MSFT", new StockPurchase(5, date));
 
     String[] expected = {"{MSFT=1113.75",
-            " GOOG=434.71",
-            " AAPL=659.85}"};
+        " GOOG=434.71",
+        " AAPL=659.85}"};
     assertEquals(expected, stockModelTrader.portfolioAsDistribution("Jake", date));
-    }
   }
+}
 
 

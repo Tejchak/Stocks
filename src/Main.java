@@ -14,9 +14,10 @@ public class Main {
    */
   public static void main(String[] args) {
     StockView view = new StockViewImpl(System.out);
+    StockView view2 = new StockViewGUI();
     Readable readable = new InputStreamReader(System.in);
     StockModelTrader model = new StockModelNew();
-    StockController controller = new StockControllerNew(model, view, readable);
+    StockController controller = new StockControllerNew(model, view2, readable);
     controller.startProgram();
   }
 }

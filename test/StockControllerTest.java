@@ -109,7 +109,7 @@
       StockView view = new MockView();
       String input = "1\nblob\naapl\n2024\n05\n9\n2024\n5\n29\n5\n";
       Readable rd = new StringReader(input);
-      StockController controller = new StockControllerImpl(model, view, rd);
+      StockController controller = new StockControllerNew(model, view, rd);
 
       controller.startProgram();
 
@@ -227,6 +227,60 @@
               +  "Type the month (e.g., 1):\n"
               + "Type the day (e.g., 1):\n"
               + "The gain/loss over that period of time is $9.46\n"
+              + "1. Examine the gain or loss of a specific stock\n"
+              + "2. Examine the x-day moving average of a stock\n"
+              + "3. Find the x-day crossovers for a stock\n"
+              + "4. Examine or create a portfolio\n"
+              + "5. Quit the program\n"
+              + "Please enter a number between 1 and 5\n";
+
+      assertEquals(expectedOutput, ((MockView) view).log.toString());
+    }
+
+    @Test
+    public void testNotEnoughShares() {
+      StockModelTrader model = new StockModelNew();
+      StockView view = new MockView();
+      String input = "4\n9\nResources/Jake.xml\n4\n3\nJake\nL\n2024\n5\n29\n80\n3\n5\n";
+      Readable rd = new StringReader(input);
+      StockController controller = new StockControllerNew(model, view, rd);
+
+      controller.startProgram();
+
+      String expectedOutput = "Welcome to the Stocks Program!\n"
+              + "1. Examine the gain or loss of a specific stock\n"
+              + "2. Examine the x-day moving average of a stock\n"
+              + "3. Find the x-day crossovers for a stock\n"
+              + "4. Examine or create a portfolio\n"
+              + "5. Quit the program\n"
+              + "Please enter a number between 1 and 5\n"
+              + "1. Create a new portfolio?\n"
+              + "2. Add stock to a portfolio?\n"
+              + "3. Take away stock from a portfolio?\n"
+              + "4. Calculate the value of a portfolio?\n"
+              + "Please enter a number between 1 and 9\n"
+              + "Type the filepath (E.G. Resources/portfolios.xml): \n"
+              + "1. Examine the gain or loss of a specific stock\n"
+              + "2. Examine the x-day moving average of a stock\n"
+              + "3. Find the x-day crossovers for a stock\n"
+              + "4. Examine or create a portfolio\n"
+              + "5. Quit the program\n"
+              + "Please enter a number between 1 and 5\n"
+              + "1. Create a new portfolio?\n"
+              + "2. Add stock to a portfolio?\n"
+              + "3. Take away stock from a portfolio?\n"
+              + "4. Calculate the value of a portfolio?\n"
+              + "Please enter a number between 1 and 9\n"
+              + "Enter the name of the portfolio you would like to sell stock from: \n"
+              + "Type the stock symbol (case insensitive, e.g., GOOG or goog):\n"
+              + "What is the date you would like to sell (you must sell shares in Chronological " +
+              "order!):  date\n"
+              + "Type the year (e.g., 2017):\n"
+              + "Type the month (e.g., 1):\n"
+              + "Type the day (e.g., 1):\n"
+              + "How many shares would you like to sell:\n"
+              + "Invalid number: you only have 70.0 shares available\n"
+              + "How many shares would you like to sell:\n"
               + "1. Examine the gain or loss of a specific stock\n"
               + "2. Examine the x-day moving average of a stock\n"
               + "3. Find the x-day crossovers for a stock\n"

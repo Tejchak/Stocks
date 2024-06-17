@@ -1,5 +1,5 @@
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -9,8 +9,8 @@ import java.util.Map;
  */
 public class BetterPortfolio {
   String name;
-  Map<String, ArrayList<StockPurchase>> purchases;
-  Map<String, ArrayList<StockSale>> sales;
+  Map<String, List<StockPurchase>> purchases;
+  Map<String, List<StockSale>> sales;
 
   /**
    * the constructor for the better portfolio that

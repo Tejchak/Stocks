@@ -7,8 +7,11 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.xml.parsers.DocumentBuilder;
+
 import java.io.File;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
@@ -16,6 +19,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -34,7 +38,7 @@ import org.xml.sax.SAXException;
  * querries (which is why we have the csv files and stocks field)
  */
 public class StockModelNew extends StockModelImpl implements StockModelTrader {
-  private final ArrayList<BetterPortfolio> portfolios;
+  private final List<BetterPortfolio> portfolios;
 
   /**
    * Constructor for the model, initializes the key as
@@ -50,7 +54,8 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
 
   /**
    * Checks if a portfolio contains a given stock.
-   * @param pName the name of the portfolio.
+   *
+   * @param pName       the name of the portfolio.
    * @param stockSymbol the ticker of the stock.
    * @return true if the portfolio contains the stock.
    */
@@ -66,7 +71,8 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
 
   /**
    * Calculates the total value of a portfolio on the given date.
-   * @param n the name of the portfolio.
+   *
+   * @param n    the name of the portfolio.
    * @param date the date on which the value is being calculated.
    * @return the total value in USD.
    */
@@ -92,14 +98,14 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
             value = Double.parseDouble(sections[4]);
           }
         }
-        ArrayList<StockPurchase> l = portfolio.purchases.getOrDefault(stockSymbol,
+        List<StockPurchase> l = portfolio.purchases.getOrDefault(stockSymbol,
                 new ArrayList<StockPurchase>());
         for (StockPurchase p : l) {
           if (!p.getPurchaseDate().isAfter(date)) {
             result += (value * p.getShares());
           }
         }
-        ArrayList<StockSale> l2 = portfolio.sales.getOrDefault(stockSymbol,
+        List<StockSale> l2 = portfolio.sales.getOrDefault(stockSymbol,
                 new ArrayList<StockSale>());
         for (StockSale s : l2) {
           if (!s.getSaledate().isAfter(date)) {
@@ -115,8 +121,9 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
    * Gets the units that will be used for a barchart based
    * on the amount of time between the start date
    * and the end date.
+   *
    * @param start the starting date.
-   * @param end the ending date.
+   * @param end   the ending date.
    * @return the String representing a time stamp between these times.
    */
   @Override
@@ -141,6 +148,7 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
 
   /**
    * Method that converts the date from a string to a LocalDate.
+   *
    * @param date the string fromat of a date.
    * @return the Local date from the given string.
    */
@@ -153,9 +161,10 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
   /**
    * Gets the data for a portfolio over a given period as a map. Each value in the map is a date
    * as a string and the corresponding value is the portfolio' value at that date.
-   * @param pName determines the portfolio we're getting data for
-   * @param start determines the start date (first key-value pair in map)
-   * @param end determines the end date (last key-value pair in map)
+   *
+   * @param pName     determines the portfolio we're getting data for
+   * @param start     determines the start date (first key-value pair in map)
+   * @param end       determines the end date (last key-value pair in map)
    * @param timeStamp determines how we
    * @return
    */
@@ -195,7 +204,8 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
   /**
    * Gets the amount of bought shares of a given stock in a portfolio
    * only gets the shares that have been bought before the given date.
-   * @param name the name of the portfolio.
+   *
+   * @param name        the name of the portfolio.
    * @param stockSymbol the symbol for the stock.
    * @param currentDate the date that the shares are being found on.
    * @return the amount of bought shares.
@@ -219,7 +229,8 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
   /**
    * Gets the most recent date of a sale from a given portfolio of the
    * given stock.
-   * @param pName the name of the portfolio.
+   *
+   * @param pName       the name of the portfolio.
    * @param stockSymbol the stock being found.
    * @return the date of the most recent sale.
    */
@@ -254,14 +265,15 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
 
   /**
    * Creates a portfolio, and adds the given amount shares of the given stock.
-   * @param name the name of the portfolio.
+   *
+   * @param name        the name of the portfolio.
    * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
-   * @param purchase the StockPurchases being made with the
+   * @param purchase    the StockPurchases being made with the
    */
   @Override
   public void createPortfolio(String name, String stockSymbol, StockPurchase purchase) {
     BetterPortfolio p = new BetterPortfolio(name);
-    ArrayList<StockPurchase> addition = new ArrayList<StockPurchase>();
+    List<StockPurchase> addition = new ArrayList<StockPurchase>();
     addition.add(purchase);
     p.purchases.put(stockSymbol, addition);
     this.portfolios.add(p);
@@ -269,15 +281,16 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
 
   /**
    * Removes the given stock from a portfolio.
+   *
    * @param portfolioName the name of the portfolio.
-   * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
-   * @param stockSale the stockSale being added
+   * @param stockSymbol   the symbol of a stock as a string (Ex, AMC).
+   * @param stockSale     the stockSale being added
    */
   @Override
   public void sellStock(String portfolioName, String stockSymbol, StockSale stockSale) {
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(portfolioName)) {
-        ArrayList<StockSale> soldList = p.sales.getOrDefault(stockSymbol, new ArrayList<>());
+        List<StockSale> soldList = p.sales.getOrDefault(stockSymbol, new ArrayList<>());
         soldList.add(stockSale);
         p.sales.put(stockSymbol, soldList);
       }
@@ -300,16 +313,17 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
 
   /**
    * Adds the given stock to the portfolio.
+   *
    * @param portfolioName the name of the portfolio.
-   * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
+   * @param stockSymbol   the symbol of a stock as a string (Ex, AMC).
    * @param stockPurchase the stockPurchase
    */
   @Override
   public void buyStock(String portfolioName, String stockSymbol,
-                                  StockPurchase stockPurchase) {
+                       StockPurchase stockPurchase) {
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(portfolioName)) {
-        ArrayList<StockPurchase> purchasesList = p.purchases.getOrDefault(stockSymbol,
+        List<StockPurchase> purchasesList = p.purchases.getOrDefault(stockSymbol,
                 new ArrayList<>());
         purchasesList.add(stockPurchase);
         p.purchases.put(stockSymbol, purchasesList);
@@ -319,6 +333,7 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
 
   /**
    * Checks if a portfolio exists in the model.
+   *
    * @param n the name of the portfolio we're looking for.
    * @return true if it exists in the model, false if not.
    */
@@ -337,8 +352,8 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
    * modify the original.
    */
   @Override
-  public ArrayList<BetterPortfolio> getPortfolios() {
-    ArrayList<BetterPortfolio> result = new ArrayList<>();
+  public List<BetterPortfolio> getPortfolios() {
+    List<BetterPortfolio> result = new ArrayList<>();
     for (BetterPortfolio p : this.portfolios) {
       BetterPortfolio port = new BetterPortfolio(p.name);
       port.purchases = new HashMap<>(p.purchases);
@@ -351,17 +366,18 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
   /**
    * Gets the portfolio as a distribution. Gets each stock in a portfolio finds it's value
    * and matches them together then displays them in the form {stock=value}.
+   *
    * @param pName the name of the portfolio.
-   * @param date the date for the distribution.
+   * @param date  the date for the distribution.
    * @return the distribution as an array.
    */
   @Override
   public String[] portfolioAsDistribution(String pName, LocalDate date) {
-    HashMap<String, Double> result = new HashMap<String, Double>();
+    Map<String, Double> result = new HashMap<String, Double>();
     date = moveToRecentTradingDay(date);
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(pName)) {
-        for (String symbol :p.purchases.keySet()) {
+        for (String symbol : p.purchases.keySet()) {
           if (!result.containsKey(symbol)) {
             result.put(symbol, Math.round((this.getBoughtShares(pName, symbol, date)
                     - this.getSoldShares(pName, symbol, date)) * getClosingValue(symbol, date)
@@ -375,8 +391,9 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
 
   /**
    * Gets the closing value on given date.
+   *
    * @param stockSymbol the stock for which the closing value is being found.
-   * @param date the date on which the value is being found.
+   * @param date        the date on which the value is being found.
    * @return the closing value as a double.
    */
   public double getClosingValue(String stockSymbol, LocalDate date) {
@@ -408,9 +425,10 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
    * The method finds the current value of the stock in the portfolio and
    * compares it to the goal value, based on this comparison it will
    * either buy or sell stock.
+   *
    * @param weights a hashmap of stocksymbols(String) to their weights as decimals(double).
-   * @param name the name of the portfolio being rebalanced.
-   * @param date the date that the rebalancing will take place on.
+   * @param name    the name of the portfolio being rebalanced.
+   * @param date    the date that the rebalancing will take place on.
    */
   @Override
   public void rebalancePortfolio(Map<String, Double> weights, String name, LocalDate date) {
@@ -424,14 +442,14 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
       if (goalVal > currentVal) {
         double shares = (goalVal - currentVal) / getClosingValue(stocksymbol, date);
         StockPurchase purchase = new StockPurchase(shares, date);
-        ArrayList<StockPurchase> newPurchase = this.getPortfolio(name).purchases.get(stocksymbol);
+        List<StockPurchase> newPurchase = this.getPortfolio(name).purchases.get(stocksymbol);
         newPurchase.add(purchase);
         this.getPortfolio(name).purchases.put(stocksymbol, newPurchase);
       }
       if (goalVal < currentVal) {
         double shares2 = (currentVal - goalVal) / getClosingValue(stocksymbol, date);
         StockSale sale = new StockSale(shares2, date);
-        ArrayList<StockSale> newSale = this.getPortfolio(name)
+        List<StockSale> newSale = this.getPortfolio(name)
                 .sales.getOrDefault(stocksymbol, new ArrayList<>());
         newSale.add(sale);
         this.getPortfolio(name).sales.put(stocksymbol, newSale);
@@ -443,13 +461,14 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
    * Gets a String list of stocks that are currently available to be sold,
    * i.e there purchase date is before ethe given date and there sale date
    * is not before.
+   *
    * @param name the name of the portfolio where the stocks are being pulled from.
    * @param date the date of which these stocks exist.
    * @return the list of stocks that currently exist.
    */
   @Override
   public List<String> getListStocks(String name, LocalDate date) {
-    ArrayList<String> result = new ArrayList<>();
+    List<String> result = new ArrayList<>();
     BetterPortfolio p = getPortfolio(name);
     for (String symbol : p.purchases.keySet()) {
       if ((this.getBoughtShares(name, symbol, date) - this.getSoldShares(name, symbol, date)) > 0) {
@@ -463,6 +482,7 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
    * Moves a date from the weekend to a weekday.
    * There are some drawbacks to this method
    * because it does not account for holidays unfortunately.
+   *
    * @param date the date being moved.
    * @return the edited date.
    */
@@ -472,8 +492,7 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
       try {
         this.getClosingValue("GOOG", date);
         break;
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         date = date.minusDays(1);
       }
     }
@@ -484,6 +503,7 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
    * Saves the current state of the portfolios to an XML file.
    * Will create a new file if the file doesn't exist, if the
    * file does exist it will add to it with a new portfolio.
+   *
    * @param filePath the name of the file to be saved.
    */
   @Override
@@ -568,6 +588,7 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
    * Loads the portfolios from an XML file.
    * Will iterate through each portfolio in an xml file and pull the correct data
    * for each one.
+   *
    * @param xmlFilePath the string representing the path to the desired xml.
    */
   @Override
@@ -585,10 +606,6 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
         if (portfolioNode.getNodeType() == Node.ELEMENT_NODE) {
           Element portfolioElement = (Element) portfolioNode;
           String portfolioName = portfolioElement.getAttribute("name");
-
-//          if (!portfolioName.equals(pName)) {
-//            continue;
-//          }
 
           BetterPortfolio portfolio = new BetterPortfolio(portfolioName);
 

@@ -14,10 +14,12 @@ public class Main {
    */
   public static void main(String[] args) {
     StockView view = new StockViewImpl(System.out);
-    StockView view2 = new StockViewGUI();
+    IStockViewGUI view2 = new StockViewGUI();
     Readable readable = new InputStreamReader(System.in);
     StockModelTrader model = new StockModelNew();
+    StockController controller2 = new StockControllerGUI(model, view2);
     StockController controller = new StockControllerNew(model, view2, readable);
-    controller.startProgram();
+    controller2.startProgram();
+  //  controller.startProgram();
   }
 }

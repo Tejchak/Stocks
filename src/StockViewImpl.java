@@ -63,4 +63,6 @@ public class StockViewImpl implements StockView {
       throw new RuntimeException("error adding to appendable");
     }
   }
+
+
 }

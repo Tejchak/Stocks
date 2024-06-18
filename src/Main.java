@@ -18,7 +18,7 @@ public class Main {
     Readable readable = new InputStreamReader(System.in);
     StockModelTrader model = new StockModelNew();
     StockController controller2 = new StockControllerGUI(model, view2);
-    StockController controller = new StockControllerNew(model, view2, readable);
+    StockController controller = new StockControllerNew(model, view, readable);
     controller2.startProgram();
   //  controller.startProgram();
   }

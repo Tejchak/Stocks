@@ -126,6 +126,9 @@ public class StockModelImpl implements StockModel {
     } catch (IOException e) {
       throw new IllegalArgumentException("No price data found for " + stockSymbol);
     }
+    if (output.toString().split("\n").length < 10) {
+      throw new RuntimeException("No data");
+    }
     //System.out.println(output.toString());
     return output.toString().split("\n");
   }
@@ -138,33 +141,13 @@ public class StockModelImpl implements StockModel {
    */
   @Override
   public boolean checkStockExists(String stockSymbol) {
-    URL url = null;
     try {
-      url = new URL("https://www.alphavantage"
-              + ".co/query?function=TIME_SERIES_DAILY"
-              + "&outputsize=full"
-              + "&symbol"
-              + "=" + stockSymbol + "&apikey=" + this.apiKey + "&datatype=csv");
-    } catch (MalformedURLException e) {
-      throw new RuntimeException("the alphavantage API has either changed or "
-              + "no longer works");
+      getStockData(stockSymbol);
     }
-
-    InputStream in = null;
-    StringBuilder output = new StringBuilder();
-
-    try {
-
-      in = url.openStream();
-      int b;
-
-      while ((b = in.read()) != -1) {
-        output.append((char) b);
-      }
-    } catch (IOException e) {
-      throw new IllegalArgumentException("No price data found for " + stockSymbol);
+    catch (Exception e) {
+      return false;
     }
-    return !output.toString().contains("\"Error Message\":");
+    return true;
   }
 
   /**

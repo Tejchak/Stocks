@@ -178,6 +178,13 @@ public class StockViewGUI implements IStockViewGUI {
     cancelButton.addActionListener(e -> createFrame.dispose());
   }
 
+  public String getRidOfSales() {
+    String getRid = JOptionPane.showInputDialog(frame,
+            "You must make sales in chronological order. Would "
+                    + "you like to get rid of future sales?", "Sales", JOptionPane.PLAIN_MESSAGE);
+    return getRid;
+  }
+
   public void displayCreatePortfolio() {
     createFrame = new JFrame("Create New Portfolio");
     createFrame.setSize(800, 600);

@@ -118,14 +118,19 @@ public class StockControllerGUI implements GUIFeatures {
     } else if (sellDate.isEmpty() || !checkDate(sellDate)) {
       view.displayMessage("Check the inputted date (ensure your inputted month has the correct number of days" +
               "e.g. February only has 28 days");
-    } else {
+    } else if (!model.convertDate(sellDate).isAfter(model.getLatestSellDate(portfolioName, stockName))) {
+      String getRid = view.getRidOfSales();
+      if (getRid.equalsIgnoreCase("Yes")) {
+        model.removeSales(portfolioName, stockName, model.getLatestSellDate(portfolioName, stockName));
+      }
+    } else if (!model.convertDate(sellDate).isBefore(model.getLatestSellDate(portfolioName, stockName))) {
       try {
         shares = Integer.parseInt(numberOfShares);
         double currentShares = model.getBoughtShares(portfolioName, stockName, model.convertDate(sellDate))
                 - model.getSoldShares(portfolioName, stockName, model.convertDate(sellDate));
         if (currentShares < shares) {
           view.displayMessage("Number of shares must be greater than the amount you currently own. "
-          + "You own " + currentShares + " shares of stock " + stockName + ".\n");
+                  + "You own " + currentShares + " shares of stock " + stockName + ".\n");
           view.disposeCreateFrame();
         } else {
           StockSale sale = new StockSale(shares, model.convertDate(sellDate));

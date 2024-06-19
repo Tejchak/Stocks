@@ -235,7 +235,7 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
    * @return the date of the most recent sale.
    */
   public LocalDate getLatestSellDate(String pName, String stockSymbol) {
-    LocalDate latestDate = null;
+    LocalDate latestDate = LocalDate.of(0000, 1, 1);
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(pName)) {
         for (StockSale sale : p.sales.getOrDefault(stockSymbol, new ArrayList<>())) {

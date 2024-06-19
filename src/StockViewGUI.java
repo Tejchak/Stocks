@@ -51,12 +51,18 @@ public class StockViewGUI implements IStockViewGUI {
     createPortfolioButton.addActionListener(evt -> displayCreatePortfolio());
     buyStockButton.addActionListener(evt -> displayBuyStock());
     queryPortfolioButton.addActionListener(evt -> displayQueryPortfolio());
+    savePortfolioButton.addActionListener(evt -> displaySavePortfolio());
   }
 
-//  public void displaySavePortfolio() {
-//    createFrame = new JFrame("Save Portfolio");
-//    createFrame.setSize
-//  }
+  public void displaySavePortfolio() {
+    String name = JOptionPane.showInputDialog(frame,
+            "Enter the name of the portfolio to save:", "Save Portfolio", JOptionPane.PLAIN_MESSAGE);
+    JFileChooser fileChooser = new JFileChooser();
+    int approved = fileChooser.showSaveDialog(frame);
+    if (approved == JFileChooser.APPROVE_OPTION) {
+      features.savePortfolio(name, fileChooser.getSelectedFile().getAbsolutePath());
+    }
+  }
 
   public void displayBuyStock() {
     createFrame = new JFrame("Buy Stock");

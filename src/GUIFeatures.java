@@ -5,4 +5,5 @@ public interface GUIFeatures extends StockController {
   public void sellStock();
   public void queryPortfolio();
   public void loadXml();
+  public void savePortfolio(String name, String filepath);
 }

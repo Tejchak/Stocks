@@ -149,4 +149,20 @@ public class StockControllerGUI implements GUIFeatures {
     }
     view.disposeCreateFrame();
   }
+
+  @Override
+  public void savePortfolio(String name, String filepath) {
+    if (!model.existingPortfolio(name)) {
+      view.displayMessage("Portfolio does not exist yet.");
+    }
+    else {
+      try {
+        model.portfolioToXML(filepath);
+      }
+      catch (Exception e) {
+        view.displayMessage("Error saving portfolio to file.");
+      }
+    }
+    view.disposeCreateFrame();
+  }
 }

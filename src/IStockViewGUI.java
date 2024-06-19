@@ -18,4 +18,5 @@ public interface IStockViewGUI {
   public void disposeCreateFrame();
 
   public String getNumShares();
+
 }

@@ -77,9 +77,9 @@ public class StockViewGUI implements IStockViewGUI {
         days[i] = "0" + (i + 1);
       }
     }
-    String[] years = new String[12];
+    String[] years = new String[11];
     for (int i = 0; i < years.length; i++) {
-      years[i] = String.valueOf(2013 + i);
+      years[i] = String.valueOf(2014 + i);
     }
 
     JLabel dateLabel = new JLabel("Purchase Date \n(will go to most recent trading day):");
@@ -133,9 +133,9 @@ public class StockViewGUI implements IStockViewGUI {
         days[i] = "0" + (i + 1);
       }
     }
-    String[] years = new String[12];
+    String[] years = new String[11];
     for (int i = 0; i < years.length; i++) {
-      years[i] = String.valueOf(2013 + i);
+      years[i] = String.valueOf(2014 + i);
     }
 
     JLabel dateLabel = new JLabel("<html>Purchase Date (will go to most recent trading day)" +
@@ -186,9 +186,9 @@ public class StockViewGUI implements IStockViewGUI {
         days[i] = "0" + (i + 1);
       }
     }
-    String[] years = new String[12];
+    String[] years = new String[11];
     for (int i = 0; i < years.length; i++) {
-      years[i] = String.valueOf(2013 + i);
+      years[i] = String.valueOf(2014 + i);
     }
 
     JLabel dateLabel = new JLabel("<html>Purchase Date (will go to most recent trading day)" +
@@ -201,8 +201,9 @@ public class StockViewGUI implements IStockViewGUI {
     JButton cancelButton = new JButton("Cancel");
 
     createFrame.add(nameLabel);
-    createFrame.add(dateLabel);
+    createFrame.add(portfolioNameField);
     createFrame.add(submitButton);
+    createFrame.add(dateLabel);
     JPanel datePanel = new JPanel();
     datePanel.add(new JLabel("Day:"));
     datePanel.add(dayComboBox);
@@ -210,7 +211,6 @@ public class StockViewGUI implements IStockViewGUI {
     datePanel.add(monthComboBox);
     datePanel.add(new JLabel("Year:"));
     datePanel.add(yearComboBox);
-    createFrame.add(portfolioNameField);
     createFrame.add(datePanel);
     createFrame.add(cancelButton);
 

@@ -1,4 +1,4 @@
-import java.time.LocalDate;
+import java.util.List;
 
 public class StockControllerGUI implements GUIFeatures {
   private StockModelTrader model;
@@ -189,5 +189,9 @@ public class StockControllerGUI implements GUIFeatures {
       }
     }
     view.disposeCreateFrame();
+  }
+
+  protected List<BetterPortfolio> portfolioList() {
+    return model.getPortfolios();
   }
 }

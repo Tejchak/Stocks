@@ -127,9 +127,8 @@ public class StockControllerGUI implements GUIFeatures {
       view.displayMessage("Portfolio does not exist yet.");
     }
     else {
-      view.displayMessage("" +
-              model.calculatePortfolio(portfolioName, model.convertDate(purchaseDate))
-      + "\n");
+      view.displayMessage("\n" +
+              model.calculatePortfolio(portfolioName, model.convertDate(purchaseDate)));
       for (String s : model.portfolioAsDistribution(portfolioName,
               model.convertDate(purchaseDate))) {
         if (s.contains("=")) {

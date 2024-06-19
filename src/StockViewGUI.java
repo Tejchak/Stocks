@@ -11,7 +11,7 @@ public class StockViewGUI implements IStockViewGUI {
   private JButton createPortfolioButton, buyStockButton,
           sellStockButton, queryPortfolioButton, savePortfolioButton, loadPortfolioButton;
   private JFrame createFrame;
-  private JTextField portfolioNameField, stockNameField, numShares;
+  private JTextField portfolioNameField, stockNameField, numShares, filePathField;
   private JComboBox<String> dayComboBox, monthComboBox, yearComboBox;
   private GUIFeatures features;
 
@@ -172,7 +172,7 @@ public class StockViewGUI implements IStockViewGUI {
   }
 
   public void displayQueryPortfolio() {
-    createFrame = new JFrame("Create New Portfolio");
+    createFrame = new JFrame("Query Portfolio");
     createFrame.setSize(800, 600);
     createFrame.setLayout(new GridLayout(2, 2, 10, 10));
 
@@ -201,8 +201,8 @@ public class StockViewGUI implements IStockViewGUI {
     JButton cancelButton = new JButton("Cancel");
 
     createFrame.add(nameLabel);
-    createFrame.add(portfolioNameField);
     createFrame.add(dateLabel);
+    createFrame.add(submitButton);
     JPanel datePanel = new JPanel();
     datePanel.add(new JLabel("Day:"));
     datePanel.add(dayComboBox);
@@ -210,13 +210,35 @@ public class StockViewGUI implements IStockViewGUI {
     datePanel.add(monthComboBox);
     datePanel.add(new JLabel("Year:"));
     datePanel.add(yearComboBox);
+    createFrame.add(portfolioNameField);
     createFrame.add(datePanel);
-    createFrame.add(submitButton);
     createFrame.add(cancelButton);
 
     createFrame.setVisible(true);
 
     submitButton.addActionListener(evt -> features.queryPortfolio());
+    cancelButton.addActionListener(e -> createFrame.dispose());
+  }
+
+  public void displayLoadXml() {
+    createFrame = new JFrame("Load from xml");
+    createFrame.setSize(200, 100);
+    createFrame.setLayout(new GridLayout(2, 2, 10, 10));
+
+    JLabel filePathLabel = new JLabel("File path name:");
+    filePathField = new JTextField();
+
+    JButton submitButton = new JButton("Create");
+    JButton cancelButton = new JButton("Cancel");
+
+    createFrame.add(filePathLabel);
+    createFrame.add(submitButton);
+    createFrame.add(filePathField);
+    createFrame.add(cancelButton);
+
+    createFrame.setVisible(true);
+
+    submitButton.addActionListener(evt -> features.createPortfolio());
     cancelButton.addActionListener(e -> createFrame.dispose());
   }
 

@@ -131,22 +131,14 @@ public class StockControllerGUI implements GUIFeatures {
   }
 
   @Override
-  public void loadXml() {
-    String portfolioName = view.getPortfolioName();
-    String purchaseDate = view.getPurchaseDate();
-    if (!model.existingPortfolio(portfolioName)) {
-      view.displayMessage("Portfolio does not exist yet.");
-    } else {
-      view.displayMessage("\n" +
-              model.calculatePortfolio(portfolioName, model.convertDate(purchaseDate)));
-      for (String s : model.portfolioAsDistribution(portfolioName,
-              model.convertDate(purchaseDate))) {
-        if (s.contains("=")) {
-          s = s.replace("=", " = $");
-        }
-        view.displayMessage(s);
-      }
+  public void loadXml(String filepath) {
+    try {
+      model.loadPortfolioFromXML(filepath);
     }
+    catch (Exception e) {
+      view.displayMessage("Error getting portfolio from xml file.");
+    }
+    view.displayMessage("Portfolio loaded.");
     view.disposeCreateFrame();
   }
 

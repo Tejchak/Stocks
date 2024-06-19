@@ -52,6 +52,7 @@ public class StockViewGUI implements IStockViewGUI {
     buyStockButton.addActionListener(evt -> displayBuyStock());
     queryPortfolioButton.addActionListener(evt -> displayQueryPortfolio());
     savePortfolioButton.addActionListener(evt -> displaySavePortfolio());
+    loadPortfolioButton.addActionListener(evt -> displayLoadXml());
   }
 
   public void displaySavePortfolio() {
@@ -227,25 +228,11 @@ public class StockViewGUI implements IStockViewGUI {
   }
 
   public void displayLoadXml() {
-    createFrame = new JFrame("Load from xml");
-    createFrame.setSize(200, 100);
-    createFrame.setLayout(new GridLayout(2, 2, 10, 10));
-
-    JLabel filePathLabel = new JLabel("File path name:");
-    filePathField = new JTextField();
-
-    JButton submitButton = new JButton("Create");
-    JButton cancelButton = new JButton("Cancel");
-
-    createFrame.add(filePathLabel);
-    createFrame.add(submitButton);
-    createFrame.add(filePathField);
-    createFrame.add(cancelButton);
-
-    createFrame.setVisible(true);
-
-    submitButton.addActionListener(evt -> features.createPortfolio());
-    cancelButton.addActionListener(e -> createFrame.dispose());
+    JFileChooser fileChooser = new JFileChooser();
+    int approved = fileChooser.showOpenDialog(frame);
+    if (approved == JFileChooser.APPROVE_OPTION) {
+      features.loadXml(fileChooser.getSelectedFile().getAbsolutePath());
+    }
   }
 
   public void displayMessage(String message) {

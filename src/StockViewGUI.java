@@ -53,6 +53,7 @@ public class StockViewGUI implements IStockViewGUI {
     queryPortfolioButton.addActionListener(evt -> displayQueryPortfolio());
     savePortfolioButton.addActionListener(evt -> displaySavePortfolio());
     loadPortfolioButton.addActionListener(evt -> displayLoadXml());
+    sellStockButton.addActionListener(evt -> displaySellStock());
   }
 
   public void displaySavePortfolio() {
@@ -118,6 +119,62 @@ public class StockViewGUI implements IStockViewGUI {
     createFrame.setVisible(true);
 
     submitButton.addActionListener(evt -> features.buyStock());
+    cancelButton.addActionListener(e -> createFrame.dispose());
+  }
+
+  public void displaySellStock() {
+    createFrame = new JFrame("Sell Stock");
+    createFrame.setSize(800, 600);
+    createFrame.setLayout(new GridLayout(5, 2, 10, 10));
+
+    JLabel nameLabel = new JLabel("Portfolio you would like to use:");
+    portfolioNameField = new JTextField();
+
+    JLabel stockLabel = new JLabel("Stock Name:");
+    stockNameField = new JTextField();
+    JLabel sharesLabel = new JLabel("Number of Shares (whole number):");
+    numShares = new JTextField();
+    String[] days = new String[31];
+    for (int i = 0; i < days.length; i++) {
+      days[i] = String.valueOf(i + 1);
+      if (i  - 1 < 10) {
+        days[i] = "0" + (i + 1);
+      }
+    }
+    String[] years = new String[11];
+    for (int i = 0; i < years.length; i++) {
+      years[i] = String.valueOf(2014 + i);
+    }
+
+    JLabel dateLabel = new JLabel("Sell Date \n(will go to most recent trading day):");
+    dayComboBox = new JComboBox<>(days);
+    monthComboBox = new JComboBox<>(new String[]{"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"});
+    yearComboBox = new JComboBox<>(years);
+
+    JButton submitButton = new JButton("Create");
+    JButton cancelButton = new JButton("Cancel");
+
+    createFrame.add(nameLabel);
+    createFrame.add(portfolioNameField);
+    createFrame.add(stockLabel);
+    createFrame.add(stockNameField);
+    createFrame.add(sharesLabel);
+    createFrame.add(numShares);
+    createFrame.add(dateLabel);
+    JPanel datePanel = new JPanel();
+    datePanel.add(new JLabel("Day:"));
+    datePanel.add(dayComboBox);
+    datePanel.add(new JLabel("Month:"));
+    datePanel.add(monthComboBox);
+    datePanel.add(new JLabel("Year:"));
+    datePanel.add(yearComboBox);
+    createFrame.add(datePanel);
+    createFrame.add(submitButton);
+    createFrame.add(cancelButton);
+
+    createFrame.setVisible(true);
+
+    submitButton.addActionListener(evt -> features.sellStock());
     cancelButton.addActionListener(e -> createFrame.dispose());
   }
 

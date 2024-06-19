@@ -104,7 +104,40 @@ public class StockControllerGUI implements GUIFeatures {
 
   @Override
   public void sellStock() {
-
+    String portfolioName = view.getPortfolioName();
+    String stockName = view.getStockName().toUpperCase();
+    String sellDate = view.getPurchaseDate();
+    String numberOfShares = view.getNumShares();
+    int shares = 0;
+    if (!model.existingPortfolio(portfolioName)) {
+      view.displayMessage("Portfolio does not exist yet.");
+    } else if (!model.checkStockExists(stockName)) {
+      view.displayMessage("We do not have your stock in our database. Sorry for the inconvenience");
+    } else if (numberOfShares == null || numberOfShares.isEmpty()) {
+      view.displayMessage("Number of shares cannot be empty.");
+    } else if (sellDate.isEmpty() || !checkDate(sellDate)) {
+      view.displayMessage("Check the inputted date (ensure your inputted month has the correct number of days" +
+              "e.g. February only has 28 days");
+    } else {
+      try {
+        shares = Integer.parseInt(numberOfShares);
+        double currentShares = model.getBoughtShares(portfolioName, stockName, model.convertDate(sellDate))
+                - model.getSoldShares(portfolioName, stockName, model.convertDate(sellDate));
+        if (currentShares < shares) {
+          view.displayMessage("Number of shares must be greater than the amount you currently own. "
+          + "You own " + currentShares + " shares of stock " + stockName + ".\n");
+          view.disposeCreateFrame();
+        } else {
+          StockSale sale = new StockSale(shares, model.convertDate(sellDate));
+          model.sellStock(portfolioName, stockName, sale);
+          view.displayMessage("Stock successfully sold: " + portfolioName + " " + shares + " shares" +
+                  " with stock " + stockName + " sold on " + sellDate);
+        }
+      } catch (NumberFormatException e) {
+        view.displayMessage("Number of shares must be an integer.");
+      }
+    }
+    view.disposeCreateFrame();
   }
 
   @Override

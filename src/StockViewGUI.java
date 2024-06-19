@@ -150,6 +150,7 @@ public class StockViewGUI implements IStockViewGUI {
     dayComboBox = new JComboBox<>(days);
     monthComboBox = new JComboBox<>(new String[]{"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"});
     yearComboBox = new JComboBox<>(years);
+    JComboBox getRidComboBox = new JComboBox<>(new String[] {"No", "Yes"});
 
     JButton submitButton = new JButton("Create");
     JButton cancelButton = new JButton("Cancel");
@@ -168,21 +169,17 @@ public class StockViewGUI implements IStockViewGUI {
     datePanel.add(monthComboBox);
     datePanel.add(new JLabel("Year:"));
     datePanel.add(yearComboBox);
+    datePanel.add(new JLabel("Would you like to get rid " +
+            "of all future sales if they exist?"));
+    datePanel.add(getRidComboBox);
     createFrame.add(datePanel);
     createFrame.add(submitButton);
     createFrame.add(cancelButton);
 
     createFrame.setVisible(true);
 
-    submitButton.addActionListener(evt -> features.sellStock());
+    submitButton.addActionListener(evt -> features.sellStock(getRidComboBox.getSelectedItem() + ""));
     cancelButton.addActionListener(e -> createFrame.dispose());
-  }
-
-  public String getRidOfSales() {
-    String getRid = JOptionPane.showInputDialog(frame,
-            "You must make sales in chronological order. Would "
-                    + "you like to get rid of future sales?", "Sales", JOptionPane.PLAIN_MESSAGE);
-    return getRid;
   }
 
   public void displayCreatePortfolio() {

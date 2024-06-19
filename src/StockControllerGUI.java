@@ -103,7 +103,7 @@ public class StockControllerGUI implements GUIFeatures {
 
 
   @Override
-  public void sellStock() {
+  public void sellStock(String getRid) {
     String portfolioName = view.getPortfolioName();
     String stockName = view.getStockName().toUpperCase();
     String sellDate = view.getPurchaseDate();
@@ -119,9 +119,12 @@ public class StockControllerGUI implements GUIFeatures {
       view.displayMessage("Check the inputted date (ensure your inputted month has the correct number of days" +
               "e.g. February only has 28 days");
     } else if (!model.convertDate(sellDate).isAfter(model.getLatestSellDate(portfolioName, stockName))) {
-      String getRid = view.getRidOfSales();
       if (getRid.equalsIgnoreCase("Yes")) {
-        model.removeSales(portfolioName, stockName, model.getLatestSellDate(portfolioName, stockName));
+        model.removeSales(portfolioName, stockName, model.convertDate(sellDate));
+        this.sellStock("");
+      }
+      else {
+        view.displayMessage("Sales must be in chronological order. Get rid of future sales");
       }
     } else if (!model.convertDate(sellDate).isBefore(model.getLatestSellDate(portfolioName, stockName))) {
       try {

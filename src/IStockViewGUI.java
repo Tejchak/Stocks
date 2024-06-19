@@ -19,5 +19,4 @@ public interface IStockViewGUI {
 
   public String getNumShares();
 
-  public String getRidOfSales();
 }

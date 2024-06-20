@@ -17,12 +17,16 @@ public class StockControllerGUI implements GUIFeatures {
     this.view = view;
   }
 
+  /**
+   * Starts the main program loop, displaying the user interface and handling user input.
+   */
   @Override
   public void startProgram() {
     view.setFeatures(this);
     view.createMenu();
   }
 
+  //Checks if the date can be converted.
   private boolean checkDate(String date) {
     try {
       model.convertDate(date);
@@ -32,6 +36,10 @@ public class StockControllerGUI implements GUIFeatures {
     return true;
   }
 
+  /**
+   * Manages the creation of the portfolio between the user interface and
+   * the model.
+   */
   @Override
   public void createPortfolio() {
     String portfolioName = view.getPortfolioName();
@@ -67,6 +75,10 @@ public class StockControllerGUI implements GUIFeatures {
     view.disposeCreateFrame();
   }
 
+  /**
+   * Manages the purchase of a stock through the GUI
+   * to the madel.
+   */
   @Override
   public void buyStock() {
     String portfolioName = view.getPortfolioNameBox();
@@ -103,6 +115,12 @@ public class StockControllerGUI implements GUIFeatures {
   }
 
 
+  /**
+   * Manages the sale of a portfolio in the gui.
+   * Checks for errors in the inputs and allows the user
+   * to get rid of the older inputs.
+   * @param getRid the user selection for getting rid of sales.
+   */
   @Override
   public void sellStock(String getRid) {
     String portfolioName = view.getPortfolioNameBox();
@@ -149,6 +167,10 @@ public class StockControllerGUI implements GUIFeatures {
     view.disposeCreateFrame();
   }
 
+  /**
+   * Allows the user to view the total value of a portfolio
+   * and its distribution in a gui.
+   */
   @Override
   public void queryPortfolio() {
     String portfolioName = view.getPortfolioNameBox();
@@ -172,6 +194,11 @@ public class StockControllerGUI implements GUIFeatures {
     view.disposeCreateFrame();
   }
 
+  /**
+   * Manages the loading of a portfolio from a
+   * selected file path.
+   * @param filepath the path to the file.
+   */
   @Override
   public void loadXml(String filepath) {
     try {
@@ -183,6 +210,12 @@ public class StockControllerGUI implements GUIFeatures {
     view.displayMessage("Portfolio loaded.");
   }
 
+  /**
+   * Manages the saving of a portfolio through the gui.
+   * Handles miss inputs and errors that could possibly arise.
+   * @param name the name of the portfolio.
+   * @param filepath the file path for the storage of the portfolio.
+   */
   @Override
   public void savePortfolio(String name, String filepath) {
     if (!model.existingPortfolio(name)) {
@@ -199,6 +232,12 @@ public class StockControllerGUI implements GUIFeatures {
     view.disposeCreateFrame();
   }
 
+  /**
+   * A list of portfolios from the model so the gui allows
+   * the user to select from existing portfolios.
+   * @return a list of the portfolio names.
+   */
+  @Override
   public List<String> portfolioList() {
     List<String> portfolioNames = new ArrayList<>();
     for (BetterPortfolio b : model.getPortfolios()) {

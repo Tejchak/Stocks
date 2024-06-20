@@ -81,6 +81,7 @@ public class StockViewGUI implements IStockViewGUI {
     createFrame = new JFrame("Buy Stock");
     createFrame.setSize(800, 600);
     createFrame.setLayout(new GridLayout(5, 2, 10, 10));
+    createFrame.setLocation(frame.getLocation());
 
     JLabel nameLabel = new JLabel("Portfolio you would like to use:");
     String[] nameList = features.portfolioList().toArray(new String[]{});;
@@ -129,15 +130,16 @@ public class StockViewGUI implements IStockViewGUI {
     createFrame.add(cancelButton);
 
     createFrame.setVisible(true);
-
+    frame.setVisible(false);
     submitButton.addActionListener(evt -> features.buyStock());
-    cancelButton.addActionListener(e -> createFrame.dispose());
+    cancelButton.addActionListener(e -> disposeCreateFrame());
   }
 
   public void displaySellStock() {
     createFrame = new JFrame("Sell Stock");
     createFrame.setSize(800, 600);
     createFrame.setLayout(new GridLayout(5, 2, 10, 10));
+    createFrame.setLocation(frame.getLocation());
 
     JLabel nameLabel = new JLabel("Portfolio you would like to use:");
     String[] nameList = features.portfolioList().toArray(new String[]{});;
@@ -192,13 +194,15 @@ public class StockViewGUI implements IStockViewGUI {
     createFrame.setVisible(true);
 
     submitButton.addActionListener(evt -> features.sellStock(getRidComboBox.getSelectedItem() + ""));
-    cancelButton.addActionListener(e -> createFrame.dispose());
+    cancelButton.addActionListener(e -> disposeCreateFrame());
+    frame.setVisible(false);
   }
 
   public void displayCreatePortfolio() {
     createFrame = new JFrame("Create New Portfolio");
     createFrame.setSize(800, 600);
     createFrame.setLayout(new GridLayout(5, 2, 10, 10));
+    createFrame.setLocation(frame.getLocation());
 
     JLabel nameLabel = new JLabel("Portfolio Name:");
     portfolioNameField = new JTextField();
@@ -247,15 +251,17 @@ public class StockViewGUI implements IStockViewGUI {
     createFrame.add(cancelButton);
 
     createFrame.setVisible(true);
+    frame.setVisible(false);
 
     submitButton.addActionListener(evt -> features.createPortfolio());
-    cancelButton.addActionListener(e -> createFrame.dispose());
+    cancelButton.addActionListener(e -> disposeCreateFrame());
   }
 
   public void displayQueryPortfolio() {
     createFrame = new JFrame("Query Portfolio");
     createFrame.setSize(800, 600);
     createFrame.setLayout(new GridLayout(2, 2, 10, 10));
+    createFrame.setLocation(frame.getLocation());
 
     JLabel nameLabel = new JLabel("Portfolio Name:");
     String[] nameList = features.portfolioList().toArray(new String[]{});;
@@ -297,9 +303,9 @@ public class StockViewGUI implements IStockViewGUI {
     createFrame.add(cancelButton);
 
     createFrame.setVisible(true);
-
+    frame.setVisible(false);
     submitButton.addActionListener(evt -> features.queryPortfolio());
-    cancelButton.addActionListener(e -> createFrame.dispose());
+    cancelButton.addActionListener(e ->  disposeCreateFrame());
   }
 
   public void displayLoadXml() {
@@ -308,6 +314,7 @@ public class StockViewGUI implements IStockViewGUI {
     if (approved == JFileChooser.APPROVE_OPTION) {
       features.loadXml(fileChooser.getSelectedFile().getAbsolutePath());
     }
+
   }
 
   public void displayMessage(String message) {
@@ -319,7 +326,7 @@ public class StockViewGUI implements IStockViewGUI {
   }
 
   public String getPortfolioNameBox() {
-    return portfolioComboBox.getSelectedItem() + "";
+      return portfolioComboBox.getSelectedItem() + "";
   }
 
   public String getStockName() {
@@ -336,6 +343,7 @@ public class StockViewGUI implements IStockViewGUI {
 
   @Override
   public void disposeCreateFrame() {
+    frame.setVisible(true);
     createFrame.dispose();
   }
 

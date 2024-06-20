@@ -19,7 +19,11 @@ public class Main {
     StockModelTrader model = new StockModelNew();
     StockController controller2 = new StockControllerGUI(model, view2);
     StockController controller = new StockControllerNew(model, view, readable);
-    controller2.startProgram();
-  //  controller.startProgram();
+    if (args.length > 0 && args[0].equals("-text")) {
+      controller.startProgram();
+    }
+    else {
+      controller2.startProgram();
+    }
   }
 }

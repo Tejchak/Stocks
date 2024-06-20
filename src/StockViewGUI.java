@@ -108,7 +108,7 @@ public class StockViewGUI implements IStockViewGUI {
     monthComboBox = new JComboBox<>(new String[]{"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"});
     yearComboBox = new JComboBox<>(years);
 
-    JButton submitButton = new JButton("Create");
+    JButton submitButton = new JButton("Buy");
     JButton cancelButton = new JButton("Cancel");
 
     createFrame.add(nameLabel);
@@ -167,7 +167,7 @@ public class StockViewGUI implements IStockViewGUI {
     yearComboBox = new JComboBox<>(years);
     JComboBox getRidComboBox = new JComboBox<>(new String[] {"No", "Yes"});
 
-    JButton submitButton = new JButton("Create");
+    JButton submitButton = new JButton("Sell");
     JButton cancelButton = new JButton("Cancel");
 
     createFrame.add(nameLabel);
@@ -285,7 +285,7 @@ public class StockViewGUI implements IStockViewGUI {
     monthComboBox = new JComboBox<>(new String[]{"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"});
     yearComboBox = new JComboBox<>(years);
 
-    JButton submitButton = new JButton("Create");
+    JButton submitButton = new JButton("Query");
     JButton cancelButton = new JButton("Cancel");
 
     createFrame.add(nameLabel);

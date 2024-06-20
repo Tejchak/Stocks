@@ -193,4 +193,14 @@ public interface StockModelTrader extends StockModel {
    * @param xmlFilePath the string representing the path to the desired xml.
    */
   public void loadPortfolioFromXML(String xmlFilePath);
+
+  /**
+   * Gets the portfolio as a composition. Gets each stock in a portfolio finds the number of shares
+   * and matches them together then displays them in the form {stock=shares}.
+   *
+   * @param pName the name of the portfolio.
+   * @param date  the date for the composition.
+   * @return the distribution as an array.
+   */
+  public String[] portfolioComposition(String pName, LocalDate date);
 }

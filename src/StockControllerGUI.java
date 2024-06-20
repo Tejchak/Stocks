@@ -183,10 +183,10 @@ public class StockControllerGUI implements GUIFeatures {
     else {
       view.displayMessage("\n" + "Total value is:  $" +
               model.calculatePortfolio(portfolioName, model.convertDate(purchaseDate)));
-      for (String s : model.portfolioAsDistribution(portfolioName,
+      for (String s : model.portfolioComposition(portfolioName,
               model.convertDate(purchaseDate))) {
         if (s.contains("=")) {
-          s = s.replace("=", " = $");
+          s = s.replace("=", " = ");
         }
         view.displayMessage(s);
       }

@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.text.IconView;
 import javax.swing.text.View;
 
 import java.awt.*;
@@ -11,8 +12,8 @@ public class StockViewGUI implements IStockViewGUI {
   private JButton createPortfolioButton, buyStockButton,
           sellStockButton, queryPortfolioButton, savePortfolioButton, loadPortfolioButton;
   private JFrame createFrame;
-  private JTextField portfolioNameField, stockNameField, numShares, filePathField;
-  private JComboBox<String> dayComboBox, monthComboBox, yearComboBox;
+  private JTextField portfolioNameField, stockNameField, numShares;
+  private JComboBox<String> dayComboBox, monthComboBox, yearComboBox, portfolioComboBox;
   private GUIFeatures features;
 
   public StockViewGUI() {
@@ -57,12 +58,22 @@ public class StockViewGUI implements IStockViewGUI {
   }
 
   public void displaySavePortfolio() {
-    String name = JOptionPane.showInputDialog(frame,
-            "Enter the name of the portfolio to save:", "Save Portfolio", JOptionPane.PLAIN_MESSAGE);
-    JFileChooser fileChooser = new JFileChooser();
-    int approved = fileChooser.showSaveDialog(frame);
-    if (approved == JFileChooser.APPROVE_OPTION) {
-      features.savePortfolio(name, fileChooser.getSelectedFile().getAbsolutePath());
+    String[] nameList = features.portfolioList().toArray(new String[]{});;
+    portfolioComboBox = new JComboBox<>(nameList);
+    int result = JOptionPane.showConfirmDialog(frame, portfolioComboBox, "Select Portfolio to Save",
+            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+    if (result == JOptionPane.OK_OPTION) {
+      String selectedPortfolioName = (String) portfolioComboBox.getSelectedItem();
+      if (selectedPortfolioName != null && !selectedPortfolioName.isEmpty()) {
+        JFileChooser fileChooser = new JFileChooser();
+        int approved = fileChooser.showSaveDialog(frame);
+        if (approved == JFileChooser.APPROVE_OPTION) {
+          features.savePortfolio(selectedPortfolioName, fileChooser.getSelectedFile().getAbsolutePath());
+          displayMessage("Saved Portfolio to " + fileChooser.getSelectedFile().getAbsolutePath());
+        }
+      } else {
+        JOptionPane.showMessageDialog(frame, "No portfolio selected.", "Error", JOptionPane.ERROR_MESSAGE);
+      }
     }
   }
 
@@ -72,7 +83,8 @@ public class StockViewGUI implements IStockViewGUI {
     createFrame.setLayout(new GridLayout(5, 2, 10, 10));
 
     JLabel nameLabel = new JLabel("Portfolio you would like to use:");
-    portfolioNameField = new JTextField();
+    String[] nameList = features.portfolioList().toArray(new String[]{});;
+    portfolioComboBox = new JComboBox<>(nameList);
 
     JLabel stockLabel = new JLabel("Stock Name:");
     stockNameField = new JTextField();
@@ -99,7 +111,7 @@ public class StockViewGUI implements IStockViewGUI {
     JButton cancelButton = new JButton("Cancel");
 
     createFrame.add(nameLabel);
-    createFrame.add(portfolioNameField);
+    createFrame.add(portfolioComboBox);
     createFrame.add(stockLabel);
     createFrame.add(stockNameField);
     createFrame.add(sharesLabel);
@@ -128,7 +140,8 @@ public class StockViewGUI implements IStockViewGUI {
     createFrame.setLayout(new GridLayout(5, 2, 10, 10));
 
     JLabel nameLabel = new JLabel("Portfolio you would like to use:");
-    portfolioNameField = new JTextField();
+    String[] nameList = features.portfolioList().toArray(new String[]{});;
+    portfolioComboBox = new JComboBox<>(nameList);
 
     JLabel stockLabel = new JLabel("Stock Name:");
     stockNameField = new JTextField();
@@ -156,7 +169,7 @@ public class StockViewGUI implements IStockViewGUI {
     JButton cancelButton = new JButton("Cancel");
 
     createFrame.add(nameLabel);
-    createFrame.add(portfolioNameField);
+    createFrame.add(portfolioComboBox);
     createFrame.add(stockLabel);
     createFrame.add(stockNameField);
     createFrame.add(sharesLabel);
@@ -245,7 +258,8 @@ public class StockViewGUI implements IStockViewGUI {
     createFrame.setLayout(new GridLayout(2, 2, 10, 10));
 
     JLabel nameLabel = new JLabel("Portfolio Name:");
-    portfolioNameField = new JTextField();
+    String[] nameList = features.portfolioList().toArray(new String[]{});;
+    portfolioComboBox = new JComboBox<>(nameList);
 
     String[] days = new String[31];
     for (int i = 0; i < days.length; i++) {
@@ -269,7 +283,7 @@ public class StockViewGUI implements IStockViewGUI {
     JButton cancelButton = new JButton("Cancel");
 
     createFrame.add(nameLabel);
-    createFrame.add(portfolioNameField);
+    createFrame.add(portfolioComboBox);
     createFrame.add(submitButton);
     createFrame.add(dateLabel);
     JPanel datePanel = new JPanel();
@@ -301,7 +315,11 @@ public class StockViewGUI implements IStockViewGUI {
   }
 
   public String getPortfolioName() {
-    return portfolioNameField.getText();
+      return portfolioNameField.getText();
+  }
+
+  public String getPortfolioNameBox() {
+    return portfolioComboBox.getSelectedItem() + "";
   }
 
   public String getStockName() {

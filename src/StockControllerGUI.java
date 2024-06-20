@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class StockControllerGUI implements GUIFeatures {
@@ -38,7 +39,7 @@ public class StockControllerGUI implements GUIFeatures {
     String purchaseDate = view.getPurchaseDate();
     String numberOfShares = view.getNumShares();
     int shares = 0;
-    if (portfolioName.isEmpty()) {
+    if (portfolioName.isEmpty() || portfolioName == null) {
       view.displayMessage("Portfolio name cannot be empty.");
     } else if (!model.checkStockExists(stockName)) {
       view.displayMessage("We do not have your stock in our database. Sorry for the inconvenience");
@@ -68,7 +69,7 @@ public class StockControllerGUI implements GUIFeatures {
 
   @Override
   public void buyStock() {
-    String portfolioName = view.getPortfolioName();
+    String portfolioName = view.getPortfolioNameBox();
     String stockName = view.getStockName().toUpperCase();
     String purchaseDate = view.getPurchaseDate();
     String numberOfShares = view.getNumShares();
@@ -104,7 +105,7 @@ public class StockControllerGUI implements GUIFeatures {
 
   @Override
   public void sellStock(String getRid) {
-    String portfolioName = view.getPortfolioName();
+    String portfolioName = view.getPortfolioNameBox();
     String stockName = view.getStockName().toUpperCase();
     String sellDate = view.getPurchaseDate();
     String numberOfShares = view.getNumShares();
@@ -150,7 +151,7 @@ public class StockControllerGUI implements GUIFeatures {
 
   @Override
   public void queryPortfolio() {
-    String portfolioName = view.getPortfolioName();
+    String portfolioName = view.getPortfolioNameBox();
     String purchaseDate = view.getPurchaseDate();
     if (!checkDate(purchaseDate)) {
       view.displayMessage("Please input a valid date.");
@@ -180,7 +181,6 @@ public class StockControllerGUI implements GUIFeatures {
       view.displayMessage("Error getting portfolio from xml file.");
     }
     view.displayMessage("Portfolio loaded.");
-    view.disposeCreateFrame();
   }
 
   @Override
@@ -199,7 +199,11 @@ public class StockControllerGUI implements GUIFeatures {
     view.disposeCreateFrame();
   }
 
-  protected List<BetterPortfolio> portfolioList() {
-    return model.getPortfolios();
+  public List<String> portfolioList() {
+    List<String> portfolioNames = new ArrayList<>();
+    for (BetterPortfolio b : model.getPortfolios()) {
+      portfolioNames.add(b.name);
+    }
+    return portfolioNames;
   }
 }

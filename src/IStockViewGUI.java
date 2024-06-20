@@ -9,6 +9,8 @@ public interface IStockViewGUI {
 
   public String getPortfolioName();
 
+  public String getPortfolioNameBox();
+
   public String getStockName();
 
   public String getPurchaseDate();

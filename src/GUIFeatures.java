@@ -1,3 +1,5 @@
+import java.util.List;
+
 public interface GUIFeatures extends StockController {
 
   public void createPortfolio();
@@ -6,4 +8,5 @@ public interface GUIFeatures extends StockController {
   public void queryPortfolio();
   public void loadXml(String filepath);
   public void savePortfolio(String name, String filepath);
+  public List<String> portfolioList();
 }

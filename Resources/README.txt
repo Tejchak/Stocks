@@ -1,4 +1,4 @@
-
+GUI
 
 Upon running the main file our project can create a text-based user interface asking the user what
 what exactly it is they would like to do. The user can choose to examine the gain/loss of stock over

@@ -288,6 +288,9 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
    */
   @Override
   public void sellStock(String portfolioName, String stockSymbol, StockSale stockSale) {
+    if (!existingPortfolio(portfolioName) || !checkStockExists(stockSymbol) || stockSale == null) {
+      throw new RuntimeException("invalid arguments");
+    }
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(portfolioName)) {
         List<StockSale> soldList = p.sales.getOrDefault(stockSymbol, new ArrayList<>());
@@ -321,6 +324,9 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
   @Override
   public void buyStock(String portfolioName, String stockSymbol,
                        StockPurchase stockPurchase) {
+    if (!existingPortfolio(portfolioName) || !checkStockExists(stockSymbol) || stockPurchase == null) {
+      throw new RuntimeException("invalid arguments");
+    }
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(portfolioName)) {
         List<StockPurchase> purchasesList = p.purchases.getOrDefault(stockSymbol,
@@ -373,6 +379,9 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
    */
   @Override
   public String[] portfolioComposition(String pName, LocalDate date) {
+    if (!existingPortfolio(pName)) {
+      throw new RuntimeException("invalid pName");
+    }
     Map<String, Double> result = new HashMap<String, Double>();
     date = moveToRecentTradingDay(date);
     for (BetterPortfolio p : this.portfolios) {
@@ -457,6 +466,13 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
    */
   @Override
   public void rebalancePortfolio(Map<String, Double> weights, String name, LocalDate date) {
+    double totalWeight = 0;
+    for (double weight : weights.values()) {
+      totalWeight += weight;
+    }
+    if (totalWeight != 1) {
+      throw new RuntimeException("invalid weights");
+    }
     double total = this.calculatePortfolio(name, date);
     date = moveToRecentTradingDay(date);
     for (String stocksymbol : weights.keySet()) {

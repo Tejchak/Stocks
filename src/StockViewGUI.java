@@ -1,11 +1,11 @@
 import javax.swing.*;
-import javax.swing.text.IconView;
-import javax.swing.text.View;
-
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
+/**
+ * Class for the generative user interface, contains fields for each
+ * of the ways that the user can interact with the program.
+ * Uses java swing to create these buttons and menus.
+ */
 public class StockViewGUI implements IStockViewGUI {
   private JFrame frame;
   private JTextArea outputArea;
@@ -16,10 +16,15 @@ public class StockViewGUI implements IStockViewGUI {
   private JComboBox<String> dayComboBox, monthComboBox, yearComboBox, portfolioComboBox;
   private GUIFeatures features;
 
+  /**
+   * Empty constructor so the view can be initialized in the main.
+   */
   public StockViewGUI() {
-
   }
 
+  /**
+   * Creates the opening menu for the stock view with the GUI.
+   */
   @Override
   public void createMenu() {
     frame = new JFrame("Stock Portfolio Manager");
@@ -99,22 +104,8 @@ public class StockViewGUI implements IStockViewGUI {
     stockNameField = new JTextField();
     JLabel sharesLabel = new JLabel("Number of Shares (whole number):");
     numShares = new JTextField();
-    String[] days = new String[31];
-    for (int i = 0; i < days.length; i++) {
-      days[i] = String.valueOf(i + 1);
-      if (i - 1 < 10) {
-        days[i] = "0" + (i + 1);
-      }
-    }
-    String[] years = new String[11];
-    for (int i = 0; i < years.length; i++) {
-      years[i] = String.valueOf(2014 + i);
-    }
 
     JLabel dateLabel = new JLabel("Purchase Date \n(will go to most recent trading day):");
-    dayComboBox = new JComboBox<>(days);
-    monthComboBox = new JComboBox<>(new String[]{"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"});
-    yearComboBox = new JComboBox<>(years);
 
     JButton submitButton = new JButton("Buy");
     JButton cancelButton = new JButton("Cancel");
@@ -126,13 +117,7 @@ public class StockViewGUI implements IStockViewGUI {
     createFrame.add(sharesLabel);
     createFrame.add(numShares);
     createFrame.add(dateLabel);
-    JPanel datePanel = new JPanel();
-    datePanel.add(new JLabel("Day:"));
-    datePanel.add(dayComboBox);
-    datePanel.add(new JLabel("Month:"));
-    datePanel.add(monthComboBox);
-    datePanel.add(new JLabel("Year:"));
-    datePanel.add(yearComboBox);
+    JPanel datePanel = initDatePanel();
     createFrame.add(datePanel);
     createFrame.add(submitButton);
     createFrame.add(cancelButton);
@@ -159,22 +144,10 @@ public class StockViewGUI implements IStockViewGUI {
     stockNameField = new JTextField();
     JLabel sharesLabel = new JLabel("Number of Shares (whole number):");
     numShares = new JTextField();
-    String[] days = new String[31];
-    for (int i = 0; i < days.length; i++) {
-      days[i] = String.valueOf(i + 1);
-      if (i - 1 < 10) {
-        days[i] = "0" + (i + 1);
-      }
-    }
-    String[] years = new String[11];
-    for (int i = 0; i < years.length; i++) {
-      years[i] = String.valueOf(2014 + i);
-    }
+
 
     JLabel dateLabel = new JLabel("Sell Date \n(will go to most recent trading day):");
-    dayComboBox = new JComboBox<>(days);
-    monthComboBox = new JComboBox<>(new String[]{"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"});
-    yearComboBox = new JComboBox<>(years);
+
     JComboBox getRidComboBox = new JComboBox<>(new String[]{"No", "Yes"});
 
     JButton submitButton = new JButton("Sell");
@@ -187,13 +160,7 @@ public class StockViewGUI implements IStockViewGUI {
     createFrame.add(sharesLabel);
     createFrame.add(numShares);
     createFrame.add(dateLabel);
-    JPanel datePanel = new JPanel();
-    datePanel.add(new JLabel("Day:"));
-    datePanel.add(dayComboBox);
-    datePanel.add(new JLabel("Month:"));
-    datePanel.add(monthComboBox);
-    datePanel.add(new JLabel("Year:"));
-    datePanel.add(yearComboBox);
+    JPanel datePanel = initDatePanel();
     datePanel.add(new JLabel("Would you like to get rid " +
             "of all future sales if they exist?"));
     datePanel.add(getRidComboBox);
@@ -206,6 +173,34 @@ public class StockViewGUI implements IStockViewGUI {
     submitButton.addActionListener(evt -> features.sellStock(getRidComboBox.getSelectedItem() + ""));
     cancelButton.addActionListener(e -> disposeCreateFrame());
     frame.setVisible(false);
+  }
+
+  //initializes the date.
+  private JPanel initDatePanel() {
+    String[] days = new String[31];
+    for (int i = 0; i < days.length; i++) {
+      days[i] = String.valueOf(i + 1);
+      if (i - 1 < 10) {
+        days[i] = "0" + (i + 1);
+      }
+    }
+    String[] years = new String[11];
+    for (int i = 0; i < years.length; i++) {
+      years[i] = String.valueOf(2014 + i);
+    }
+
+    JPanel datePanel = new JPanel();
+    dayComboBox = new JComboBox<>(days);
+    monthComboBox = new JComboBox<>(new String[]{"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"});
+    yearComboBox = new JComboBox<>(years);
+    datePanel.add(new JLabel("Day:"));
+    datePanel.add(dayComboBox);
+    datePanel.add(new JLabel("Month:"));
+    datePanel.add(monthComboBox);
+    datePanel.add(new JLabel("Year:"));
+    datePanel.add(yearComboBox);
+
+    return datePanel;
   }
 
   /**

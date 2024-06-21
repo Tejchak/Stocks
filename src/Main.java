@@ -23,7 +23,7 @@ public class Main {
       controller.startProgram();
     }
     else {
-      controller2.startProgram();
+      controller.startProgram();
     }
   }
 }

@@ -66,10 +66,10 @@ public class StockControllerNew extends StockControllerImpl {
   protected void handlePortfolioMenu() {
     view.portfolioMenu();
     int option = getValidPositiveNum("Please enter a number between 1 and 9");
-    while (option != 1 && option != 9 && model.getPortfolios().isEmpty()) {
+    while (option != 1 && option != 10 && model.getPortfolios().isEmpty()) {
       view.displayResult("Must have an existing portfolio "
               + "before you can add, remove, or calculate.");
-      option = getValidPositiveNum("Please enter 1 or 9");
+      option = getValidPositiveNum("Please enter 1 or 10");
     }
     switch (option) {
       case 1:
@@ -85,18 +85,21 @@ public class StockControllerNew extends StockControllerImpl {
         calculatePortfolio();
         break;
       case 5:
-        viewDistribution();
+        viewComposition();
         break;
       case 6:
-        rebalance();
+        viewDistribution();
         break;
       case 7:
-        handleBarChart();
+        rebalance();
         break;
       case 8:
-        storePortfolio();
+        handleBarChart();
         break;
       case 9:
+        storePortfolio();
+        break;
+      case 10:
         loadFile();
         break;
       default:
@@ -117,6 +120,25 @@ public class StockControllerNew extends StockControllerImpl {
       model.portfolioToXML(filePath);
     } catch (Exception e) {
       view.displayResult("Error writing to file");
+    }
+  }
+
+  //Method to handle case when user wants to view the composition
+  protected void viewComposition() {
+    String portfolioName = getStringInput(
+            "Enter the name of the portfolio you would like to add to: ");
+    while (!model.existingPortfolio(portfolioName)) {
+      portfolioName = getStringInput("Portfolio " + portfolioName
+              + " does not exist. Please enter another name.");
+    }
+    String date = getDate("desired");
+    LocalDate finalDate = getValidLocalDate("desired", date);
+    for (String s : model.portfolioComposition(portfolioName,
+            finalDate)) {
+      if (s.contains("=")) {
+        s = s.replace("=", " = ");
+      }
+      view.displayResult(s);
     }
   }
 

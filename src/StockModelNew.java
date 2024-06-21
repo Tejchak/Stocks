@@ -289,7 +289,7 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
   @Override
   public void sellStock(String portfolioName, String stockSymbol, StockSale stockSale) {
     if (!existingPortfolio(portfolioName) || !checkStockExists(stockSymbol) || stockSale == null) {
-      throw new RuntimeException("invalid arguments");
+      throw new RuntimeException(checkStockExists(stockSymbol) + " " + existingPortfolio(portfolioName));
     }
     for (BetterPortfolio p : this.portfolios) {
       if (p.name.equals(portfolioName)) {

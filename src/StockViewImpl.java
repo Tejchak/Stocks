@@ -40,11 +40,12 @@ public class StockViewImpl implements StockView {
       appendable.append("2. Add stock to a portfolio?\n");
       appendable.append("3. Take away stock from a portfolio?\n");
       appendable.append("4. Calculate the value of a portfolio?\n");
-      appendable.append("5. View the portfolio distribution\n");
-      appendable.append("6. Rebalance a portfolio\n");
-      appendable.append("7. View a portfolio performance as a bar chart\n");
-      appendable.append("8. Store a portfolio\n");
-      appendable.append("9. Recover a portfolio\n");
+      appendable.append("5. View the portfolio composition (stockName : Shares) \n");
+      appendable.append("6. View the portfolio distribution\n");
+      appendable.append("7. Rebalance a portfolio\n");
+      appendable.append("8. View a portfolio performance as a bar chart\n");
+      appendable.append("9. Store a portfolio\n");
+      appendable.append("10. Recover a portfolio\n");
     }
     catch (IOException e) {
       throw new RuntimeException("error adding to appendable");

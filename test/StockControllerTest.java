@@ -146,7 +146,7 @@ public class StockControllerTest {
   public void testNotEnoughShares() {
     StockModelTrader model = new StockModelNew();
     StockView view = new MockView();
-    String input = "4\n9\nResources/Jake.xml\n4\n3\nJake\nL\n2024\n5\n29\n80\n3\n5\n";
+    String input = "4\n10\nResources/Jake.xml\n4\n3\nJake\nL\n2024\n5\n29\n80\n3\n5\n";
     Readable rd = new StringReader(input);
     StockController controller = new StockControllerNew(model, view, rd);
 
@@ -351,7 +351,7 @@ public class StockControllerTest {
     StockModelTrader model = new StockModelNew();
     StockView view = new MockView();
     String input =
-            "4\n9\nResources/Jake.xml\n4\n3\nTej\nGOOG\n2024\n12\n29\n2024\n5\n29\n80\n3\n5\n";
+            "4\n10\nResources/Jake.xml\n4\n3\nTej\nGOOG\n2024\n12\n29\n2024\n5\n29\n80\n3\n5\n";
     Readable rd = new StringReader(input);
     StockController controller = new StockControllerNew(model, view, rd);
 
@@ -462,7 +462,7 @@ public class StockControllerTest {
   public void testInvalidFilePathForLoading() {
     StockModelTrader model = new StockModelNew();
     StockView view = new MockView();
-    String input = "4\n9\ninvalidpath\n5\n";
+    String input = "4\n10\ninvalidpath\n5\n";
     Readable rd = new StringReader(input);
     StockController controller = new StockControllerNew(model, view, rd);
 

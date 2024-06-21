@@ -126,9 +126,6 @@ public class StockModelImpl implements StockModel {
     } catch (IOException e) {
       throw new IllegalArgumentException("No price data found for " + stockSymbol);
     }
-    if (output.toString().split("\n").length < 10) {
-      throw new RuntimeException("No data");
-    }
     //System.out.println(output.toString());
     return output.toString().split("\n");
   }
@@ -141,8 +138,16 @@ public class StockModelImpl implements StockModel {
    */
   @Override
   public boolean checkStockExists(String stockSymbol) {
+    String[] stockData;
     try {
-      getStockData(stockSymbol);
+      stockData = getStockData(stockSymbol);
+      if (stockData[1].contains("\"Error Message\":") || stockData[1].contains("Thank you for "
+              + "using Alpha Vantage!")) {
+        return false;
+      }
+      if (stockData.length < 10) {
+        return false;
+      }
     }
     catch (Exception e) {
       return false;

@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 
 /**
  * Class for the generative user interface, contains fields for each
@@ -13,7 +14,7 @@ public class StockViewGUI implements IStockViewGUI {
           sellStockButton, queryPortfolioButton, savePortfolioButton, loadPortfolioButton;
   private JFrame createFrame;
   private JTextField portfolioNameField, stockNameField, numShares;
-  private JComboBox<String> dayComboBox, monthComboBox, yearComboBox, portfolioComboBox;
+  private JComboBox<String> dayComboBox, monthComboBox, yearComboBox, portfolioComboBox, getRidComboBox;
   private GUIFeatures features;
 
   /**
@@ -62,6 +63,57 @@ public class StockViewGUI implements IStockViewGUI {
     sellStockButton.addActionListener(evt -> displaySellStock());
   }
 
+  private void setupFrame(String title, boolean isCreatePortfolio, boolean isSell, ActionListener submitAction) {
+
+    createFrame = new JFrame(title);
+    createFrame.setSize(800, 600);
+    createFrame.setLayout(new GridLayout(5, 2, 10, 10));
+    createFrame.setLocation(frame.getLocation());
+    JLabel nameLabel = new JLabel(isCreatePortfolio ? "Portfolio Name:" : "Portfolio you would like to use:");
+    if (isCreatePortfolio) {
+      portfolioNameField = new JTextField();
+      createFrame.add(nameLabel);
+      createFrame.add(portfolioNameField);
+    } else {
+       String[] portfolioList = features.portfolioList().toArray(new String[]{});
+      portfolioComboBox = new JComboBox<>(portfolioList);
+      createFrame.add(nameLabel);
+      createFrame.add(portfolioComboBox);
+    }
+
+    stockNameField = new JTextField();
+    numShares = new JTextField();
+
+    JLabel stockLabel = new JLabel("Stock Name:");
+    JLabel sharesLabel = new JLabel("Number of Shares (whole number):");
+    JLabel dateLabel = new JLabel("Date (will go to most recent trading day):");
+
+    JButton submitButton = new JButton("Submit");
+    JButton cancelButton = new JButton("Cancel");
+
+    createFrame.add(stockLabel);
+    createFrame.add(stockNameField);
+    createFrame.add(sharesLabel);
+    createFrame.add(numShares);
+    createFrame.add(dateLabel);
+    JPanel datePanel = initDatePanel();
+    if (isSell) {
+      getRidComboBox = new JComboBox<>(new String[]{"No", "Yes"});
+      datePanel.add(new JLabel("Would you like to get rid " +
+              "of all future sales if they exist?"));
+      datePanel.add(getRidComboBox);
+    }
+    createFrame.add(datePanel);
+    createFrame.add(submitButton);
+    createFrame.add(cancelButton);
+
+    createFrame.setVisible(true);
+    frame.setVisible(false);
+
+    submitButton.addActionListener(submitAction);
+    cancelButton.addActionListener(e -> disposeCreateFrame());
+  }
+
   /**
    * Does a pop up that allows the user to select a file path and
    * the name of the portfolio that they will save.
@@ -90,89 +142,16 @@ public class StockViewGUI implements IStockViewGUI {
 
   //Displays the purchase of a stock in the gui.
   private void displayBuyStock() {
-    createFrame = new JFrame("Buy Stock");
-    createFrame.setSize(800, 600);
-    createFrame.setLayout(new GridLayout(5, 2, 10, 10));
-    createFrame.setLocation(frame.getLocation());
-
-    JLabel nameLabel = new JLabel("Portfolio you would like to use:");
-    String[] nameList = features.portfolioList().toArray(new String[]{});
-    ;
-    portfolioComboBox = new JComboBox<>(nameList);
-
-    JLabel stockLabel = new JLabel("Stock Name:");
-    stockNameField = new JTextField();
-    JLabel sharesLabel = new JLabel("Number of Shares (whole number):");
-    numShares = new JTextField();
-
-    JLabel dateLabel = new JLabel("Purchase Date \n(will go to most recent trading day):");
-
-    JButton submitButton = new JButton("Buy");
-    JButton cancelButton = new JButton("Cancel");
-
-    createFrame.add(nameLabel);
-    createFrame.add(portfolioComboBox);
-    createFrame.add(stockLabel);
-    createFrame.add(stockNameField);
-    createFrame.add(sharesLabel);
-    createFrame.add(numShares);
-    createFrame.add(dateLabel);
-    JPanel datePanel = initDatePanel();
-    createFrame.add(datePanel);
-    createFrame.add(submitButton);
-    createFrame.add(cancelButton);
-
-    createFrame.setVisible(true);
-    frame.setVisible(false);
-    submitButton.addActionListener(evt -> features.buyStock());
-    cancelButton.addActionListener(e -> disposeCreateFrame());
+    setupFrame("Buy Stock", false, false, evt -> {
+      features.buyStock();
+    });
   }
 
   //Displays the selling of a stock on the gui.
   private void displaySellStock() {
-    createFrame = new JFrame("Sell Stock");
-    createFrame.setSize(800, 600);
-    createFrame.setLayout(new GridLayout(5, 2, 10, 10));
-    createFrame.setLocation(frame.getLocation());
-
-    JLabel nameLabel = new JLabel("Portfolio you would like to use:");
-    String[] nameList = features.portfolioList().toArray(new String[]{});
-    ;
-    portfolioComboBox = new JComboBox<>(nameList);
-
-    JLabel stockLabel = new JLabel("Stock Name:");
-    stockNameField = new JTextField();
-    JLabel sharesLabel = new JLabel("Number of Shares (whole number):");
-    numShares = new JTextField();
-
-
-    JLabel dateLabel = new JLabel("Sell Date \n(will go to most recent trading day):");
-
-    JComboBox getRidComboBox = new JComboBox<>(new String[]{"No", "Yes"});
-
-    JButton submitButton = new JButton("Sell");
-    JButton cancelButton = new JButton("Cancel");
-
-    createFrame.add(nameLabel);
-    createFrame.add(portfolioComboBox);
-    createFrame.add(stockLabel);
-    createFrame.add(stockNameField);
-    createFrame.add(sharesLabel);
-    createFrame.add(numShares);
-    createFrame.add(dateLabel);
-    JPanel datePanel = initDatePanel();
-    datePanel.add(new JLabel("Would you like to get rid " +
-            "of all future sales if they exist?"));
-    datePanel.add(getRidComboBox);
-    createFrame.add(datePanel);
-    createFrame.add(submitButton);
-    createFrame.add(cancelButton);
-
-    createFrame.setVisible(true);
-
-    submitButton.addActionListener(evt -> features.sellStock(getRidComboBox.getSelectedItem() + ""));
-    cancelButton.addActionListener(e -> disposeCreateFrame());
-    frame.setVisible(false);
+    setupFrame("Sell Stock", false, true, evt -> {
+      features.sellStock();
+    });
   }
 
   //initializes the date.
@@ -208,62 +187,9 @@ public class StockViewGUI implements IStockViewGUI {
    */
   @Override
   public void displayCreatePortfolio() {
-    createFrame = new JFrame("Create New Portfolio");
-    createFrame.setSize(800, 600);
-    createFrame.setLayout(new GridLayout(5, 2, 10, 10));
-    createFrame.setLocation(frame.getLocation());
-
-    JLabel nameLabel = new JLabel("Portfolio Name:");
-    portfolioNameField = new JTextField();
-
-    JLabel stockLabel = new JLabel("Stock Name:");
-    stockNameField = new JTextField();
-    JLabel sharesLabel = new JLabel("Number of Shares (whole number):");
-    numShares = new JTextField();
-    String[] days = new String[31];
-    for (int i = 0; i < days.length; i++) {
-      days[i] = String.valueOf(i + 1);
-      if (i - 1 < 10) {
-        days[i] = "0" + (i + 1);
-      }
-    }
-    String[] years = new String[11];
-    for (int i = 0; i < years.length; i++) {
-      years[i] = String.valueOf(2014 + i);
-    }
-
-    JLabel dateLabel = new JLabel("<html>Purchase Date (will go to most recent trading day)" +
-            ":<html>");
-    dayComboBox = new JComboBox<>(days);
-    monthComboBox = new JComboBox<>(new String[]{"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"});
-    yearComboBox = new JComboBox<>(years);
-
-    JButton submitButton = new JButton("Create");
-    JButton cancelButton = new JButton("Cancel");
-
-    createFrame.add(nameLabel);
-    createFrame.add(portfolioNameField);
-    createFrame.add(stockLabel);
-    createFrame.add(stockNameField);
-    createFrame.add(sharesLabel);
-    createFrame.add(numShares);
-    createFrame.add(dateLabel);
-    JPanel datePanel = new JPanel();
-    datePanel.add(new JLabel("Day:"));
-    datePanel.add(dayComboBox);
-    datePanel.add(new JLabel("Month:"));
-    datePanel.add(monthComboBox);
-    datePanel.add(new JLabel("Year:"));
-    datePanel.add(yearComboBox);
-    createFrame.add(datePanel);
-    createFrame.add(submitButton);
-    createFrame.add(cancelButton);
-
-    createFrame.setVisible(true);
-    frame.setVisible(false);
-
-    submitButton.addActionListener(evt -> features.createPortfolio());
-    cancelButton.addActionListener(e -> disposeCreateFrame());
+    setupFrame("Create Portfolio", true, false, evt -> {
+      features.createPortfolio();
+    });
   }
 
   //displays the query portfolio.
@@ -360,6 +286,11 @@ public class StockViewGUI implements IStockViewGUI {
   @Override
   public String getPortfolioNameBox() {
     return portfolioComboBox.getSelectedItem() + "";
+  }
+
+  @Override
+  public String getRidFutureSale() {
+    return getRidComboBox.getSelectedItem() + "";
   }
 
   /**

@@ -34,6 +34,13 @@ public interface IStockViewGUI {
   public String getPortfolioNameBox();
 
   /**
+   * Combobox with only yes or no determining if the
+   * user want to get rid of future sales.
+   * @return yes or no as a string.
+   */
+  public String getRidFutureSale();
+
+  /**
    * Gets the name of the stock inputted by the user.
    * @return the name of the stock inputted
    */

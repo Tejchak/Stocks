@@ -18,9 +18,8 @@ public interface GUIFeatures extends StockController {
    * Manages the sale of a portfolio in the gui.
    * Checks for errors in the inputs and allows the user
    * to get rid of the older inputs.
-   * @param getRid the user selection for getting rid of sales.
    */
-  public void sellStock(String getRid);
+  public void sellStock();
 
   /**
    * Allows the user to view the total value of a portfolio

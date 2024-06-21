@@ -122,7 +122,7 @@ public class StockControllerGUI implements GUIFeatures {
    * @param getRid the user selection for getting rid of sales.
    */
   @Override
-  public void sellStock(String getRid) {
+  public void sellStock() {
     String portfolioName = view.getPortfolioNameBox();
     String stockName = view.getStockName().toUpperCase();
     String sellDate = view.getPurchaseDate();
@@ -138,9 +138,9 @@ public class StockControllerGUI implements GUIFeatures {
       view.displayMessage("Check the inputted date (ensure your inputted month has the correct number of days" +
               "e.g. February only has 28 days");
     } else if (!model.convertDate(sellDate).isAfter(model.getLatestSellDate(portfolioName, stockName))) {
-      if (getRid.equalsIgnoreCase("Yes")) {
+      if (view.getRidFutureSale().equalsIgnoreCase("Yes")) {
         model.removeSales(portfolioName, stockName, model.convertDate(sellDate));
-        this.sellStock("");
+        this.sellStock();
       }
       else {
         view.displayMessage("Sales must be in chronological order. Get rid of future sales");

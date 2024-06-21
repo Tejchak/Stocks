@@ -364,6 +364,31 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
   }
 
   /**
+   * Gets the portfolio as a composition. Gets each stock in a portfolio finds the number of shares
+   * and matches them together then displays them in the form {stock=shares}.
+   *
+   * @param pName the name of the portfolio.
+   * @param date  the date for the composition.
+   * @return the distribution as an array.
+   */
+  @Override
+  public String[] portfolioComposition(String pName, LocalDate date) {
+    Map<String, Double> result = new HashMap<String, Double>();
+    date = moveToRecentTradingDay(date);
+    for (BetterPortfolio p : this.portfolios) {
+      if (p.name.equals(pName)) {
+        for (String symbol : p.purchases.keySet()) {
+          if (!result.containsKey(symbol)) {
+            result.put(symbol, Math.round((this.getBoughtShares(pName, symbol, date)
+                    - this.getSoldShares(pName, symbol, date)) * 100) / 100.0);
+          }
+        }
+      }
+    }
+    return result.toString().split(",");
+  }
+
+  /**
    * Gets the portfolio as a distribution. Gets each stock in a portfolio finds it's value
    * and matches them together then displays them in the form {stock=value}.
    *

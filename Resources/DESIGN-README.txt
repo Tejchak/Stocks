@@ -1,3 +1,17 @@
+    Gui Changes:
+    We created a new interface called GUIFeatures that extends our StockController interface.
+    Similarly, we also created a new interface call IStockViewGUI and a new class called StockViewGUI.
+    To interact with and read inputs from a GUI we had to change our controller design from how it
+    was previously set up to work with a text based view. We chose to use the Command Callbacks
+    design. This is what our GUIFeatures interface is for. GUIFeatures represents the functions
+    our view should be allowed to call. We let the view call those function by calling a function
+    called setView in our controller that passes in an object of type GUIFeatures to the view. This
+    way it has access to only the necessary functions in the GUIFeatures. By doing it this way we
+    also prevent any unwanted changes from occuring to our text-based controller that already works
+    fine and the overall readability of the code is improved by having a controller for each type
+    of view.
+
+
     Changes to our project:
     For this assignment we were enhancing our previous project, so we wanted to adhere to SOLID
     principals and minimize changes to our previous project as much as possible. To accomplish this

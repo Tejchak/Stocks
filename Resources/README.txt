@@ -1,4 +1,17 @@
-GUI
+GUI version:
+Our GUI version of the stock program supports creating a portfolio, buying and selling specific
+quantities of specific stocks on specific dates, query the value and composition of a portfolio,
+and loading and saving portfolios. These features are all readily available as buttons when the
+user runs the program. As such how to use them should be pretty self-explanatory for the user
+(they just need to click on the button). If the user ever is in the middle of an action and they
+want to cancel it they can always just hit cancel. For example, if a user click buy stock, and they
+change their mind, they can just hit the cancel button. The portfolios are available to the user
+as a dropdown menu. For example, if a user clicks queryPortfolio, they will be able to select from
+a drop down of their portfolios. The date is also chosen via three dropdown menus (day, month, and
+year). There is only ever one window available to the user at a time. The only exception to this
+is when the user wants to save or load a portfolio a window prompting them to select the file from
+the computer will appear and the user will not be able to do anything else until they've selected
+the file or hit the cancel button.
 
 Upon running the main file our project can create a text-based user interface asking the user what
 what exactly it is they would like to do. The user can choose to examine the gain/loss of stock over

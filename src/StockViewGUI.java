@@ -57,8 +57,14 @@ public class StockViewGUI implements IStockViewGUI {
     sellStockButton.addActionListener(evt -> displaySellStock());
   }
 
+  /**
+   * Does a pop up that allows the user to select a file path and
+   * the name of the portfolio that they will save.
+   */
+  @Override
   public void displaySavePortfolio() {
-    String[] nameList = features.portfolioList().toArray(new String[]{});;
+    String[] nameList = features.portfolioList().toArray(new String[]{});
+    ;
     portfolioComboBox = new JComboBox<>(nameList);
     int result = JOptionPane.showConfirmDialog(frame, portfolioComboBox, "Select Portfolio to Save",
             JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -77,14 +83,16 @@ public class StockViewGUI implements IStockViewGUI {
     }
   }
 
-  public void displayBuyStock() {
+  //Displays the purchase of a stock in the gui.
+  private void displayBuyStock() {
     createFrame = new JFrame("Buy Stock");
     createFrame.setSize(800, 600);
     createFrame.setLayout(new GridLayout(5, 2, 10, 10));
     createFrame.setLocation(frame.getLocation());
 
     JLabel nameLabel = new JLabel("Portfolio you would like to use:");
-    String[] nameList = features.portfolioList().toArray(new String[]{});;
+    String[] nameList = features.portfolioList().toArray(new String[]{});
+    ;
     portfolioComboBox = new JComboBox<>(nameList);
 
     JLabel stockLabel = new JLabel("Stock Name:");
@@ -94,7 +102,7 @@ public class StockViewGUI implements IStockViewGUI {
     String[] days = new String[31];
     for (int i = 0; i < days.length; i++) {
       days[i] = String.valueOf(i + 1);
-      if (i  - 1 < 10) {
+      if (i - 1 < 10) {
         days[i] = "0" + (i + 1);
       }
     }
@@ -135,14 +143,16 @@ public class StockViewGUI implements IStockViewGUI {
     cancelButton.addActionListener(e -> disposeCreateFrame());
   }
 
-  public void displaySellStock() {
+  //Displays the selling of a stock on the gui.
+  private void displaySellStock() {
     createFrame = new JFrame("Sell Stock");
     createFrame.setSize(800, 600);
     createFrame.setLayout(new GridLayout(5, 2, 10, 10));
     createFrame.setLocation(frame.getLocation());
 
     JLabel nameLabel = new JLabel("Portfolio you would like to use:");
-    String[] nameList = features.portfolioList().toArray(new String[]{});;
+    String[] nameList = features.portfolioList().toArray(new String[]{});
+    ;
     portfolioComboBox = new JComboBox<>(nameList);
 
     JLabel stockLabel = new JLabel("Stock Name:");
@@ -152,7 +162,7 @@ public class StockViewGUI implements IStockViewGUI {
     String[] days = new String[31];
     for (int i = 0; i < days.length; i++) {
       days[i] = String.valueOf(i + 1);
-      if (i  - 1 < 10) {
+      if (i - 1 < 10) {
         days[i] = "0" + (i + 1);
       }
     }
@@ -165,7 +175,7 @@ public class StockViewGUI implements IStockViewGUI {
     dayComboBox = new JComboBox<>(days);
     monthComboBox = new JComboBox<>(new String[]{"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"});
     yearComboBox = new JComboBox<>(years);
-    JComboBox getRidComboBox = new JComboBox<>(new String[] {"No", "Yes"});
+    JComboBox getRidComboBox = new JComboBox<>(new String[]{"No", "Yes"});
 
     JButton submitButton = new JButton("Sell");
     JButton cancelButton = new JButton("Cancel");
@@ -198,6 +208,10 @@ public class StockViewGUI implements IStockViewGUI {
     frame.setVisible(false);
   }
 
+  /**
+   * Works with the controller to display the GUI for the creation of a portfolio.
+   */
+  @Override
   public void displayCreatePortfolio() {
     createFrame = new JFrame("Create New Portfolio");
     createFrame.setSize(800, 600);
@@ -214,7 +228,7 @@ public class StockViewGUI implements IStockViewGUI {
     String[] days = new String[31];
     for (int i = 0; i < days.length; i++) {
       days[i] = String.valueOf(i + 1);
-      if (i  - 1 < 10) {
+      if (i - 1 < 10) {
         days[i] = "0" + (i + 1);
       }
     }
@@ -225,9 +239,9 @@ public class StockViewGUI implements IStockViewGUI {
 
     JLabel dateLabel = new JLabel("<html>Purchase Date (will go to most recent trading day)" +
             ":<html>");
-     dayComboBox = new JComboBox<>(days);
-     monthComboBox = new JComboBox<>(new String[]{"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"});
-     yearComboBox = new JComboBox<>(years);
+    dayComboBox = new JComboBox<>(days);
+    monthComboBox = new JComboBox<>(new String[]{"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"});
+    yearComboBox = new JComboBox<>(years);
 
     JButton submitButton = new JButton("Create");
     JButton cancelButton = new JButton("Cancel");
@@ -257,20 +271,22 @@ public class StockViewGUI implements IStockViewGUI {
     cancelButton.addActionListener(e -> disposeCreateFrame());
   }
 
-  public void displayQueryPortfolio() {
+  //displays the query portfolio.
+  private void displayQueryPortfolio() {
     createFrame = new JFrame("Query Portfolio");
     createFrame.setSize(800, 600);
     createFrame.setLayout(new GridLayout(2, 2, 10, 10));
     createFrame.setLocation(frame.getLocation());
 
     JLabel nameLabel = new JLabel("Portfolio Name:");
-    String[] nameList = features.portfolioList().toArray(new String[]{});;
+    String[] nameList = features.portfolioList().toArray(new String[]{});
+    ;
     portfolioComboBox = new JComboBox<>(nameList);
 
     String[] days = new String[31];
     for (int i = 0; i < days.length; i++) {
       days[i] = String.valueOf(i + 1);
-      if (i  - 1 < 10) {
+      if (i - 1 < 10) {
         days[i] = "0" + (i + 1);
       }
     }
@@ -305,9 +321,13 @@ public class StockViewGUI implements IStockViewGUI {
     createFrame.setVisible(true);
     frame.setVisible(false);
     submitButton.addActionListener(evt -> features.queryPortfolio());
-    cancelButton.addActionListener(e ->  disposeCreateFrame());
+    cancelButton.addActionListener(e -> disposeCreateFrame());
   }
 
+  /**
+   * Does a pop up that allows the user to select a file path
+   * for the xml they will load from.
+   */
   public void displayLoadXml() {
     JFileChooser fileChooser = new JFileChooser();
     int approved = fileChooser.showOpenDialog(frame);
@@ -317,36 +337,82 @@ public class StockViewGUI implements IStockViewGUI {
 
   }
 
+  /**
+   * Displays a given message in the GUI.
+   *
+   * @param message the message to be displayed.
+   */
+  @Override
   public void displayMessage(String message) {
     outputArea.append(message + "\n");
   }
 
+  /**
+   * Gets the name of a portfolio from a text field box.
+   *
+   * @return the name of the portfolio entered.
+   */
+  @Override
   public String getPortfolioName() {
-      return portfolioNameField.getText();
+    return portfolioNameField.getText();
   }
 
+  /**
+   * Gets the name of a portfolio from a selection box.
+   *
+   * @return the name of the portfolio entered.
+   */
+  @Override
   public String getPortfolioNameBox() {
-      return portfolioComboBox.getSelectedItem() + "";
+    return portfolioComboBox.getSelectedItem() + "";
   }
 
+  /**
+   * Gets the name of the stock inputted by the user.
+   *
+   * @return the name of the stock inputted
+   */
+  @Override
   public String getStockName() {
     return stockNameField.getText();
   }
 
+  /**
+   * Gets the purchase date inputted to the combo boxes
+   * by the user.
+   *
+   * @return the purchase date of the stock.
+   */
+  @Override
   public String getPurchaseDate() {
     return yearComboBox.getSelectedItem() + "-" + monthComboBox.getSelectedItem() + "-" + dayComboBox.getSelectedItem();
   }
 
+  /**
+   * Gets the number of shares inputted for sales or purchases by the user.
+   *
+   * @return the number of shares as a string.
+   */
+  @Override
   public String getNumShares() {
     return numShares.getText();
   }
 
+  /**
+   * Disposes of the current frame being used.
+   */
   @Override
   public void disposeCreateFrame() {
     frame.setVisible(true);
     createFrame.dispose();
   }
 
+  /**
+   * Sets the features, i.e. the controller so the view can access
+   * some information for displaying.
+   *
+   * @param features the gui controller.
+   */
   @Override
   public void setFeatures(GUIFeatures features) {
     this.features = features;

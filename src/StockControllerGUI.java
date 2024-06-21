@@ -126,7 +126,7 @@ public class StockControllerGUI implements GUIFeatures {
     String stockName = view.getStockName().toUpperCase();
     String sellDate = view.getPurchaseDate();
     String numberOfShares = view.getNumShares();
-    int shares = 0;
+    double shares = 0;
     if (!model.existingPortfolio(portfolioName)) {
       view.displayMessage("Portfolio does not exist yet.");
     } else if (!model.checkStockExists(stockName)) {
@@ -146,7 +146,7 @@ public class StockControllerGUI implements GUIFeatures {
       }
     } else if (!model.convertDate(sellDate).isBefore(model.getLatestSellDate(portfolioName, stockName))) {
       try {
-        shares = Integer.parseInt(numberOfShares);
+        shares = Double.parseDouble(numberOfShares);
         double currentShares = model.getBoughtShares(portfolioName, stockName, model.convertDate(sellDate))
                 - model.getSoldShares(portfolioName, stockName, model.convertDate(sellDate));
         if (currentShares < shares) {
@@ -160,7 +160,7 @@ public class StockControllerGUI implements GUIFeatures {
                   " with stock " + stockName + " sold on " + sellDate);
         }
       } catch (NumberFormatException e) {
-        view.displayMessage("Number of shares must be an integer.");
+        view.displayMessage("Invalid Number");
       }
     }
     view.disposeCreateFrame();

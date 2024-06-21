@@ -118,8 +118,7 @@ public class StockViewGUI implements IStockViewGUI {
    * Does a pop up that allows the user to select a file path and
    * the name of the portfolio that they will save.
    */
-  @Override
-  public void displaySavePortfolio() {
+  private void displaySavePortfolio() {
     String[] nameList = features.portfolioList().toArray(new String[]{});
     ;
     portfolioComboBox = new JComboBox<>(nameList);
@@ -185,8 +184,7 @@ public class StockViewGUI implements IStockViewGUI {
   /**
    * Works with the controller to display the GUI for the creation of a portfolio.
    */
-  @Override
-  public void displayCreatePortfolio() {
+  private void displayCreatePortfolio() {
     setupFrame("Create Portfolio", true, false, evt -> {
       features.createPortfolio();
     });
@@ -249,7 +247,7 @@ public class StockViewGUI implements IStockViewGUI {
    * Does a pop up that allows the user to select a file path
    * for the xml they will load from.
    */
-  public void displayLoadXml() {
+  private void displayLoadXml() {
     JFileChooser fileChooser = new JFileChooser();
     int approved = fileChooser.showOpenDialog(frame);
     if (approved == JFileChooser.APPROVE_OPTION) {

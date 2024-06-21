@@ -15,12 +15,6 @@ public interface IStockViewGUI {
    */
   public void setFeatures(GUIFeatures features);
 
-
-  /**
-   * Works with the controller to display the GUI for the creation of a portfolio.
-   */
-  public void displayCreatePortfolio();
-
   /**
    * Gets the name of a portfolio from a text field box.
    * @return the name of the portfolio entered.
@@ -70,15 +64,5 @@ public interface IStockViewGUI {
    */
   public String getNumShares();
 
-  /**
-   * Does a pop up that allows the user to select a file path and
-   * the name of the portfolio that they will save.
-   */
-  public void displaySavePortfolio();
 
-  /**
-   * Does a pop up that allows the user to select a file path
-   * for the xml they will load from.
-   */
-  public void displayLoadXml();
 }

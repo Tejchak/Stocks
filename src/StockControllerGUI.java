@@ -119,7 +119,6 @@ public class StockControllerGUI implements GUIFeatures {
    * Manages the sale of a portfolio in the gui.
    * Checks for errors in the inputs and allows the user
    * to get rid of the older inputs.
-   * @param getRid the user selection for getting rid of sales.
    */
   @Override
   public void sellStock() {

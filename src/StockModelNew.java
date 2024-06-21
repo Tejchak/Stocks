@@ -518,7 +518,6 @@ public class StockModelNew extends StockModelImpl implements StockModelTrader {
         this.getClosingValue("GOOG", date);
         break;
       } catch (Exception e) {
-        System.out.println("here");
         if (date.isBefore(LocalDate.of(2013, 6, 8))) {
           date = LocalDate.of(2013, 8, 19);
         }

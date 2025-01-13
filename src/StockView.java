@@ -15,6 +15,7 @@ public interface StockView {
 
   /**
    * Displays a given string when prompted.
+   *
    * @param result a String to be displayed.
    */
   public void displayResult(String result);

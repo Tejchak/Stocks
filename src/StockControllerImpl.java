@@ -1,11 +1,4 @@
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.time.Period;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Map;
 import java.util.Scanner;
 import java.time.format.DateTimeFormatter;
 
@@ -13,9 +6,9 @@ import java.time.format.DateTimeFormatter;
  * Controller for the stock model that gets inputs and calls the model at certain points.
  */
 public class StockControllerImpl implements StockController {
-  private final StockModel model;
-  private final StockView view;
-  private final Scanner scanner;
+  protected final StockModelTrader model;
+  protected final StockView view;
+  protected final Scanner scanner;
 
   /**
    * Constructor that takes in a model and view so it can send to both
@@ -25,7 +18,7 @@ public class StockControllerImpl implements StockController {
    * @param view     the view for the stock progrqm.
    * @param readable the information that the scanner will be taking.
    */
-  public StockControllerImpl(StockModel model, StockView view, Readable readable) {
+  public StockControllerImpl(StockModelTrader model, StockView view, Readable readable) {
     this.model = model;
     this.view = view;
     this.scanner = new Scanner(readable);
@@ -69,7 +62,7 @@ public class StockControllerImpl implements StockController {
    * @param prompt a String prompt that gets printed.
    * @return the string response of the user.
    */
-  private String getStringInput(String prompt) {
+  protected String getStringInput(String prompt) {
     view.displayResult(prompt);
     return this.scanner.nextLine();
   }
@@ -79,8 +72,9 @@ public class StockControllerImpl implements StockController {
    *
    * @return the stock symbol entered by the user.
    */
-  private String getStockSymbol() {
-    return getStringInput("Type the stock symbol (case insensitive, e.g., GOOG or goog):");
+  protected String getStockSymbol() {
+    return getStringInput("Type the stock symbol (case insensitive, e.g., GOOG or goog):")
+            .toUpperCase();
   }
 
   /**
@@ -89,8 +83,28 @@ public class StockControllerImpl implements StockController {
    * @param prompt a String prompt that specifies the type of date (start/end).
    * @return the date entered by the user.
    */
-  private String getDate(String prompt) {
-    return getStringInput("Type the " + prompt + " date (YYYY-MM-DD, e.g., 2024-05-09):");
+  protected String getDate(String prompt) {
+    view.displayResult("What is the " + prompt + " date");
+    int year = getValidPositiveNum("Type the year (e.g., 2017):");
+    int month = getValidPositiveNum("Type the month (e.g., 1):");
+    int day = getValidPositiveNum("Type the day (e.g., 1):");
+    String formattedDate = String.format("%04d-%02d-%02d", year, month, day);
+    return formattedDate;
+  }
+
+  protected LocalDate getValidLocalDate(String prompt, String date) {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    LocalDate localDate = null;
+    while (true) {
+      try {
+        localDate = LocalDate.parse(date, formatter);
+        break;
+      } catch (Exception e) {
+        view.displayResult("Invalid date, please try again (year, then month, then day)");
+        date = getDate(prompt);
+      }
+    }
+    return localDate;
   }
 
   /**
@@ -121,47 +135,17 @@ public class StockControllerImpl implements StockController {
     return input;
   }
 
-  private double getValidPositiveDouble(String prompt) {
-    double input = 0.0;
-    boolean validInput = false;
-    while (!validInput) {
-      view.displayResult(prompt);
-      if (scanner.hasNextDouble()) {
-        input = scanner.nextDouble();
-        scanner.nextLine();
-        if (input > 0) {
-          validInput = true;
-        } else {
-          view.displayResult("Invalid input. Please enter a positive number.");
-        }
-      } else if (scanner.hasNextInt()) {
-        input = scanner.nextInt();
-        scanner.nextLine();
-        if (input > 0) {
-          validInput = true;
-        } else {
-          view.displayResult("Invalid input. Please enter a positive number.");
-        }
-      } else {
-        view.displayResult("Invalid input. Please enter a positive number.");
-        scanner.next();
-      }
-    }
-    return input;
-  }
-
-
   /**
    * Handles the portfolio menu options, including creating, adding,
    * removing, and calculating portfolio values.
    */
-  private void handlePortfolioMenu() {
+  protected void handlePortfolioMenu() {
     view.portfolioMenu();
-    int option = getValidPositiveNum("Please enter a number between 1 and 5");
-    while (option != 1 && model.getPortfolios().isEmpty()) {
-      view.displayResult("Must have an existing portfolio " +
-              "before you can add, remove, or calculate.");
-      option = getValidPositiveNum("Please enter a number between 1 and 4");
+    int option = getValidPositiveNum("Please enter a number between 1 and 9");
+    while (option != 1 && option != 9 && model.getPortfolios().isEmpty()) {
+      view.displayResult("Must have an existing portfolio "
+              + "before you can add, remove, or calculate.");
+      option = getValidPositiveNum("Please enter 1 or 9");
     }
     switch (option) {
       case 1:
@@ -172,119 +156,49 @@ public class StockControllerImpl implements StockController {
         String portfolioName = getStringInput(
                 "Enter the name of the portfolio you would like to add to: ");
         while (!model.existingPortfolio(portfolioName)) {
-          portfolioName = getStringInput("Portfolio " + portfolioName +
-                  " does not exist. Please enter another name.");
+          portfolioName = getStringInput("Portfolio " + portfolioName
+                  + " does not exist. Please enter another name.");
         }
         String stockSymbol = getStockSymbol();
-        String[] stockData = getValidStock(stockSymbol);
-        shares = getValidPositiveNum("How many shares would you like to get" +
-                "(you can only purchase whole shares):");
-        String purchaseDate = getDate("Enter the date you would like to purchase: ");
-        String[] purchaseDateLine = getValidTradingDay(stockData, purchaseDate, "purchase");
-        Date correctDate = model.convertDate(purchaseDateLine[0]);
-        StockPurchase  currentPurchase = new StockPurchase(shares, correctDate);
-        model.addStockToPortfolio(portfolioName, stockSymbol, currentPurchase);
+        shares = getValidPositiveNum("How many shares would you like to get"
+                + "(you can only purchase whole shares):");
+        model.addStockToPortfolio(portfolioName, stockSymbol, shares);
         break;
       case 3:
-        double sellShares;
+        int share;
         String pName = getStringInput(
                 "Enter the name of the portfolio you would like to take away from: ");
         while (!model.existingPortfolio(pName)) {
-          pName = getStringInput("Portfolio " + pName +
-                  " does not exist. Please enter another name.");
+          pName = getStringInput("Portfolio " + pName
+                  + " does not exist. Please enter another name.");
         }
         String symbol = getStockSymbol();
-        while (!model.portfolioContainsStock(pName, symbol)) {
-          view.displayResult("Sorry it appears you haven't bought any shares of that stock");
-          symbol = getStockSymbol();
-        }
-        stockData = getValidStock(symbol);
-        String sellDate = getDate("date you would like to sell (you must sell shares in "
-                + "Chronological order!): ");
-        String[] sellDateLine = getValidTradingDay(stockData, sellDate, "sell");
-        Date currentSellDate = model.convertDate(sellDateLine[0]);
-        Date finalDate = getValidSellDate(pName, symbol, currentSellDate, stockData);
-        sellShares = getValidPositiveDouble("How many shares would you like to sell:");
-        double availableShares = model.getBoughtShares(pName, symbol, finalDate) -
-                model.getSoldShares(pName, symbol, finalDate);
-        if (availableShares > 0) {
-          while (availableShares < sellShares) {
-            view.displayResult("Invalid number: you only have "
-                    + availableShares + " shares available");
-            sellShares = getValidPositiveDouble("How many shares would you like to sell:");
-          }
-          StockSale sale = new StockSale(sellShares, finalDate);
-          model.removeStockFromPortfolio(pName, symbol, sale);
-        }
-        else {
-          view.displayResult("Invalid number, you have no shares available at this time.");
-        }
+        share = getValidPositiveNum("How many shares would you like to remove" +
+                "(you can only purchase whole shares):");
+        model.removeStockFromPortfolio(pName, symbol, share);
         break;
       case 4:
-        String n = getStringInput("Enter the name of the portfolio you " +
-                "would like to calculate the value of: ");
+        String n = getStringInput("Enter the name of the portfolio you "
+                + "would like to calculate the value of: ");
         while (!model.existingPortfolio(n)) {
           n = getStringInput("Portfolio " + n +
                   " does not exist. Please enter another name.");
         }
-        String date = getDate("date you would like " +
-                "to calculate the value on: ");
-        view.displayResult(n + " is worth " + model.calculatePortfolio(n, model.convertDate(date)) + " USD");
+        String date = getDate("date you would like "
+                + "to calculate the value on: ");
+        view.displayResult(n + " is worth $" + model.calculatePortfolio(n,
+                model.convertDate(date)));
         break;
-      case 5:
-          String name = getStringInput("Enter the name of the portfolio you " +
-                  "would like to calculate the value of: ");
-          while (!model.existingPortfolio(name)) {
-            name = getStringInput("Portfolio " + name +
-                    " does not exist. Please enter another name.");
-          }
-          String valDate = getDate("date you would like to view this portfolio on: ");
-          Date day = model.convertDate(valDate);
-          view.displayResult(model.portfolioAsDistribution(name, day));
-          break;
-      default: view.displayResult("Invalid input. Please enter a valid number.");
+      default:
+        view.displayResult("Invalid input. Please enter a valid number.");
     }
-  }
-
-  private void handleBarChart() {
-    String pName = getStringInput(
-            "Enter the name of the portfolio you would like to add to: ");
-    while (!model.existingPortfolio(pName)) {
-      pName = getStringInput("Portfolio " + pName +
-              " does not exist. Please enter another name.");
-    }
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    String startDate = getDate("start");
-    LocalDate start = LocalDate.parse(startDate, formatter);
-    String endDate = getDate("end");
-    LocalDate end = LocalDate.parse(endDate, formatter);
-    Period period = Period.between(start, end);
-    String timeStamp = model.getTimeStamp(period);
-    Map<String, Double> data = model.getPortfolioData(pName, start, end, timeStamp);
-    data.put(endDate, model.calculatePortfolio(pName, model.convertDate(endDate)));
-    double highestValue = Collections.max(data.values());
-    double scale = highestValue / 50;
-    view.displayResult("Performance of portfolio " + pName + " from " +
-            startDate + " to " +
-            endDate);
-    for (Map.Entry<String, Double> entry : data.entrySet()) {
-      String date = entry.getKey();
-      Double value = entry.getValue();
-      StringBuilder line = new StringBuilder();
-      line.append(date).append(":").append(" ");
-      for (int i = 0; i < value / scale; i++) {
-        line.append("*");
-      }
-      view.displayResult(line.toString());
-    }
-    view.displayResult("Scale: * =  $" + scale);
   }
 
   /**
    * Handles the creation of a new portfolio
    * by prompting the user for details and updating the model.
    */
-  private void handleNewPortfolio() {
+  protected void handleNewPortfolio() {
     String name = getStringInput("Type the name for your portfolio");
     view.displayResult("You must have atleast one stock in your portfolio");
     String stockSymbol = getStockSymbol();
@@ -292,13 +206,12 @@ public class StockControllerImpl implements StockController {
       view.displayResult("Sorry it appears your stock doesn't exist in out database");
       stockSymbol = getStockSymbol();
     }
-    String[] stockData = getValidStock(stockSymbol);
+    String[] stockData = model.getStockData(stockSymbol);
     int shares = getValidPositiveNum("How many shares would you like to get" +
             "(you can only purchase whole shares):");
-    String purchaseDate = getDate("date you would like to purchase: ");
+    String purchaseDate = getDate("purchase: ");
     String[] purchaseDateLine = getValidTradingDay(stockData, purchaseDate, "purchase");
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    Date correctDate = model.convertDate(purchaseDateLine[0]);
+    LocalDate correctDate = model.convertDate(purchaseDateLine[0]);
     StockPurchase currentPurchase = new StockPurchase(shares, correctDate);
     model.createPortfolio(name, stockSymbol, currentPurchase);
     view.displayResult("Successfully created portfolio");
@@ -341,7 +254,7 @@ public class StockControllerImpl implements StockController {
    * @param startEnd  indicates if the date is start or end.
    * @return a valid trading day line.
    */
-  private String[] getValidTradingDay(String[] stockData, String date, String startEnd) {
+  protected String[] getValidTradingDay(String[] stockData, String date, String startEnd) {
     String[] line;
     while (true) {
       try {
@@ -356,56 +269,22 @@ public class StockControllerImpl implements StockController {
     return line;
   }
 
-  private Date getValidSellDate(String pName, String stockSymbol, Date sellDate, String[] stockData) {
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    Date latestSellDate = model.getLatestSellDate(pName, stockSymbol);
-    if (latestSellDate != null) {
-      while (latestSellDate.after(sellDate)) {
-        view.displayResult("Sell date cannot be before most recent sell date for this stock. "
-                + "You sold this stock on " + dateFormat.format(latestSellDate));
-        if (askRemoveSale(pName, stockSymbol, sellDate)) {
-          break;
-        }
-        else {
-          sellDate = model.convertDate(getValidTradingDay(stockData, getDate("sell"), "sell")[0]);
-        }
-      }
-    }
-    return sellDate;
-  }
-
-  private boolean askRemoveSale(String pName, String stockSymbol, Date sellDate) {
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    view.displayResult("Would you like to remove your sales that are after the date " +
-            dateFormat.format(sellDate) + "?" + " Type y for yes and n for no");
-    String response = scanner.nextLine();
-    while (!response.equals("y") && !response.equals("n")) {
-      view.displayResult("Invalid input: Please type y/n.");
-      response = scanner.nextLine();
-    }
-    if (response.equals("y")) {
-      model.removeSales(pName, stockSymbol, sellDate);
-      return true;
-    }
-    return false;
-  }
-
   /**
    * Validates the stock symbol to ensure it exists in the database.
    *
    * @param stockSymbol the stock symbol to validate.
    * @return the stock data for the valid stock symbol.
    */
-  private String[] getValidStock(String stockSymbol) {
+  protected String[] getValidStock(String stockSymbol) {
     String[] stockData;
     while (true) {
       try {
         stockData = model.getStockData(stockSymbol);
-        // System.out.println(Arrays.toString(stockData));
         if (!stockData[1].contains("\"Error Message\":") && !stockData[1].contains("Thank you for "
                 + "using Alpha Vantage!")) {
           break;
-        } else {
+        }
+        else {
           if (stockData[1].contains("\"Error Message\":")) {
             view.displayResult("Your symbol doesn't exist in our database. Please try again.");
           } else {
@@ -435,7 +314,7 @@ public class StockControllerImpl implements StockController {
     String[] endLine = getValidTradingDay(stockData, endDate, "end");
     String[] endDateLine = getValidEndDate(stockData, startDateLine[0], endLine);
     double gainLoss = model.stockGainLoss(stockData, startDateLine, endDateLine);
-    view.displayResult("The gain/loss over that period of time is " + gainLoss);
+    view.displayResult("The gain/loss over that period of time is $" + gainLoss);
   }
 
   //Handles the moving average and assigns the variables for the model.
@@ -449,7 +328,7 @@ public class StockControllerImpl implements StockController {
             "prior to " + earliestDate + " will not be included in calculating the moving average");
     int xDays = getValidPositiveNum("Type the number of days for moving average:");
     double movingAverage = model.movingAverage(stockData, startDate, xDays);
-    view.displayResult("The " + xDays + "-day moving average is " + movingAverage);
+    view.displayResult("The " + xDays + "-day moving average is $" + movingAverage);
   }
 
   //Handles the crossover

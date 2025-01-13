@@ -2,32 +2,24 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.ParseException;
 import java.time.LocalDate;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.text.SimpleDateFormat;
 
 /**
- * The implementation of the Stock model. This specific implementation uses the alphavantage api
- * and a resources root folder to obtain its stocks. Furthermore we also gave it a stocks field
- * to store all the stocks that have thus far been called. We also enforced the constraint that you
- * cannot have a portfolio with without a stock in the portfolio, and when calculating any kind
- * of moving average, if the x days ends up going further back than what we have data for,
- * those days will be not be used when calculating the moving average. The portfolios list is a
- * list of portfolios, portfolios is a class we created to create and manage stock portfolios. The
- * ApiKey is used to access Alphavantage, it is a free one so there are a limited number of
- * querries (which is why we have the csv files and stocks field)
+ * The implementation of the Stock model.
+ * Uses the AlphaVantage api to access stock data.
+ * Also keeps track of stocks that have once been used while being able to pull
+ * from a collections of CSV files.
  */
 public class StockModelImpl implements StockModel {
   private final String apiKey;
-  private final ArrayList<BetterPortfolio> portfolios;
+  private final List<Portfolio> portfolios;
   private Map<String, String[]> stocks;
 
   /**
@@ -37,13 +29,14 @@ public class StockModelImpl implements StockModel {
    * Further the hashmap is the storage of stock info.
    */
   StockModelImpl() {
-    this.apiKey = "F99D5A7QDFY52B58";
-    this.portfolios = new ArrayList<>();
+    this.apiKey = "QCLLY08TISZBMXL9";
+    this.portfolios = new ArrayList<Portfolio>();
     this.stocks = new HashMap<String, String[]>();
   }
 
   /**
    * Gets the information about a stock given its name.
+   *
    * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
    * @return The information of the stock as a string array.
    */
@@ -56,33 +49,21 @@ public class StockModelImpl implements StockModel {
       String[] stockData = this.getStockDataCSV(stockSymbol);
       this.stocks.put(stockSymbol, stockData);
       return stockData;
-    }
-    catch (Exception e) {
-        String[] stockData = this.getStockDataAPI(stockSymbol);
-        this.stocks.put(stockSymbol, stockData);
-        return stockData;
+    } catch (Exception e) {
+      String[] stockData = this.getStockDataAPI(stockSymbol);
+      this.stocks.put(stockSymbol, stockData);
+      return stockData;
     }
   }
 
-  @Override
-  public boolean portfolioContainsStock(String pName, String stockSymbol) {
-    for (BetterPortfolio portfolio : this.portfolios) {
-      if (portfolio.name.equals(pName)) {
-        return portfolio.purchases.containsKey(stockSymbol);
-      }
-    }
-    throw new RuntimeException("Could not find portfolio with name " + pName);
-  }
-
-//gets the stock data from a csv file in the resources root folder.
+  //gets the stock data from a csv file in the resources root folder.
   protected String[] getStockDataCSV(String stocksymbol) {
     StringBuilder result = new StringBuilder();
     URL url = null;
 
     try {
       url = getClass().getClassLoader().getResource(stocksymbol + ".csv");
-    }
-    catch (NullPointerException e) {
+    } catch (NullPointerException e) {
       throw new RuntimeException("the alphavantage API has either changed or "
               + "no longer works");
     }
@@ -91,11 +72,10 @@ public class StockModelImpl implements StockModel {
       InputStream is = url.openStream();
       int b;
 
-      while ((b=is.read())!=-1) {
-        result.append((char)b);
+      while ((b = is.read()) != -1) {
+        result.append((char) b);
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       throw new RuntimeException("Could not find file " + stocksymbol + ".csv");
     }
     String[] stockData = result.toString().split("\n");
@@ -103,7 +83,7 @@ public class StockModelImpl implements StockModel {
     return stockData;
   }
 
-  //gets the stock data from an online API (Alphavantage)
+  //gets the stock data from an online API.
   protected String[] getStockDataAPI(String stockSymbol) {
     URL url = null;
     try {
@@ -118,9 +98,8 @@ public class StockModelImpl implements StockModel {
               + ".co/query?function=TIME_SERIES_DAILY"
               + "&outputsize=full"
               + "&symbol"
-              + "=" + stockSymbol + "&apikey="+this.apiKey+"&datatype=csv");
-    }
-    catch (MalformedURLException e) {
+              + "=" + stockSymbol + "&apikey=" + this.apiKey + "&datatype=csv");
+    } catch (MalformedURLException e) {
       throw new RuntimeException("the alphavantage API has either changed or "
               + "no longer works");
     }
@@ -141,26 +120,34 @@ public class StockModelImpl implements StockModel {
       in = url.openStream();
       int b;
 
-      while ((b=in.read())!=-1) {
-        output.append((char)b);
+      while ((b = in.read()) != -1) {
+        output.append((char) b);
       }
+    } catch (IOException e) {
+      throw new IllegalArgumentException("No price data found for " + stockSymbol);
     }
-    catch (IOException e) {
-      throw new IllegalArgumentException("No price data found for "+stockSymbol);
-    }
-   //System.out.println(output.toString());
+    //System.out.println(output.toString());
     return output.toString().split("\n");
   }
 
   /**
    * Compares the name of a stock to our sources to see if it exists.
+   *
    * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
    * @return true if the stock exists, false if not.
    */
   @Override
   public boolean checkStockExists(String stockSymbol) {
+    String[] stockData;
     try {
-      getStockData(stockSymbol);
+      stockData = getStockData(stockSymbol);
+      if (stockData[1].contains("\"Error Message\":") || stockData[1].contains("Thank you for "
+              + "using Alpha Vantage!")) {
+        return false;
+      }
+      if (stockData.length < 10) {
+        return false;
+      }
     }
     catch (Exception e) {
       return false;
@@ -169,16 +156,17 @@ public class StockModelImpl implements StockModel {
   }
 
   /**
-   * Calculates the total value of a portfolio on the given date.
-   * @param n the name of the portfolio.
+   * Calculates the total value of a portfolio.
+   *
+   * @param n    the name of the portfolio.
    * @param date the date on which the value is being calculated.
    * @return the total value in USD.
    */
   @Override
-  public double calculatePortfolio(String n, Date date) {
+  public double calculatePortfolio(String n, LocalDate date) {
     double result = 0.0;
-    BetterPortfolio portfolio = null;
-    for (BetterPortfolio p : this.portfolios) {
+    Portfolio portfolio = null;
+    for (Portfolio p : this.portfolios) {
       while (portfolio == null) {
         if (p.name.equals(n)) {
           portfolio = p;
@@ -186,216 +174,49 @@ public class StockModelImpl implements StockModel {
       }
     }
     if (portfolio != null) {
-      for (String stockSymbol : portfolio.purchases.keySet()) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+      for (String stockSymbol : portfolio.stocks.keySet()) {
         String[] stockData = getStockData(stockSymbol);
         Double value = 0.0;
         for (int i = 0; i < stockData.length; i++) {
           String line = stockData[i];
-          if (line.substring(0, 10).equals(dateFormat.format(date))) {
+          if (line.substring(0, 10).equals(date)) {
             String[] sections = line.split(",");
             value = Double.parseDouble(sections[4]);
           }
         }
-        ArrayList<StockPurchase> l = portfolio.purchases.getOrDefault(stockSymbol, new ArrayList<StockPurchase>());
-        for (StockPurchase p : l) {
-          if (!p.purchaseDate.after(date)) {
-            result += (value * p.shares);
-          }
-        }
-        ArrayList<StockSale> l2 = portfolio.sales.getOrDefault(stockSymbol, new ArrayList<StockSale>());
-        for (StockSale s : l2) {
-          if (!s.saledate.after(date)) {
-            result -= (value * s.shares);
-          }
-        }
+        result += (value * portfolio.stocks.getOrDefault(stockSymbol, 0));
       }
     }
-    return result;
+    return Math.round(result * 100) / 100.0;
   }
 
-  @Override
-  public String getTimeStamp(Period period) {
-    if (period.getYears() >= 5) {
-      return "Years";
-    }
-    if (period.getMonths() >= 5) {
-      if (period.getMonths() <= 30) {
-        return "Months";
-      }
-      return "Two months";
-    }
-    if (period.getDays() >= 5) {
-      if (period.getDays() <= 30) {
-        return "Days";
-      }
-      return "Weeks";
-    }
-    return "";
-  }
-
-  public Date convertDate(String date) {
-    Date newDate = new Date();
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    try {
-      newDate = dateFormat.parse(date);
-    } catch (ParseException e) {
-      throw new RuntimeException("Unable to parse date: " + date, e);
-    }
-    return newDate;
-  }
-
-  @Override
-  public Map<String, Double> getPortfolioData(String pName, LocalDate start, LocalDate end, String timeStamp) {
-    Map<String, Double> data = new HashMap<>();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    LocalDate currentDate = start;
-    double currentValue = 0.0;
-    while (currentDate.isBefore(end)) {
-      Date date = convertDate(currentDate.format(formatter));
-      currentValue = calculatePortfolio(pName, date);
-      data.put(currentDate.format(formatter), currentValue);
-      switch(timeStamp) {
-        case "Years":
-          currentDate = currentDate.plusYears(1);
-          break;
-        case "Months":
-          currentDate = currentDate.plusMonths(1);
-          break;
-        case "Two months":
-          currentDate = currentDate.plusMonths(2);
-          break;
-        case "Weeks":
-          currentDate = currentDate.plusWeeks(1);
-          break;
-        case "Days":
-          currentDate = currentDate.plusDays(1);
-          break;
-        default:
-          throw new RuntimeException("Unknown time stamp: " + timeStamp);
-      }
-    }
-    return data;
-  }
-
-  @Override
-  public double getBoughtShares(String name, String StockSymbol, Date currentDate) {
-    int totalShares = 0;
-    for (BetterPortfolio p : this.portfolios) {
-      if (p.name.equals(name)) {
-        for (StockPurchase purchase : p.purchases.getOrDefault(StockSymbol, new ArrayList<>())) {
-          if (!purchase.purchaseDate.after(currentDate)) {
-            totalShares += purchase.shares;
-          }
-        }
-      }
-    }
-    return totalShares;
-  }
-
-
-  public Date getLatestSellDate(String pName, String stockSymbol) {
-    Date latestDate = null;
-    for (BetterPortfolio p : this.portfolios) {
-      if (p.name.equals(pName)) {
-        for (StockSale sale : p.sales.getOrDefault(stockSymbol, new ArrayList<>())) {
-          if (latestDate == null || sale.saledate.after(latestDate)) {
-            latestDate = sale.saledate;
-          }
-        }
-      }
-    }
-    return latestDate;
-  }
-
-  @Override
-  public double getSoldShares(String name, String StockSymbol, Date currentDate) {
-    double totalShares = 0;
-    for (BetterPortfolio p : this.portfolios) {
-      if (p.name.equals(name)) {
-        for (StockSale sale : p.sales.getOrDefault(StockSymbol, new ArrayList<>())) {
-          if (!sale.saledate.after(currentDate)) {
-            totalShares += sale.shares;
-          }
-        }
-      }
-    }
-    return totalShares;
-  }
 
   /**
-   * Creates a portfolio, and adds the given amount shares of the given stock.
-   * @param name the name of the portfolio.
-   * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
-   * @param purchase the StockPurchases being made with the
-   */
-  @Override
-  public void createPortfolio(String name, String stockSymbol, StockPurchase purchase) {
-    BetterPortfolio p = new BetterPortfolio(name);
-    ArrayList<StockPurchase> addition = new ArrayList<StockPurchase>();
-    addition.add(purchase);
-    p.purchases.put(stockSymbol, addition);
-    this.portfolios.add(p);
-  }
-
-  /**
-   * Removes the given stock from a portfolio.
+   * Adds the given stock to the given portfolio.
+   *
    * @param portfolioName the name of the portfolio.
-   * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
-   * @param stockSale the stockSale being added
+   * @param stockSymbol   the symbol of a stock as a string (Ex, AMC).
+   * @param shares        the amount of shares pf the given stock.
    */
   @Override
-  public void removeStockFromPortfolio(String portfolioName, String stockSymbol, StockSale stockSale) {
-    for (BetterPortfolio p : this.portfolios) {
+  public void addStockToPortfolio(String portfolioName, String stockSymbol, int shares) {
+    for (Portfolio p : this.portfolios) {
       if (p.name.equals(portfolioName)) {
-        ArrayList<StockSale> soldList = p.sales.getOrDefault(stockSymbol, new ArrayList<>());
-        soldList.add(stockSale);
-        p.sales.put(stockSymbol, soldList);
-      }
-    }
-  }
-
-  @Override
-  public void removeSales(String portfolioName, String stockSymbol, Date sellDate) {
-    for (BetterPortfolio p : this.portfolios) {
-      if (p.name.equals(portfolioName)) {
-        for (int i = 0; i < p.sales.get(stockSymbol).size(); i++) {
-          StockSale sale = p.sales.get(stockSymbol).get(i);
-          if (sale.saledate.after(sellDate)) {
-            p.sales.get(stockSymbol).remove(sale);
-          }
-        }
-      }
-      }
-  }
-
-  /**
-   * Adds the given stock to the portfolio.
-   * @param portfolioName the name of the portfolio.
-   * @param stockSymbol the symbol of a stock as a string (Ex, AMC).
-   * @param stockPurchase the stockPurchase
-   */
-  @Override
-  public void addStockToPortfolio(String portfolioName, String stockSymbol,
-                                  StockPurchase stockPurchase) {
-    for (BetterPortfolio p : this.portfolios) {
-      if (p.name.equals(portfolioName)) {
-        ArrayList<StockPurchase> purchasesList = p.purchases.getOrDefault(stockSymbol, new ArrayList<>());
-        purchasesList.add(stockPurchase);
-        p.purchases.put(stockSymbol, purchasesList);
+        p.stocks.put(stockSymbol, p.stocks.getOrDefault(stockSymbol, 0) + shares);
       }
     }
   }
 
   /**
    * Gets the line of the given date.
+   *
    * @param stockData the data about a stock.
-   * @param date the date as a String (YYYY-MM-DD).
+   * @param date      the date as a String (YYYY-MM-DD).
    * @return the line on a given date split up into its parts.
    */
   @Override
   public String[] getLine(String[] stockData, String date) {
-    for (String line: stockData) {
+    for (String line : stockData) {
       if (line.length() > 9) {
         if (line.substring(0, 10).equals(date)) {
           String[] sections = line.split(",");
@@ -408,9 +229,10 @@ public class StockModelImpl implements StockModel {
 
   /**
    * Calculates the gain or loss of a stock from the startdate to the enddate.
-   * @param stockData the data about a stock.
+   *
+   * @param stockData     the data about a stock.
    * @param startDateLine the starting date line.
-   * @param endDateLine the end date line.
+   * @param endDateLine   the end date line.
    * @return the gain or loss of the stock as a double.
    */
   @Override
@@ -418,15 +240,16 @@ public class StockModelImpl implements StockModel {
     double startPrice = Double.parseDouble(startDateLine[4]);
     double endPrice = Double.parseDouble(endDateLine[4]);
     double gainLoss = endPrice - startPrice;
-    return gainLoss;
+    return Math.round(gainLoss * 100) / 100.0;
   }
 
   /**
    * Calculates the x-day moving average of a stock on a given day and with a
-   * given x
+   * given x.
+   *
    * @param stockData the data about a stock.
    * @param startDate the starting date as a String (YYYY-MM-DD).
-   * @param xDays the amount of days the moving average is being calculated for.
+   * @param xDays     the amount of days the moving average is being calculated for.
    * @return the x-day moving average.
    */
   @Override
@@ -446,8 +269,7 @@ public class StockModelImpl implements StockModel {
         String line = stockData[j];
         String[] sections = line.split(",");
         movingAverage += Double.parseDouble(sections[4]);
-      }
-      else {
+      } else {
         notCounted = j;
       }
     }
@@ -455,20 +277,22 @@ public class StockModelImpl implements StockModel {
       xDays = xDays - (notCounted - xDays);
     }
     movingAverage /= xDays;
-    return movingAverage;
+    return Math.round(movingAverage * 100) / 100.0;
   }
 
   /**
    * Creates a string builder with all of the days that are crossovers.
+   *
    * @param stockData the data about a stock.
    * @param startDate the starting date as a String (YYYY-MM-DD).
-   * @param endDate the ending date as a String (YYYY-MM-DD).
-   * @param xDays the amount of days the moving average is being calculated
-   *              for to find the moving average.
+   * @param endDate   the ending date as a String (YYYY-MM-DD).
+   * @param xDays     the amount of days the moving average is being calculated
+   *                  for to find the moving average.
    * @return the crossover dates.
    */
   @Override
-  public StringBuilder xDayCrossover(String[] stockData, String startDate, String endDate, int xDays) {
+  public StringBuilder xDayCrossover(String[] stockData,
+                                     String startDate, String endDate, int xDays) {
     StringBuilder crossovers = new StringBuilder();
     int startIndex = -1;
     int endIndex = -2;
@@ -482,29 +306,50 @@ public class StockModelImpl implements StockModel {
       }
     }
     for (int j = startIndex; j < endIndex + 1; j++) {
-        String line = stockData[j];
-        String[] sections = line.split(",");
-        if (this.isCrossover(stockData, sections[0], xDays, Double.parseDouble(sections[4]))) {
-          crossovers.append(sections[0]).append(", ");
-        }
+      String line = stockData[j];
+      String[] sections = line.split(",");
+      if (this.isCrossover(stockData, sections[0], xDays, Double.parseDouble(sections[4]))) {
+        crossovers.append(sections[0]).append(", ");
       }
-      return crossovers;
+    }
+    return crossovers;
 
   }
 
+  /**
+   * Removes the given stock from a portfolio.
+   *
+   * @param portfolioName the name of the portfolio.
+   * @param stockSymbol   the symbol of a stock as a string (Ex, AMC).
+   * @param shares        the amount of shares pf the given stock.
+   */
+  @Override
+  public void removeStockFromPortfolio(String portfolioName, String stockSymbol, int shares) {
+    for (Portfolio p : this.portfolios) {
+      if (p.name.equals(portfolioName)) {
+        p.stocks.put(stockSymbol, p.stocks.getOrDefault(stockSymbol, 0) - shares);
+      }
+      if (p.stocks.get(stockSymbol) <= 0) {
+        p.stocks.remove(stockSymbol);
+      }
+    }
+  }
+
   //Checks if the highest price is above the moving average.
-  private boolean isCrossover(String[] stockData, String startDate, int xDays, Double highestPrice) {
+  private boolean isCrossover(String[] stockData,
+                              String startDate, int xDays, Double highestPrice) {
     return highestPrice - this.movingAverage(stockData, startDate, xDays) > 0;
   }
 
   /**
    * Checks if a portfolio exists in the model.
+   *
    * @param n the name of the portfolio we're looking for.
    * @return true if it exists in the model, false if not.
    */
   @Override
   public boolean existingPortfolio(String n) {
-    for (BetterPortfolio p : this.portfolios) {
+    for (Portfolio p : this.portfolios) {
       if (p.name.equals(n)) {
         return true;
       }
@@ -512,8 +357,14 @@ public class StockModelImpl implements StockModel {
     return false;
   }
 
+
   /**
-   * Gets a copy of the portfolios field.
+   * Gets the closing value of a given stock or throws an exception
+   * if the date or stock name does not exist.
+   *
+   * @param stockSymbol the stock for which the closing value is being found.
+   * @param date        the date on which the value is being found.
+   * @return the double closing value of the stock on the day.
    */
   @Override
   public ArrayList<BetterPortfolio> getPortfolios() {
@@ -543,16 +394,19 @@ public class StockModelImpl implements StockModel {
     return Arrays.toString(result.toString().split(","));
   }
 
-  //gets the closing value of a stock on a given day.
-  private double getClosingValue(String stockSymbol, Date date) {
+  //gets the closing value of a stock on a given day
+  public double getClosingValue(String stockSymbol, LocalDate date) {
     String[] stockData = getStockData(stockSymbol);
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     for (String line : stockData) {
       String[] sections = line.split(",");
-      if (sections[0].equals(dateFormat.format(date))) {
+      if (sections[0].equals(date.format(formatter))) {
         return Double.parseDouble(sections[4]);
       }
     }
     throw new IllegalArgumentException("Date does not exist for stock");
   }
 }
+
+
+

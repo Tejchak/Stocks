@@ -366,6 +366,35 @@ public class StockModelImpl implements StockModel {
    * @param date        the date on which the value is being found.
    * @return the double closing value of the stock on the day.
    */
+  @Override
+  public ArrayList<BetterPortfolio> getPortfolios() {
+    ArrayList<BetterPortfolio> result = new ArrayList<>();
+    for (BetterPortfolio p : this.portfolios) {
+      BetterPortfolio port = new BetterPortfolio(p.name);
+      port.purchases = new HashMap<>(p.purchases);
+      port.sales = new HashMap<>(p.sales);
+      result.add(port);
+    }
+    return result;
+  }
+
+  @Override
+  public String portfolioAsDistribution(String pName, Date date) {
+    HashMap<String, Double> result = new HashMap<String, Double>();
+    for (BetterPortfolio p : this.portfolios) {
+      if (p.name.equals(pName)) {
+        for (String symbol :p.purchases.keySet()) {
+          if (!result.containsKey(symbol)) {
+            result.put(symbol, (this.getBoughtShares(pName, symbol, date) -
+                    this.getSoldShares(pName, symbol, date)) * getClosingValue(symbol, date));
+          }
+        }
+      }
+    }
+    return Arrays.toString(result.toString().split(","));
+  }
+
+  //gets the closing value of a stock on a given day
   public double getClosingValue(String stockSymbol, LocalDate date) {
     String[] stockData = getStockData(stockSymbol);
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
